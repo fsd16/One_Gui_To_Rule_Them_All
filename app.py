@@ -3,16 +3,18 @@ import sys
 from PySide6.QtWidgets import QApplication, QMainWindow
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
-# from logic.pps import PPS
+from logic.pps import PPS_308_Bench
 
 import smartside.signal as smartsignal
 
-class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):#, PPS): ("GPIB0::1::INSTR"),
+class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal): 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
         
         self.auto_connect()
+        
+        self.ac_source = PPS_308_Bench("GPIB0::1::INSTR")
     
     
     _closers = 'butt_close, butt_close_2, butt_close_3'
@@ -23,22 +25,26 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):#, PPS): (
     # PPS Tab
     def _on_butt_ac_off__pressed(self):
         print("AC off was pressed")
+        self.ac_source.pps_off()
     
     def _on_butt_ac_on__pressed(self):
         print("AC on was pressed")
-    
+        self.ac_source.pps_on()
+        
     def _on_butt_apply__pressed(self):
-        # self.pps_apply()
         print("Apply was pressed")
+        self.ac_source.pps_apply()
         
     def _on_check_abnormal__stateChanged(self):
         print ('Check is', self.sender().isChecked())
 
     def _on_entry_ac_volts__valueChanged(self):
         print("Ac Volts entered:", self.sender().value())
+        self.ac_source.set_ac_rms_volts(self.sender().value())
 
     def _on_entry_freq__valueChanged(self):
         print("Frequency entered:", self.sender().value())
+        self.ac_source.set_ac_freq(self.sender().value())
         
     def _on_entry_step_size__valueChanged(self):
         print("Step size entered:", self.sender().value())
@@ -46,12 +52,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):#, PPS): (
         
     def _on_radio_single__clicked(self):
         print("Single is selected")
+        self.ac_source.set_ac_config("single")
     
     def _on_radio_split__clicked(self):
         print("Split is selected")
+        self.ac_source.set_ac_config("split")
     
     def _on_radio_three__clicked(self):
         print("Three is selected")
+        self.ac_source.set_ac_config("three")
         
     # Scope tab
     def _on_butt_apply_lab__pressed(self):
