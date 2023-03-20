@@ -1,0 +1,1 @@
+pyside6-uic.exe One_GUI_To_Rule_Them_All.ui > ui_One_Gui_To_Rule_Them_All.py
