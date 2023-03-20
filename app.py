@@ -54,32 +54,38 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal, PPS):
         print("Three is selected")
         
     # Scope tab
-    def _on_butt_ac_off__pressed(self):
-        print("AC off was pressed")
-    
-    def _on_butt_ac_on__pressed(self):
-        print("AC on was pressed")
-    
-    def _on_butt_apply__pressed(self):
-        self.pps_apply()
+    def _on_butt_apply_lab__pressed(self):
         print("Apply was pressed")
     
-    # make "global" to all tabs
-    def _on_butt_close__pressed(self):
-        print("Close was pressed")
+    def _on_butt_cap__pressed(self):
+        print("AC off was pressed")
         
-    def _on_check_abnormal__stateChanged(self):
+    def _on_check_auto__stateChanged(self):
+        print ('Check is', self.sender().isChecked())
+        
+    def _on_check_date__stateChanged(self):
         print ('Check is', self.sender().isChecked())
 
-    def _on_entry_ac_volts__valueChanged(self):
-        print("Ac Volts entered:", self.sender().value())
+    def _on_check_invert__stateChanged(self):
+        print ('Check is', self.sender().isChecked())
+    
+    def _on_line_cap_name__editingFinished(self):
+        print("Capture name entered:", self.sender().text())
 
-    def _on_entry_freq__valueChanged(self):
-        print("Frequency entered:", self.sender().value())
+    def _on_line_cap_path__editingFinished(self):
+        print("Capture path entered:", self.sender().text())
+    
+    def _on_line_ch1_lab__editingFinished(self):
+        print("CH1 label entered:", self.sender().text())
         
-    def _on_entry_step_size__valueChanged(self):
-        print("Step size entered:", self.sender().value())
-        self.entry_ac_volts.setSingleStep(self.sender().value())
+    def _on_line_ch2_lab__editingFinished(self):
+        print("CH2 label entered:", self.sender().text())
+        
+    def _on_line_ch3_lab__editingFinished(self):
+        print("CH3 label entered:", self.sender().text())
+        
+    def _on_line_ch4_lab__editingFinished(self):
+        print("CH4 label entered:", self.sender().text())
         
 if __name__ == '__main__':
     
