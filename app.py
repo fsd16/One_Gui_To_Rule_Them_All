@@ -3,22 +3,22 @@ import sys
 from PySide6.QtWidgets import QApplication, QMainWindow
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
-from logic.pps import PPS
+# from logic.pps import PPS
 
 import smartside.signal as smartsignal
 
-class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal, PPS):
+class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):#, PPS): ("GPIB0::1::INSTR"),
     def __init__(self, *args, **kwargs):
-        super().__init__(("GPIB0::1::INSTR"), *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.setupUi(self)
         
         self.auto_connect()
     
     
     _closers = 'butt_close, butt_close_2, butt_close_3'
-    def _on_closers__pressed(self):
+    def _when_closers__pressed(self):
         print("Close was pressed")
-        sys.exit(app.exec_())
+        sys.exit()
     
     # PPS Tab
     def _on_butt_ac_off__pressed(self):
@@ -28,7 +28,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal, PPS):
         print("AC on was pressed")
     
     def _on_butt_apply__pressed(self):
-        self.pps_apply()
+        # self.pps_apply()
         print("Apply was pressed")
         
     def _on_check_abnormal__stateChanged(self):
@@ -55,10 +55,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal, PPS):
         
     # Scope tab
     def _on_butt_apply_lab__pressed(self):
-        print("Apply was pressed")
+        print("Apply labels was pressed")
     
     def _on_butt_cap__pressed(self):
-        print("AC off was pressed")
+        print("Capture was pressed")
         
     def _on_check_auto__stateChanged(self):
         print ('Check is', self.sender().isChecked())
@@ -86,6 +86,25 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal, PPS):
         
     def _on_line_ch4_lab__editingFinished(self):
         print("CH4 label entered:", self.sender().text())
+        
+    # RLC tab
+    def _on_butt_rlc_off__pressed(self):
+        print("RLC off was pressed")
+    
+    def _on_butt_rlc_on__pressed(self):
+        print("RLC on was pressed")
+
+    def _on_entry_ac_volts_2__valueChanged(self):
+        print("Ac Volts entered:", self.sender().value())
+
+    def _on_entry_freq_2__valueChanged(self):
+        print("Frequency entered:", self.sender().value())
+        
+    def _on_entry_reactive_pwr__valueChanged(self):
+        print("Reactive power entered:", self.sender().value())
+
+    def _on_entry_real_pwr__valueChanged(self):
+        print("Real power entered:", self.sender().value())
         
 if __name__ == '__main__':
     

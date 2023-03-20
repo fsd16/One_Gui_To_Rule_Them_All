@@ -230,60 +230,60 @@ class Ui_MainWindow(object):
         self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.gridLayout_4 = QGridLayout()
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.label_10 = QLabel(self.tab_rlc)
-        self.label_10.setObjectName(u"label_10")
+        self.butt_close_2 = QPushButton(self.tab_rlc)
+        self.butt_close_2.setObjectName(u"butt_close_2")
 
-        self.gridLayout_4.addWidget(self.label_10, 0, 0, 1, 1)
-
-        self.label_11 = QLabel(self.tab_rlc)
-        self.label_11.setObjectName(u"label_11")
-
-        self.gridLayout_4.addWidget(self.label_11, 0, 1, 1, 2)
-
-        self.label_12 = QLabel(self.tab_rlc)
-        self.label_12.setObjectName(u"label_12")
-
-        self.gridLayout_4.addWidget(self.label_12, 0, 3, 1, 2)
+        self.gridLayout_4.addWidget(self.butt_close_2, 2, 5, 1, 1)
 
         self.label_13 = QLabel(self.tab_rlc)
         self.label_13.setObjectName(u"label_13")
 
         self.gridLayout_4.addWidget(self.label_13, 0, 5, 1, 1)
 
-        self.line_freq = QLineEdit(self.tab_rlc)
-        self.line_freq.setObjectName(u"line_freq")
+        self.label_10 = QLabel(self.tab_rlc)
+        self.label_10.setObjectName(u"label_10")
 
-        self.gridLayout_4.addWidget(self.line_freq, 1, 0, 1, 1)
-
-        self.line_ac_volts = QLineEdit(self.tab_rlc)
-        self.line_ac_volts.setObjectName(u"line_ac_volts")
-
-        self.gridLayout_4.addWidget(self.line_ac_volts, 1, 1, 1, 2)
-
-        self.line_real_pwr = QLineEdit(self.tab_rlc)
-        self.line_real_pwr.setObjectName(u"line_real_pwr")
-
-        self.gridLayout_4.addWidget(self.line_real_pwr, 1, 3, 1, 2)
-
-        self.line_reactive_pwr = QLineEdit(self.tab_rlc)
-        self.line_reactive_pwr.setObjectName(u"line_reactive_pwr")
-
-        self.gridLayout_4.addWidget(self.line_reactive_pwr, 1, 5, 1, 1)
-
-        self.butt_rlc_off = QPushButton(self.tab_rlc)
-        self.butt_rlc_off.setObjectName(u"butt_rlc_off")
-
-        self.gridLayout_4.addWidget(self.butt_rlc_off, 2, 2, 1, 2)
+        self.gridLayout_4.addWidget(self.label_10, 0, 0, 1, 1)
 
         self.butt_rlc_on = QPushButton(self.tab_rlc)
         self.butt_rlc_on.setObjectName(u"butt_rlc_on")
 
         self.gridLayout_4.addWidget(self.butt_rlc_on, 2, 0, 1, 1)
 
-        self.butt_close_2 = QPushButton(self.tab_rlc)
-        self.butt_close_2.setObjectName(u"butt_close_2")
+        self.label_12 = QLabel(self.tab_rlc)
+        self.label_12.setObjectName(u"label_12")
 
-        self.gridLayout_4.addWidget(self.butt_close_2, 2, 5, 1, 1)
+        self.gridLayout_4.addWidget(self.label_12, 0, 3, 1, 2)
+
+        self.butt_rlc_off = QPushButton(self.tab_rlc)
+        self.butt_rlc_off.setObjectName(u"butt_rlc_off")
+
+        self.gridLayout_4.addWidget(self.butt_rlc_off, 2, 2, 1, 2)
+
+        self.label_11 = QLabel(self.tab_rlc)
+        self.label_11.setObjectName(u"label_11")
+
+        self.gridLayout_4.addWidget(self.label_11, 0, 1, 1, 2)
+
+        self.entry_freq_2 = QSpinBox(self.tab_rlc)
+        self.entry_freq_2.setObjectName(u"entry_freq_2")
+
+        self.gridLayout_4.addWidget(self.entry_freq_2, 1, 0, 1, 1)
+
+        self.entry_ac_volts_2 = QSpinBox(self.tab_rlc)
+        self.entry_ac_volts_2.setObjectName(u"entry_ac_volts_2")
+
+        self.gridLayout_4.addWidget(self.entry_ac_volts_2, 1, 1, 1, 1)
+
+        self.entry_reactive_pwr = QSpinBox(self.tab_rlc)
+        self.entry_reactive_pwr.setObjectName(u"entry_reactive_pwr")
+
+        self.gridLayout_4.addWidget(self.entry_reactive_pwr, 1, 5, 1, 1)
+
+        self.entry_real_pwr = QSpinBox(self.tab_rlc)
+        self.entry_real_pwr.setObjectName(u"entry_real_pwr")
+
+        self.gridLayout_4.addWidget(self.entry_real_pwr, 1, 3, 1, 1)
 
 
         self.gridLayout_5.addLayout(self.gridLayout_4, 0, 0, 1, 1)
@@ -295,7 +295,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QRect(0, 0, 800, 21))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -303,7 +303,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(2)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -336,13 +336,13 @@ class Ui_MainWindow(object):
         self.butt_cap.setText(QCoreApplication.translate("MainWindow", u"Capture", None))
         self.butt_close_3.setText(QCoreApplication.translate("MainWindow", u"Close", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_scope), QCoreApplication.translate("MainWindow", u"Scope", None))
-        self.label_10.setText(QCoreApplication.translate("MainWindow", u"Frequency (Hz)", None))
-        self.label_11.setText(QCoreApplication.translate("MainWindow", u"AC Voltage (Vrms)", None))
-        self.label_12.setText(QCoreApplication.translate("MainWindow", u"Real Power (W)", None))
-        self.label_13.setText(QCoreApplication.translate("MainWindow", u"Reactive Power (Vars)", None))
-        self.butt_rlc_off.setText(QCoreApplication.translate("MainWindow", u"RLC off", None))
-        self.butt_rlc_on.setText(QCoreApplication.translate("MainWindow", u"RLC on", None))
         self.butt_close_2.setText(QCoreApplication.translate("MainWindow", u"Close", None))
+        self.label_13.setText(QCoreApplication.translate("MainWindow", u"Reactive Power (Vars)", None))
+        self.label_10.setText(QCoreApplication.translate("MainWindow", u"Frequency (Hz)", None))
+        self.butt_rlc_on.setText(QCoreApplication.translate("MainWindow", u"RLC on", None))
+        self.label_12.setText(QCoreApplication.translate("MainWindow", u"Real Power (W)", None))
+        self.butt_rlc_off.setText(QCoreApplication.translate("MainWindow", u"RLC off", None))
+        self.label_11.setText(QCoreApplication.translate("MainWindow", u"AC Voltage (Vrms)", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_rlc), QCoreApplication.translate("MainWindow", u"RLC", None))
     # retranslateUi
 

@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_pps">
        <attribute name="title">
@@ -255,24 +255,10 @@
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_10">
+          <item row="2" column="5">
+           <widget class="QPushButton" name="butt_close_2">
             <property name="text">
-             <string>Frequency (Hz)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" colspan="2">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>AC Voltage (Vrms)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3" colspan="2">
-           <widget class="QLabel" name="label_12">
-            <property name="text">
-             <string>Real Power (W)</string>
+             <string>Close</string>
             </property>
            </widget>
           </item>
@@ -283,22 +269,10 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLineEdit" name="line_freq"/>
-          </item>
-          <item row="1" column="1" colspan="2">
-           <widget class="QLineEdit" name="line_ac_volts"/>
-          </item>
-          <item row="1" column="3" colspan="2">
-           <widget class="QLineEdit" name="line_real_pwr"/>
-          </item>
-          <item row="1" column="5">
-           <widget class="QLineEdit" name="line_reactive_pwr"/>
-          </item>
-          <item row="2" column="2" colspan="2">
-           <widget class="QPushButton" name="butt_rlc_off">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_10">
             <property name="text">
-             <string>RLC off</string>
+             <string>Frequency (Hz)</string>
             </property>
            </widget>
           </item>
@@ -309,12 +283,38 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="5">
-           <widget class="QPushButton" name="butt_close_2">
+          <item row="0" column="3" colspan="2">
+           <widget class="QLabel" name="label_12">
             <property name="text">
-             <string>Close</string>
+             <string>Real Power (W)</string>
             </property>
            </widget>
+          </item>
+          <item row="2" column="2" colspan="2">
+           <widget class="QPushButton" name="butt_rlc_off">
+            <property name="text">
+             <string>RLC off</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="2">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>AC Voltage (Vrms)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QSpinBox" name="entry_freq_2"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="entry_ac_volts_2"/>
+          </item>
+          <item row="1" column="5">
+           <widget class="QSpinBox" name="entry_reactive_pwr"/>
+          </item>
+          <item row="1" column="3">
+           <widget class="QSpinBox" name="entry_real_pwr"/>
           </item>
          </layout>
         </item>
@@ -330,7 +330,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
