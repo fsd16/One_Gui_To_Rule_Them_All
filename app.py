@@ -21,21 +21,21 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         
     
     _closers = 'butt_close, butt_close_2, butt_close_3'
-    def _when_closers__pressed(self):
-        print("Close was pressed")
+    def _when_closers__clicked(self):
+        print("Close was clicked")
         sys.exit()
     
     # PPS Tab
-    def _on_butt_ac_off__pressed(self):
-        print("AC off was pressed")
+    def _on_butt_ac_off__clicked(self):
+        print("AC off was clicked")
         self.ac_source.pps_off()
     
-    def _on_butt_ac_on__pressed(self):
-        print("AC on was pressed")
+    def _on_butt_ac_on__clicked(self):
+        print("AC on was clicked")
         self.ac_source.pps_on()
         
-    def _on_butt_apply__pressed(self):
-        print("Apply was pressed")
+    def _on_butt_apply__clicked(self):
+        print("Apply was clicked")
         
         if self.check_abnormal.isChecked():
             self.ac_source.pps_apply_abnormal()
