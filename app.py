@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
 from logic.pps import PPS_308_Bench
+from logic.scope import Scope
 
 import smartside.signal as smartsignal
 
@@ -13,6 +14,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         self.setupUi(self)
         
         self.ac_source = PPS_308_Bench("GPIB0::1::INSTR")
+        self.scope = Scope("GPIB0::28::INSTR")
         
         self.menu_abnormal.addItems(self.ac_source.AB_WAVEFORMS)
         self.menu_phase.addItems(self.ac_source.PROFILES)
@@ -91,45 +93,55 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
             self.ac_source.set_ac_config("three")
         
     # Scope tab
-    def _on_butt_apply_lab__pressed(self):
-        print("Apply labels was pressed")
+    def _on_butt_apply_lab__clicked(self):
+        print("Apply labels was clicked")
+        self.scope.scope_label()
     
-    def _on_butt_cap__pressed(self):
-        print("Capture was pressed")
+    def _on_butt_cap__clicked(self):
+        print("Capture was clicked")
+        self.scope.scope_capture()
         
     def _on_check_auto__stateChanged(self):
         print ('Check is', self.sender().isChecked())
         
     def _on_check_date__stateChanged(self):
         print ('Check is', self.sender().isChecked())
-
+        self.scope.set_date(self.sender().isChecked())
+        
     def _on_check_invert__stateChanged(self):
         print ('Check is', self.sender().isChecked())
-    
+        self.scope.set_invert(self.sender().isChecked())
+        
     def _on_line_cap_name__editingFinished(self):
         print("Capture name entered:", self.sender().text())
-
+        self.scope.set_name(self.sender().text())
+        
     def _on_line_cap_path__editingFinished(self):
         print("Capture path entered:", self.sender().text())
+        self.scope.set_path(self.sender().text())
     
     def _on_line_ch1_lab__editingFinished(self):
         print("CH1 label entered:", self.sender().text())
+        self.scope.set_ch1(self.sender().text())
         
     def _on_line_ch2_lab__editingFinished(self):
         print("CH2 label entered:", self.sender().text())
+        self.scope.set_ch2(self.sender().text())
         
     def _on_line_ch3_lab__editingFinished(self):
         print("CH3 label entered:", self.sender().text())
+        self.scope.set_ch3(self.sender().text())
         
     def _on_line_ch4_lab__editingFinished(self):
         print("CH4 label entered:", self.sender().text())
+        self.scope.set_ch4(self.sender().text())
         
     # RLC tab
-    def _on_butt_rlc_off__pressed(self):
-        print("RLC off was pressed")
+    def _on_butt_rlc_off__clicked(self):
+        print("RLC off was clicked")
     
-    def _on_butt_rlc_on__pressed(self):
-        print("RLC on was pressed")
+    def _on_butt_rlc_on__clicked(self):
+        print("RLC on was clicked")
 
     def _on_entry_ac_volts_2__valueChanged(self):
         print("Ac Volts entered:", self.sender().value())

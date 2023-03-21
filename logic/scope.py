@@ -13,7 +13,19 @@ class Scope(AgilentDSO):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.SCOPE = {
+            "path": os.getcwd(),
+            "name": "foo",
+            "date": False,
+            "invert": False,
+            "ch1": "1",
+            "ch2": "2",
+            "ch3": "3",
+            "ch4": "4",
+        }
     
+    # Ensure file name is unique
     def uniquify(self, path):
         filename, extension = os.path.splitext(path)
         counter = 1
@@ -24,38 +36,54 @@ class Scope(AgilentDSO):
 
         return path
 
+    def set_path(self, path):
+        self.SCOPE["path"] = path
+    
+    def set_name(self, name):
+        self.SCOPE["name"] = name
+        
+    def set_date(self, date):
+        self.SCOPE["date"] = date
+    
+    def set_invert(self, invert):
+        self.SCOPE["invert"] = invert
+
+    def set_ch1(self, label):
+        self.SCOPE["ch1"] = label
+    
+    def set_ch2(self, label):
+        self.SCOPE["ch2"] = label
+    
+    def set_ch3(self, label):
+        self.SCOPE["ch3"] = label
+    
+    def set_ch4(self, label):
+        self.SCOPE["ch4"] = label
+        
     # callback to take the scope capture
-    def scope_capture(self, path, date, name, invert):
-        capture_folder = Path(path)
+    def scope_capture(self):
+        capture_folder = Path(self.SCOPE["path"])
+        
         if not Path(capture_folder).exists():
             Path(capture_folder).mkdir(parents=True)
             print("made filepath: {}".format(capture_folder))
 
         date_prefix = ''
-        if date:
+        if self.SCOPE["date"]:
             date_prefix = ("%s_" % (strftime("%Y-%m-%d_%H;%M;%S", localtime())))
-        capture_name_str = name
+
+        capture_name_str = self.SCOPE["name"]
         if Path(capture_name_str).suffix != '.png':
             capture_name_str = capture_name_str + '.png'
-        
 
         capture_path = self.uniquify(capture_folder / (date_prefix + capture_name_str))
-        self.capture(capture_path, invert_graticule=invert)
-        print("Captured to: {}".format(capture_path))
+        self.capture(capture_path, invert_graticule=self.SCOPE["invert"])
         
-
-        # This works for any number of digits in a single location in the name string
-        # pat = re.compile(r'\d+')
-        # if pat.search(capture_name_str):
-            # new = 1 + int(pat.search(capture_name_str).group())
-            # print(new)
-            # capture_name_str = pat.sub(str(new), capture_name_str)
-            # print(capture_name_str)
-
-        # capture_name.set(capture_name_str)
+        print("Captured to: {}".format(capture_path))
 
     # callback to apply the labels
-    def scope_label(self, ch1, ch2 , ch3, ch4):
+    def scope_label(self):
+        ch1, ch2 , ch3, ch4 = [self.SCOPE.get(k) for k in ["ch1", "ch2" , "ch3", "ch4"]]
         self.write(':DISPLAY:LABEL ON;:CHAN1:LABel "{}";:CHAN2:LABel "{}";:CHAN3:LABel "{}";:CHAN4:LABel "{}"'.format(ch1, ch2 ,ch3 ,ch4))
         print("labelled {}, {}, {}, {}".format(ch1, ch2 ,ch3 ,ch4))
 
