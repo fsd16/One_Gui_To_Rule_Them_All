@@ -12,10 +12,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
         
+        self.ac_source = PPS_308_Bench("GPIB0::1::INSTR")
+        
+        self.menu_abnormal.addItems(self.ac_source.AB_WAVEFORMS)
+        self.menu_phase.addItems(self.ac_source.PROFILES)
+        
         self.auto_connect()
         
-        self.ac_source = PPS_308_Bench("GPIB0::1::INSTR")
-    
     
     _closers = 'butt_close, butt_close_2, butt_close_3'
     def _when_closers__pressed(self):
@@ -33,10 +36,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         
     def _on_butt_apply__pressed(self):
         print("Apply was pressed")
-        self.ac_source.pps_apply()
+        
+        if self.check_abnormal.isChecked():
+            self.ac_source.pps_apply_abnormal()
+        else:
+            self.ac_source.pps_apply()
         
     def _on_check_abnormal__stateChanged(self):
-        print ('Check is', self.sender().isChecked())
+        print ('Abnormal was checked', self.sender().isChecked())
 
     def _on_entry_ac_volts__valueChanged(self):
         print("Ac Volts entered:", self.sender().value())
@@ -49,18 +56,39 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     def _on_entry_step_size__valueChanged(self):
         print("Step size entered:", self.sender().value())
         self.entry_ac_volts.setSingleStep(self.sender().value())
+    
+    def _on_menu_abnormal__activated(self):
+        print("Abnormal waveform selected:", self.sender().currentText())
+        self.ac_source.set_ab_waveform(self.sender().currentText())
         
-    def _on_radio_single__clicked(self):
-        print("Single is selected")
-        self.ac_source.set_ac_config("single")
-    
-    def _on_radio_split__clicked(self):
-        print("Split is selected")
-        self.ac_source.set_ac_config("split")
-    
-    def _on_radio_three__clicked(self):
-        print("Three is selected")
-        self.ac_source.set_ac_config("three")
+    def _on_menu_phase__activated(self):
+        print("Profile selected:", self.sender().currentText())
+        # self.ac_source.set_ac_profile(self.sender().currentText())
+        profile = self.ac_source.PROFILES[self.sender().currentText()]
+        self.entry_ac_volts.setValue(profile[0])
+        self.entry_freq.setValue(profile[1])
+        
+        if profile[2] == "split":
+            self.radio_split.setChecked(True)
+        elif profile[2] == "single":
+            self.radio_single.setChecked(True)
+        elif profile[2] == "three":
+            self.radio_three.setChecked(True)
+
+    def _on_radio_single__toggled(self):
+        if self.radio_single.isChecked():
+            print("Single is selected")
+            self.ac_source.set_ac_config("single")
+            
+    def _on_radio_split__toggled(self):
+        if self.radio_split.isChecked():
+            print("Split is selected")
+            self.ac_source.set_ac_config("split")
+            
+    def _on_radio_three__toggled(self):
+        if self.radio_three.isChecked():
+            print("Three is selected")
+            self.ac_source.set_ac_config("three")
         
     # Scope tab
     def _on_butt_apply_lab__pressed(self):

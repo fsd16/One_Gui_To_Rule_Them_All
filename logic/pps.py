@@ -12,11 +12,11 @@ class PPS_308_Bench(PPS_308):
         self.reset()
         # pre defined profiles
         self.PROFILES = {
-            "240v,60hz Split Phase (NA)":   (240, 60, "1"), # North American (NA)
-            "220v,60hz Split Phase ":       (220, 60, "1"), # Brazil (NA)
-            "120v,60hz Single Phase":       (120, 60, "2"),  # North American (NA)
-            "230v,50hz Single Phase (INT)": (230, 50, "2"),  # Rest of world (INT)
-            "208V,60hz Three Phase ":       (208, 60, "3"), # North American Comercial (NA)
+            "240v, 60hz, Split Phase (NA)":   (240, 60, "split"), # North American (NA)
+            "220v, 60hz, Split Phase ":       (220, 60, "split"), # Brazil (NA)
+            "120v, 60hz, Single Phase":       (120, 60, "single"),  # North American (NA)
+            "230v, 50hz, Single Phase (INT)": (230, 50, "single"),  # Rest of world (INT)
+            "208V, 60hz, Three Phase ":       (208, 60, "three"), # North American Comercial (NA)
         }
         self.base_path = 'C:/Users/fdrabsch/Envs/enphase_env/workspace/hw_testcases/src/hw_testcases/abnormal_waveform_test/waveforms'
 
@@ -42,10 +42,9 @@ class PPS_308_Bench(PPS_308):
         self.PPS_VALUES = {
             "ac_rms_voltage": 240,
             "ac_freq": 60,
-            "config": "split"
+            "config": "split",
+            "abnormal": "IEC_77A_Class_1"
         }
-
-    
     
     def set_ac_rms_volts(self, ac_rms_voltage):
         self.PPS_VALUES["ac_rms_voltage"] = ac_rms_voltage
@@ -55,6 +54,14 @@ class PPS_308_Bench(PPS_308):
         
     def set_ac_config(self, ac_config):
         self.PPS_VALUES["config"] = ac_config
+        
+    # Callback to select abnormal waveform
+    def set_ab_waveform(self, choice):
+        self.PPS_VALUES["abnormal"] = choice
+    
+    # def set_ac_profile(self, profile_key):
+    #     profile = self.PROFILES[profile_key]
+    #     self.PPS_VALUES.update(ac_rms_voltage=profile[0], ac_freq=profile[1], config=profile[2])
     
     # Callback to set ac voltage
     def calc_ac_volts(self):
@@ -77,7 +84,15 @@ class PPS_308_Bench(PPS_308):
         self.exec_program(99)
         print("pps updated ")
         print(self.PPS_VALUES)
-
+        
+    def pps_apply_abnormal(self):
+        
+        choice = self.PPS_VALUES["abnormal"]
+        path = os.path.join(self.base_path, (self.AB_WAVEFORMS[choice]))
+        continuous_waveform = Waveform.create_waveform_from_file(path)
+        
+        self.set_steady_state(voltages=self.calc_ac_volts(), frequency=self.PPS_VALUES["ac_freq"], waveform=continuous_waveform)
+        
     # callback to apply settings and turn on pps output
     def pps_on(self):    
         self.on()
@@ -87,31 +102,3 @@ class PPS_308_Bench(PPS_308):
     def pps_off(self):
         self.off()
         print("pps off")
-
-    # # callback to select a profile (Needs work)
-    # def choose_profile(choice):
-    #     ac_volts = PROFILES[choice][0]
-    #     ac_freq = PROFILES[choice][1]
-    #     ac_config = PROFILES[choice][2]
-
-    #     voltage_var.set(str(ac_volts))
-    #     freq_var.set(str(ac_freq))
-    #     config_var.set(str(ac_config))
-        
-    #     print("profile chosen")
-    #     pps_apply()
-
-    # # Callback to select and turn on an abnormal waveform
-    # def choose_ab_waveform(choice):
-
-    #     if ab_waveform_on:
-    #         ac_voltage_tuple = get_ac_volts()
-            
-    #         ac_freq = float(freq_var.get())
-    #         freq_var.set(str(ac_freq))
-        
-    #         path = os.path.join(base_path, (AB_WAVEFORMS[choice]))
-    #         continuous_waveform = Waveform.create_waveform_from_file(path)
-            
-    #         if HAVE_PPS:
-    #             ac_source.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq, waveform=continuous_waveform)
