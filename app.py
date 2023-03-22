@@ -1,10 +1,11 @@
 import sys
 
-from PySide6.QtWidgets import QApplication, QMainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
 from logic.pps import PPS_308_Bench
 from logic.scope import Scope
+from logic.rlc import RLC
 
 import smartside.signal as smartsignal
 
@@ -12,15 +13,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
+
+        self.errorMsg = QErrorMessage()
         
         self.ac_source = PPS_308_Bench("GPIB0::1::INSTR")
         self.scope = Scope("GPIB0::28::INSTR")
+        self.rlc = RLC(relay_controller_comport='COM3',
+                    phase_controller_comport='COM4')
         
         self.menu_abnormal.addItems(self.ac_source.AB_WAVEFORMS)
         self.menu_phase.addItems(self.ac_source.PROFILES)
         
-        self.auto_connect()
-        
+        self.auto_connect()    
     
     _closers = 'butt_close, butt_close_2, butt_close_3'
     def _when_closers__clicked(self):
@@ -64,6 +68,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         self.ac_source.set_ab_waveform(self.sender().currentText())
         
     def _on_menu_phase__activated(self):
+        
         print("Profile selected:", self.sender().currentText())
         # self.ac_source.set_ac_profile(self.sender().currentText())
         profile = self.ac_source.PROFILES[self.sender().currentText()]
@@ -139,21 +144,38 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     # RLC tab
     def _on_butt_rlc_off__clicked(self):
         print("RLC off was clicked")
+        self.rlc.rlc_off()
     
     def _on_butt_rlc_on__clicked(self):
         print("RLC on was clicked")
+        try:
+            self.rlc.rlc_on()
+            self.entry_real_pwr.setValue(round(self.rlc.RLC_VALUES["real_pwr"]))
+            self.entry_reactive_pwr.setValue(round(self.rlc.RLC_VALUES["reactive_pwr"]))
+        except self.rlc.NoInput:
+            self.errorMsg.showMessage("Why do I even exist?")
+        except self.rlc.VoltageInvalid:
+            self.errorMsg.showMessage("Need to specify voltage")
+        except self.rlc.PowerInvalid:
+            self.errorMsg.showMessage("Need to specify real and/or reactive power")
+        except self.rlc.FrequencyInvalid:
+            self.errorMsg.showMessage("Need to specify frequency with reactive power")
 
     def _on_entry_ac_volts_2__valueChanged(self):
         print("Ac Volts entered:", self.sender().value())
+        self.rlc.set_ac_rms_volts(self.sender().value())
 
     def _on_entry_freq_2__valueChanged(self):
         print("Frequency entered:", self.sender().value())
-        
+        self.rlc.set_ac_freq(self.sender().value())
+
     def _on_entry_reactive_pwr__valueChanged(self):
         print("Reactive power entered:", self.sender().value())
+        self.rlc.set_reactive_pwr(self.sender().value())
 
     def _on_entry_real_pwr__valueChanged(self):
         print("Real power entered:", self.sender().value())
+        self.rlc.set_real_pwr(self.sender().value())
         
 if __name__ == '__main__':
     
