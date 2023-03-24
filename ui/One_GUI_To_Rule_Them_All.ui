@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>429</width>
+    <width>462</width>
     <height>264</height>
    </rect>
   </property>
@@ -18,227 +18,731 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="tab_pps">
+      <widget class="QWidget" name="sas_tab">
        <attribute name="title">
-        <string>PPS</string>
+        <string>SAS</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_2">
+       <layout class="QGridLayout" name="gridLayout_9">
         <item row="0" column="0">
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="1" column="0" colspan="3">
-           <widget class="QRadioButton" name="radio_single">
+         <layout class="QGridLayout" name="gridLayout_8">
+          <item row="1" column="3" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="sas_butt_off">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Single Phase</string>
+             <string>SAS Off</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0" colspan="3">
-           <widget class="QRadioButton" name="radio_three">
-            <property name="text">
-             <string>Three Phase</string>
+          <item row="1" column="4" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="sas_butt_close">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="3" colspan="3">
-           <widget class="QCheckBox" name="check_abnormal">
-            <property name="text">
-             <string>Abnormal Waveform</string>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
             </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Frequency (Hz)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2" colspan="2">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>AC Voltage (Vrms)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="4" colspan="2">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Step Size</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="QSpinBox" name="entry_freq">
-            <property name="maximum">
-             <number>999</number>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="2" colspan="2">
-           <widget class="QSpinBox" name="entry_ac_volts">
-            <property name="maximum">
-             <number>999</number>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="4" colspan="2">
-           <widget class="QSpinBox" name="entry_step_size">
-            <property name="maximum">
-             <number>999</number>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QPushButton" name="butt_apply">
-            <property name="text">
-             <string>Apply</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1" colspan="2">
-           <widget class="QPushButton" name="butt_ac_on">
-            <property name="text">
-             <string>AC On</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="3" colspan="2">
-           <widget class="QPushButton" name="butt_ac_off">
-            <property name="text">
-             <string>AC Off</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="5">
-           <widget class="QPushButton" name="butt_close">
             <property name="text">
              <string>Close</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="0" colspan="3">
-           <widget class="QRadioButton" name="radio_split">
+          <item row="1" column="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="sas_butt_on">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Split Phase</string>
+             <string>SAS On</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="3" colspan="3">
-           <widget class="QComboBox" name="menu_phase"/>
+          <item row="1" column="0" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="sas_butt_apply">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Apply</string>
+            </property>
+           </widget>
           </item>
-          <item row="1" column="3" colspan="3">
-           <widget class="QComboBox" name="menu_abnormal"/>
+          <item row="0" column="2" colspan="2">
+           <layout class="QFormLayout" name="formLayout">
+            <property name="labelAlignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="formAlignment">
+             <set>Qt::AlignHCenter|Qt::AlignTop</set>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_14">
+              <property name="text">
+               <string>Vmp</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="sas_entry_vmp">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="accelerated">
+               <bool>false</bool>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <double>1000.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>32.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Pmp</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_16">
+              <property name="text">
+               <string>Fill Factor</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QDoubleSpinBox" name="sas_entry_ff">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="accelerated">
+               <bool>false</bool>
+              </property>
+              <property name="maximum">
+               <double>999.990000000000009</double>
+              </property>
+              <property name="value">
+               <double>0.780000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_17">
+              <property name="text">
+               <string>Irradiance</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QDoubleSpinBox" name="sas_entry_irrad">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="accelerated">
+               <bool>false</bool>
+              </property>
+              <property name="maximum">
+               <double>999.990000000000009</double>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QDoubleSpinBox" name="sas_entry_pmp">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+              </property>
+              <property name="accelerated">
+               <bool>false</bool>
+              </property>
+              <property name="decimals">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <double>100.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_scope">
+      <widget class="QWidget" name="ac_tab">
+       <attribute name="title">
+        <string>AC Source</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="3" column="4" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QLabel" name="label_3">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Step Size</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QCheckBox" name="ac_check_abnormal">
+            <property name="text">
+             <string>Abnormal Waveform</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="5" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="ac_butt_close">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Close</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="3" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="ac_butt_off">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>AC Off</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="4" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QSpinBox" name="ac_entry_step_size">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+            <property name="value">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QSpinBox" name="ac_entry_ac_volts">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+            <property name="value">
+             <number>240</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QRadioButton" name="ac_radio_single">
+            <property name="text">
+             <string>Single Phase</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QSpinBox" name="ac_entry_freq">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+            <property name="value">
+             <number>60</number>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="ac_butt_apply">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Apply</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QLabel" name="label">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Frequency (Hz)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QComboBox" name="ac_menu_abnormal"/>
+          </item>
+          <item row="3" column="2" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QLabel" name="label_2">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>AC Voltage (Vrms)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QRadioButton" name="ac_radio_split">
+            <property name="text">
+             <string>Split Phase</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QComboBox" name="ac_menu_phase"/>
+          </item>
+          <item row="2" column="0" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QRadioButton" name="ac_radio_three">
+            <property name="text">
+             <string>Three Phase</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1" colspan="2" alignment="Qt::AlignHCenter">
+           <widget class="QPushButton" name="ac_butt_on">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>AC On</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="scope_tab">
        <attribute name="title">
         <string>Scope</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0">
+          <item row="0" column="0" alignment="Qt::AlignBottom">
            <widget class="QLabel" name="label_6">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
              <string>CH1 Label</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="2">
+          <item row="0" column="1" colspan="2" alignment="Qt::AlignBottom">
            <widget class="QLabel" name="label_7">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
              <string>CH2 Label</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
-          <item row="0" column="3" colspan="2">
+          <item row="0" column="3" colspan="2" alignment="Qt::AlignBottom">
            <widget class="QLabel" name="label_8">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
              <string>CH3 Label</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
-          <item row="0" column="5">
+          <item row="0" column="5" alignment="Qt::AlignBottom">
            <widget class="QLabel" name="label_9">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
              <string>CH4 Label</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLineEdit" name="line_ch1_lab"/>
+          <item row="1" column="0" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QLineEdit" name="scope_line_ch1_lab">
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
           </item>
-          <item row="1" column="1" colspan="2">
-           <widget class="QLineEdit" name="line_ch2_lab"/>
+          <item row="1" column="1" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QLineEdit" name="scope_line_ch2_lab">
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
           </item>
-          <item row="1" column="3" colspan="2">
-           <widget class="QLineEdit" name="line_ch3_lab"/>
+          <item row="1" column="3" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QLineEdit" name="scope_line_ch3_lab">
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
           </item>
-          <item row="1" column="5">
-           <widget class="QLineEdit" name="line_ch4_lab"/>
+          <item row="1" column="5" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QLineEdit" name="scope_line_ch4_lab">
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
           </item>
-          <item row="2" column="0" colspan="3">
+          <item row="2" column="0" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignBottom">
            <widget class="QLabel" name="label_4">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
              <string>Capture Path</string>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="3" colspan="3">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Capture Name</string>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="3" column="0" colspan="3">
-           <widget class="QLineEdit" name="line_cap_path"/>
+          <item row="2" column="3" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QLabel" name="label_5">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Capture Name</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
           </item>
-          <item row="3" column="3" colspan="3">
-           <widget class="QLineEdit" name="line_cap_name"/>
+          <item row="3" column="0" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QLineEdit" name="scope_line_cap_path">
+            <property name="minimumSize">
+             <size>
+              <width>180</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
           </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="QCheckBox" name="check_date">
+          <item row="3" column="3" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QLineEdit" name="scope_line_cap_name">
+            <property name="minimumSize">
+             <size>
+              <width>180</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QCheckBox" name="scope_check_date">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
              <string>Date Prefix</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="2" colspan="2">
-           <widget class="QCheckBox" name="check_invert">
+          <item row="4" column="2" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QCheckBox" name="scope_check_invert">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
              <string>Invert Colours</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="4" colspan="2">
-           <widget class="QCheckBox" name="check_auto">
+          <item row="4" column="4" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QCheckBox" name="scope_check_auto">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
              <string>Auto Capture</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0" colspan="2">
-           <widget class="QPushButton" name="butt_apply_lab">
+          <item row="5" column="0" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="scope_butt_apply">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string>Apply Labels</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="2" colspan="2">
-           <widget class="QPushButton" name="butt_cap">
+          <item row="5" column="2" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="scope_butt_cap">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string>Capture</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="4" colspan="2">
-           <widget class="QPushButton" name="butt_close_3">
+          <item row="5" column="4" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="scope_butt_close">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string>Close</string>
             </property>
@@ -248,71 +752,175 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_rlc">
+      <widget class="QWidget" name="rlc_tab">
        <attribute name="title">
         <string>RLC</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="3" colspan="2">
+          <item row="0" column="3" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
            <widget class="QLabel" name="label_12">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Real Power (W)</string>
+             <string>Real Power
+(W)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="0" column="1" colspan="2">
+          <item row="0" column="1" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
            <widget class="QLabel" name="label_11">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
-             <string>AC Voltage (Vrms)</string>
+             <string>AC Voltage
+(Vrms)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QSpinBox" name="entry_freq_2"/>
+          <item row="1" column="0" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QSpinBox" name="rlc_entry_freq">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+            <property name="value">
+             <number>60</number>
+            </property>
+           </widget>
           </item>
-          <item row="1" column="3">
-           <widget class="QSpinBox" name="entry_real_pwr"/>
-          </item>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="entry_ac_volts_2"/>
-          </item>
-          <item row="0" column="5">
+          <item row="0" column="5" alignment="Qt::AlignHCenter|Qt::AlignBottom">
            <widget class="QLabel" name="label_13">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Reactive Power (Vars)</string>
+             <string>Reactive Pwr
+(Vars)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="2" column="5">
-           <widget class="QPushButton" name="butt_close_2">
+          <item row="2" column="5" alignment="Qt::AlignHCenter">
+           <widget class="QPushButton" name="rlc_butt_close">
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string>Close</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QPushButton" name="butt_rlc_on">
+          <item row="2" column="0" alignment="Qt::AlignHCenter">
+           <widget class="QPushButton" name="rlc_butt_on">
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string>RLC on</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
+          <item row="0" column="0" alignment="Qt::AlignHCenter|Qt::AlignBottom">
            <widget class="QLabel" name="label_10">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Frequency (Hz)</string>
+             <string>Frequency
+(Hz)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
-          <item row="1" column="5">
-           <widget class="QSpinBox" name="entry_reactive_pwr"/>
+          <item row="1" column="5" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QSpinBox" name="rlc_entry_reactive_pwr">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+           </widget>
           </item>
-          <item row="2" column="2" colspan="2">
-           <widget class="QPushButton" name="butt_rlc_off">
+          <item row="2" column="2" colspan="2" alignment="Qt::AlignHCenter">
+           <widget class="QPushButton" name="rlc_butt_off">
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="text">
              <string>RLC off</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QSpinBox" name="rlc_entry_real_pwr">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QSpinBox" name="rlc_entry_ac_volts">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+            <property name="value">
+             <number>240</number>
             </property>
            </widget>
           </item>
@@ -329,7 +937,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>429</width>
+     <width>462</width>
      <height>22</height>
     </rect>
    </property>

@@ -4,7 +4,7 @@ from enphase_equipment.ac_source.interface import Waveform
 from enphase_equipment.ac_source.pacific_power_source import PPS_308
 
 
-class PPS_308_Bench(PPS_308):
+class AC_SRC(PPS_308):
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -39,7 +39,7 @@ class PPS_308_Bench(PPS_308):
             "Amanda_Welz_Florida":                         ('Amanda_Welz_Florida.wfd'),
         }
         
-        self.PPS_VALUES = {
+        self.AC_VALUES = {
             "ac_rms_voltage": 240,
             "ac_freq": 60,
             "config": "split",
@@ -47,26 +47,26 @@ class PPS_308_Bench(PPS_308):
         }
     
     def set_ac_rms_volts(self, ac_rms_voltage):
-        self.PPS_VALUES["ac_rms_voltage"] = ac_rms_voltage
+        self.AC_VALUES["ac_rms_voltage"] = ac_rms_voltage
         
     def set_ac_freq(self, ac_freq):
-        self.PPS_VALUES["ac_freq"] = ac_freq
+        self.AC_VALUES["ac_freq"] = ac_freq
         
     def set_ac_config(self, ac_config):
-        self.PPS_VALUES["config"] = ac_config
+        self.AC_VALUES["config"] = ac_config
         
     # Callback to select abnormal waveform
     def set_ab_waveform(self, choice):
-        self.PPS_VALUES["abnormal"] = choice
+        self.AC_VALUES["abnormal"] = choice
     
     # def set_ac_profile(self, profile_key):
     #     profile = self.PROFILES[profile_key]
-    #     self.PPS_VALUES.update(ac_rms_voltage=profile[0], ac_freq=profile[1], config=profile[2])
+    #     self.AC_VALUES.update(ac_rms_voltage=profile[0], ac_freq=profile[1], config=profile[2])
     
     # Callback to set ac voltage
     def calc_ac_volts(self):
-        config = self.PPS_VALUES["config"]
-        ac_rms_voltage = self.PPS_VALUES["ac_rms_voltage"]
+        config = self.AC_VALUES["config"]
+        ac_rms_voltage = self.AC_VALUES["ac_rms_voltage"]
         
         if config == "split":
             ac_voltage_tuple = (ac_rms_voltage / 2.0, ac_rms_voltage / 2.0)
@@ -77,28 +77,27 @@ class PPS_308_Bench(PPS_308):
         
         return ac_voltage_tuple
 
-    # Callback to apply settings to pps
-    def pps_apply(self):
+    # Callback to apply settings to AC
+    def ac_apply(self):
         
-        self.prog_voltage_line_voltages(99, self.calc_ac_volts(), self.PPS_VALUES["ac_freq"])
+        self.prog_voltage_line_voltages(99, self.calc_ac_volts(), self.AC_VALUES["ac_freq"])
         self.exec_program(99)
-        print("pps updated ")
-        print(self.PPS_VALUES)
+        print("AC updated ")
         
-    def pps_apply_abnormal(self):
+    def ac_apply_abnormal(self):
         
-        choice = self.PPS_VALUES["abnormal"]
+        choice = self.AC_VALUES["abnormal"]
         path = os.path.join(self.base_path, (self.AB_WAVEFORMS[choice]))
         continuous_waveform = Waveform.create_waveform_from_file(path)
         
-        self.set_steady_state(voltages=self.calc_ac_volts(), frequency=self.PPS_VALUES["ac_freq"], waveform=continuous_waveform)
+        self.set_steady_state(voltages=self.calc_ac_volts(), frequency=self.AC_VALUES["ac_freq"], waveform=continuous_waveform)
         
-    # callback to apply settings and turn on pps output
-    def pps_on(self):    
+    # callback to apply settings and turn on ac output
+    def ac_on(self):    
         self.on()
-        print("pps on")
+        print("ac on")
     
-    # callback to turn off pps output
-    def pps_off(self):
+    # callback to turn off ac output
+    def ac_off(self):
         self.off()
-        print("pps off")
+        print("ac off")
