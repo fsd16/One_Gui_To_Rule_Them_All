@@ -5,6 +5,7 @@ import time
 from configparser import ConfigParser
 from concurrent import futures
 from enphase_equipment.oscilloscope.agilent import AgilentDSO
+from threading import Thread
 
 
 thread_pool_executor = futures.ThreadPoolExecutor(max_workers=1)
@@ -15,7 +16,8 @@ class Scope(AgilentDSO):
         super().__init__(*args, **kwargs)
         
         self.SCOPE = {
-            "path": os.getcwd(),
+            # update to mkdir if doesnt exist
+            "path": os.getcwd()/Path('captures'),
             "name": "foo",
             "date": False,
             "invert": False,
@@ -24,6 +26,8 @@ class Scope(AgilentDSO):
             "ch3": "3",
             "ch4": "4",
         }
+
+        self.auto_cap_run = False
     
     # Ensure file name is unique
     def uniquify(self, path):
@@ -88,11 +92,10 @@ class Scope(AgilentDSO):
         print("labelled {}, {}, {}, {}".format(ch1, ch2 ,ch3 ,ch4))
 
     # Automatically scope capture if trigger occurs
-    def auto_capture(self, auto_cap):
-        if auto_cap:
-            self.write("*CLS;:SINGle")
+    def auto_capture(self):
+        self.write("*CLS;:SINGle")
             
-        while auto_cap:
+        while self.auto_cap_run:
             if bool(int(self.ask(":TER?"))): # True when a trigger has occured
                 print("Capture Scope Data")
                 time.sleep(0.5)
@@ -101,7 +104,12 @@ class Scope(AgilentDSO):
 
     # Create thread for auto capture to run in
     def auto_capture_on(self):
-        thread_pool_executor.submit(self.auto_capture)    
+        auto_capture_thread = Thread(target=self.auto_capture)
+        auto_capture_thread.start()
+        self.auto_cap_run = True
+
+    def auto_capture_off(self):
+        self.auto_cap_run = False
         
     # callback to clean up and exit, used by the Close button
     def exit_clean(self):

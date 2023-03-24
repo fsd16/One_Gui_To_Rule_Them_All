@@ -110,6 +110,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         
     def _on_scope_check_auto__stateChanged(self):
         print ('Check is', self.sender().isChecked())
+        if self.sender().isChecked():
+            self.scope.auto_capture_on()
+        else:
+            self.scope.auto_capture_off()
         
     def _on_scope_check_date__stateChanged(self):
         print ('Check is', self.sender().isChecked())
