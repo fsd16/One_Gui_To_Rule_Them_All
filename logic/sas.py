@@ -12,30 +12,36 @@ class SAS(AgilentE4360A):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.SAS_VALUES = {
-            "vmp": 30.0,
+        self.SETTINGS = {
+            "vmp": 32.0,
             "pmp": 100.0,
             "ff": 0.78,
             "irrad": 1.0,
         }
 
+    def get_config(self):
+        return self.SETTINGS
+    
+    def set_config(self, config):
+        self.SETTINGS = config
+
     def set_vmp(self, vmp):
-        self.SAS_VALUES["vmp"] = vmp
+        self.SETTINGS["vmp"] = vmp
 
     def set_pmp(self, pmp):
-        self.SAS_VALUES["pmp"] = pmp
+        self.SETTINGS["pmp"] = pmp
 
     def set_ff(self, ff):
-        self.SAS_VALUES["ff"] = ff
+        self.SETTINGS["ff"] = ff
 
     def set_irrad(self, irrad):
-        self.SAS_VALUES["irrad"] = irrad
+        self.SETTINGS["irrad"] = irrad
 
-    def sas_apply(self):
-        sas_curve = self.create_table(Pmp=self.SAS_VALUES["pmp"],
-                                        Vmp=self.SAS_VALUES["vmp"],
-                                        FillFactor=self.SAS_VALUES["ff"],
-                                        irradiance=self.SAS_VALUES["irrad"])
+    def apply(self):
+        sas_curve = self.create_table(Pmp=self.SETTINGS["pmp"],
+                                        Vmp=self.SETTINGS["vmp"],
+                                        FillFactor=self.SETTINGS["ff"],
+                                        irradiance=self.SETTINGS["irrad"])
 
         # # Update the plotting on the measurement panel
         # measurement_panel = self.Parent.Parent.measurement_panel
@@ -58,8 +64,10 @@ class SAS(AgilentE4360A):
         self.select_table()
         self.select_table_mode()
 
-    def sas_on(self):
+    def turn_on(self):
         self.on()
+        print("SAS on")
 
-    def sas_off(self):
+    def turn_off(self):
         self.off()
+        print("SAS off")

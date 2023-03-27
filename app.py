@@ -1,6 +1,9 @@
 import sys
-
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage
+import json
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox
+from PySide6.QtCore import QSettings
+from pyqtconfig import ConfigManager
+from pydantic.utils import deep_update
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
 from logic.ac_src import AC_SRC
@@ -22,33 +25,82 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         self.rlc = RLC(relay_controller_comport='COM3',
                     phase_controller_comport='COM4')
         self.sas = SAS("GPIB0::15::INSTR")
+
+        # self.load_config()
         
         self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
         self.ac_menu_phase.addItems(self.ac_src.PROFILES)
         
         self.auto_connect()    
     
+    def load_config(self):
+
+        with open("config.json", "r") as jsonfile:
+            self.config = json.load(jsonfile)
+        
+        default_config = self.config["default"]
+        self.ac_src.set_config(default_config["ac"])
+        self.scope.set_config(default_config["scope"])
+        self.rlc.set_config(default_config["rlc"])
+        self.sas.set_config(default_config["sas"])
+        
+        children = []
+        children += self.findChildren(QSpinBox)
+        children += self.findChildren(QDoubleSpinBox)
+        children += self.findChildren(QLineEdit)
+        children += self.findChildren(QCheckBox)
+        children += self.findChildren(QRadioButton)
+        children += self.findChildren(QComboBox)
+        # print(children)
+
+        for child in children:
+            name = child.objectName()
+            if not name.startswith('qt_'):
+                if 'entry' in name:
+                    wgtobj = getattr(self, name)
+                    wgtobj.setValue(default_config["ac"][name])
+
+        print("Config loaded")
+
     _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
     def _when_closers__clicked(self):
         print("Close was clicked")
+        # save config
+        # ac_config = self.ac_src.get_config()
+        # scope_config = self.scope.get_config()
+        # rlc_config = self.rlc.get_config()
+        # sas_config = self.sas.get_config()
+        # current_config = {
+        #     "ac": ac_config,
+        #     "scope": scope_config,
+        #     "rlc": rlc_config,
+        #     "sas": sas_config,
+        # }
+
+        # self.config["current"] = deep_update(self.config["current"], current_config)
+
+        # with open("config.json", "w") as jsonfile:
+        #     json.dump(self.config, jsonfile)
+        # print("Config saved")
+
         sys.exit()
     
     # AC Tab
     def _on_ac_butt_off__clicked(self):
         print("AC off was clicked")
-        self.ac_src.ac_off()
+        self.ac_src.turn_off()
     
     def _on_ac_butt_on__clicked(self):
         print("AC on was clicked")
-        self.ac_src.ac_on()
+        self.ac_src.turn_on()
         
     def _on_ac_butt_apply__clicked(self):
         print("Apply was clicked")
         
         if self.ac_check_abnormal.isChecked():
-            self.ac_src.ac_apply_abnormal()
+            self.ac_src.apply_abnormal()
         else:
-            self.ac_src.ac_apply()
+            self.ac_src.apply()
         
     def _on_ac_check_abnormal__stateChanged(self):
         print ('Abnormal was checked', self.sender().isChecked())
@@ -102,11 +154,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     # Scope tab
     def _on_scope_butt_apply__clicked(self):
         print("Apply labels was clicked")
-        self.scope.scope_label()
+        self.scope.label()
     
     def _on_scope_butt_cap__clicked(self):
         print("Capture was clicked")
-        self.scope.scope_capture()
+        self.scope.capture_display()
         
     def _on_scope_check_auto__stateChanged(self):
         print ('Check is', self.sender().isChecked())
@@ -150,14 +202,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     # RLC tab
     def _on_rlc_butt_off__clicked(self):
         print("RLC off was clicked")
-        self.rlc.rlc_off()
+        self.rlc.turn_off()
     
     def _on_rlc_butt_on__clicked(self):
         print("RLC on was clicked")
         try:
-            self.rlc.rlc_on()
-            self.rlc_entry_real_pwr.setValue(round(self.rlc.RLC_VALUES["real_pwr"]))
-            self.rlc_entry_reactive_pwr.setValue(round(self.rlc.RLC_VALUES["reactive_pwr"]))
+            self.rlc.turn_on()
+            self.rlc_entry_real_pwr.setValue(round(self.rlc.SETTINGS["real_pwr"]))
+            self.rlc_entry_reactive_pwr.setValue(round(self.rlc.SETTINGS["reactive_pwr"]))
         except self.rlc.NoInput:
             self.errorMsg.showMessage("Why do I even exist?")
         except self.rlc.VoltageInvalid:
@@ -167,7 +219,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         except self.rlc.FrequencyInvalid:
             self.errorMsg.showMessage("Need to specify frequency with reactive power")
 
-    def _rlc_on_entry_ac_volts__valueChanged(self):
+    def _on_rlc_entry_ac_volts__valueChanged(self):
         print("Ac Volts entered:", self.sender().value())
         self.rlc.set_ac_rms_volts(self.sender().value())
 
@@ -186,15 +238,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     # SAS tab
     def _on_sas_butt_off__clicked(self):
         print("SAS off was clicked")
-        self.sas.sas_off()
+        self.sas.turn_off()
     
     def _on_sas_butt_on__clicked(self):
         print("SAS on was clicked")
-        self.sas.sas_on()
+        self.sas.turn_on()
         
     def _on_sas_butt_apply__clicked(self):
         print("Apply was clicked")
-        self.sas.sas_apply()
+        self.sas.apply()
 
     def _on_sas_entry_irrad__valueChanged(self):
         print("Irradiance entered:", self.sender().value())

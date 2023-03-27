@@ -7,7 +7,7 @@ class RLC(EnphaseRLCV2):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.RLC_VALUES = {
+        self.SETTINGS = {
             "ac_rms_voltage": 0,
             "ac_freq": 0,
             "real_pwr": 0,
@@ -24,32 +24,38 @@ class RLC(EnphaseRLCV2):
     class FrequencyInvalid(Exception):
         pass
 
+    def get_config(self):
+        return self.SETTINGS
+    
+    def set_config(self, config):
+        self.SETTINGS = dict((config.get(k, k), v) for (k, v) in self.SETTINGS.items())
+
     def set_ac_rms_volts(self, ac_rms_voltage):
-        self.RLC_VALUES["ac_rms_voltage"] = ac_rms_voltage
+        self.SETTINGS["ac_rms_voltage"] = ac_rms_voltage
         
     def set_ac_freq(self, ac_freq):
-        self.RLC_VALUES["ac_freq"] = ac_freq
+        self.SETTINGS["ac_freq"] = ac_freq
         
     def set_real_pwr(self, ac_config):
-        self.RLC_VALUES["real_pwr"] = ac_config
+        self.SETTINGS["real_pwr"] = ac_config
         
     def set_reactive_pwr(self, choice):
-        self.RLC_VALUES["reactive_pwr"] = choice
+        self.SETTINGS["reactive_pwr"] = choice
 
     def set_resistance(self, choice):
-        self.RLC_VALUES["resistance"] = choice
+        self.SETTINGS["resistance"] = choice
 
     def set_inductance(self, choice):
-        self.RLC_VALUES["inducatance"] = choice
+        self.SETTINGS["inducatance"] = choice
 
     # Callback to apply settings and turn on rlc
-    def rlc_on_power(self):
-        ac_volts = self.RLC_VALUES["ac_rms_voltage"]
-        ac_freq = self.RLC_VALUES["ac_freq"]
-        real_pwr = self.RLC_VALUES["real_pwr"]
-        reactive_pwr = self.RLC_VALUES["reactive_pwr"]
+    def on_power(self):
+        ac_volts = self.SETTINGS["ac_rms_voltage"]
+        ac_freq = self.SETTINGS["ac_freq"]
+        real_pwr = self.SETTINGS["real_pwr"]
+        reactive_pwr = self.SETTINGS["reactive_pwr"]
 
-        if all(v == 0 for v in self.RLC_VALUES.values()):
+        if all(v == 0 for v in self.SETTINGS.values()):
             raise self.NoInput
         
         if ac_volts == 0:
@@ -73,8 +79,8 @@ class RLC(EnphaseRLCV2):
         #     ind = 2*math.pi*ac_volts*ac_volts/reactive_pwr
         # else:
         #     ind = "Inf"
-        self.RLC_VALUES["real_pwr"] = actual["actual_real_power"]
-        self.RLC_VALUES["reactive_pwr"] = actual["actual_reactive_power"]
+        self.SETTINGS["real_pwr"] = actual["actual_real_power"]
+        self.SETTINGS["reactive_pwr"] = actual["actual_reactive_power"]
         r, l, c = calculate_rlc_from_real_and_reactive_power(actual["actual_real_power"],
                                                                 actual["actual_reactive_power"],
                                                                 ac_volts,
@@ -84,19 +90,19 @@ class RLC(EnphaseRLCV2):
         print("res = {}, ind = {}, cap = {}".format(r,l,c))
         print("rlc configured using power values")
 
-    def rlc_on_rlc(self):
-        res = self.RLC_VALUES["resistance"]
-        ind = self.RLC_VALUES["inductance"]
+    def on_rlc(self):
+        res = self.SETTINGS["resistance"]
+        ind = self.SETTINGS["inductance"]
 
         actual = self.request_rlc_config(r=res, l=ind)
             
         print("res = {}, ind = {}".format(res,ind))
         print("rlc configured using rlc values")
 
-    def rlc_on(self):
-        self.rlc_on_power()
+    def turn_on(self):
+        self.on_power()
 
     # callback to turn off rlc output
-    def rlc_off(self):
+    def turn_off(self):
         self.close()
         print("rlc off")
