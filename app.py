@@ -39,21 +39,50 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
             self.config = json.load(jsonfile)
         
         children = []
-        # children += self.findChildren(QSpinBox)
-        # children += self.findChildren(QDoubleSpinBox)
-        children += self.findChildren(QLineEdit)
-        # children += self.findChildren(QCheckBox)
-        # children += self.findChildren(QRadioButton)
-        # children += self.findChildren(QComboBox)
-
+        children += self.findChildren(QSpinBox)
+        children += self.findChildren(QDoubleSpinBox)
+        
         for child in children:
             name = child.objectName()
-            print(name)
-        #     if not name.startswith('qt_'):
-        #         if 'entry' in name:
-        #             wgtobj = getattr(self, name)
-        #             wgtobj.setValue(self.config["current"][name])
+            if not name.startswith('qt_'):
+                prefix, sep, rest = name.partition('_')
+                # object_names.append((name, prefix))
 
+                wgtobj = getattr(self, name)
+                if hasattr(wgtobj, "setValue"):
+                    wgtobj.setValue(self.config["current"][prefix][name])
+                
+        
+        children = []
+        children += self.findChildren(QLineEdit)
+        
+        for child in children:
+            name = child.objectName()
+            if not name.startswith('qt_'):
+                prefix, sep, rest = name.partition('_')
+                # object_names.append((name, prefix))
+
+                wgtobj = getattr(self, name)
+                if hasattr(wgtobj, "setText"):
+                    wgtobj.setText(self.config["current"][prefix][name])
+        
+        children = []
+        children += self.findChildren(QCheckBox)
+        children += self.findChildren(QRadioButton)
+        
+        for child in children:
+            name = child.objectName()
+            if not name.startswith('qt_'):
+                prefix, sep, rest = name.partition('_')
+                # object_names.append((name, prefix))
+
+                wgtobj = getattr(self, name)
+                if hasattr(wgtobj, "setChecked"):
+                    wgtobj.setChecked(self.config["current"][prefix][name])
+        
+        # Setting Menu may overide current values if they are different from the presets
+        # children = []
+        # children += self.findChildren(QComboBox)
         print("Config loaded")
 
     _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
@@ -119,19 +148,20 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
             self.ac_radio_three.setChecked(True)
 
     def _on_ac_radio_single__toggled(self):
+        self.config["current"]["ac"]["ac_radio_single"] = self.ac_radio_single.isChecked()
         if self.ac_radio_single.isChecked():
             print("Single is selected")
-            self.config["current"]["ac"]["ac_radio"] = "single"
+            
             
     def _on_ac_radio_split__toggled(self):
+        self.config["current"]["ac"]["ac_radio_split"] = self.ac_radio_split.isChecked()
         if self.ac_radio_split.isChecked():
             print("Split is selected")
-            self.config["current"]["ac"]["ac_radio"] = "split"
             
     def _on_ac_radio_three__toggled(self):
+        self.config["current"]["ac"]["ac_radio_three"] = self.ac_radio_three.isChecked()
         if self.ac_radio_three.isChecked():
             print("Three is selected")
-            self.config["current"]["ac"]["ac_radio"] = "three"
         
     # Scope tab
     def _on_scope_butt_apply__clicked(self):
