@@ -12,36 +12,29 @@ class SAS(AgilentE4360A):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.SETTINGS = {
-            "vmp": 32.0,
-            "pmp": 100.0,
-            "ff": 0.78,
-            "irrad": 1.0,
-        }
-
-    def get_config(self):
-        return self.SETTINGS
+    # def get_config(self):
+    #     return self.SETTINGS
     
-    def set_config(self, config):
-        self.SETTINGS = config
+    # def set_config(self, config):
+    #     self.SETTINGS = config
 
-    def set_vmp(self, vmp):
-        self.SETTINGS["vmp"] = vmp
+    # def set_vmp(self, vmp):
+    #     self.SETTINGS["vmp"] = vmp
 
-    def set_pmp(self, pmp):
-        self.SETTINGS["pmp"] = pmp
+    # def set_pmp(self, pmp):
+    #     self.SETTINGS["pmp"] = pmp
 
-    def set_ff(self, ff):
-        self.SETTINGS["ff"] = ff
+    # def set_ff(self, ff):
+    #     self.SETTINGS["ff"] = ff
 
-    def set_irrad(self, irrad):
-        self.SETTINGS["irrad"] = irrad
+    # def set_irrad(self, irrad):
+    #     self.SETTINGS["irrad"] = irrad
 
-    def apply(self):
-        sas_curve = self.create_table(Pmp=self.SETTINGS["pmp"],
-                                        Vmp=self.SETTINGS["vmp"],
-                                        FillFactor=self.SETTINGS["ff"],
-                                        irradiance=self.SETTINGS["irrad"])
+    def apply(self, sas_config):
+        sas_curve = self.create_table(Pmp=sas_config["sas_entry_pmp"],
+                                        Vmp=sas_config["sas_entry_vmp"],
+                                        FillFactor=sas_config["sas_entry_ff"],
+                                        irradiance=sas_config["sas_entry_irrad"])
 
         # # Update the plotting on the measurement panel
         # measurement_panel = self.Parent.Parent.measurement_panel

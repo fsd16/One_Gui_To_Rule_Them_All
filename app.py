@@ -26,7 +26,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
                     phase_controller_comport='COM4')
         self.sas = SAS("GPIB0::15::INSTR")
 
-        # self.load_config()
+        self.load_config()
         
         self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
         self.ac_menu_phase.addItems(self.ac_src.PROFILES)
@@ -38,27 +38,21 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         with open("config.json", "r") as jsonfile:
             self.config = json.load(jsonfile)
         
-        default_config = self.config["default"]
-        self.ac_src.set_config(default_config["ac"])
-        self.scope.set_config(default_config["scope"])
-        self.rlc.set_config(default_config["rlc"])
-        self.sas.set_config(default_config["sas"])
-        
-        children = []
-        children += self.findChildren(QSpinBox)
-        children += self.findChildren(QDoubleSpinBox)
-        children += self.findChildren(QLineEdit)
-        children += self.findChildren(QCheckBox)
-        children += self.findChildren(QRadioButton)
-        children += self.findChildren(QComboBox)
-        # print(children)
+        # children = []
+        # children += self.findChildren(QSpinBox)
+        # children += self.findChildren(QDoubleSpinBox)
+        # children += self.findChildren(QLineEdit)
+        # children += self.findChildren(QCheckBox)
+        # children += self.findChildren(QRadioButton)
+        # children += self.findChildren(QComboBox)
+        # # print(children)
 
-        for child in children:
-            name = child.objectName()
-            if not name.startswith('qt_'):
-                if 'entry' in name:
-                    wgtobj = getattr(self, name)
-                    wgtobj.setValue(default_config["ac"][name])
+        # for child in children:
+        #     name = child.objectName()
+        #     if not name.startswith('qt_'):
+        #         if 'entry' in name:
+        #             wgtobj = getattr(self, name)
+        #             wgtobj.setValue(default_config["ac"][name])
 
         print("Config loaded")
 
@@ -98,28 +92,28 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         print("Apply was clicked")
         
         if self.ac_check_abnormal.isChecked():
-            self.ac_src.apply_abnormal()
+            self.ac_src.apply_abnormal(self.config["default"]["ac"])
         else:
-            self.ac_src.apply()
+            self.ac_src.apply(self.config["default"]["ac"])
         
     def _on_ac_check_abnormal__stateChanged(self):
         print ('Abnormal was checked', self.sender().isChecked())
 
     def _on_ac_entry_ac_volts__valueChanged(self):
         print("Ac Volts entered:", self.sender().value())
-        self.ac_src.set_ac_rms_volts(self.sender().value())
+        self.config["default"]["ac"]["ac_entry_ac_volts"] = self.sender().value()
 
     def _on_ac_entry_freq__valueChanged(self):
         print("Frequency entered:", self.sender().value())
-        self.ac_src.set_ac_freq(self.sender().value())
+        self.config["default"]["ac"]["ac_entry_freq"] = self.sender().value()
         
     def _on_ac_entry_step_size__valueChanged(self):
         print("Step size entered:", self.sender().value())
-        self.ac_entry_ac_volts.setSingleStep(self.sender().value())
+        self.config["default"]["ac"]["ac_entry_step_size"] = self.sender().value()
     
     def _on_ac_menu_abnormal__activated(self):
         print("Abnormal waveform selected:", self.sender().currentText())
-        self.ac_src.set_ab_waveform(self.sender().currentText())
+        self.config["default"]["ac"]["ac_manu_abnormal"] = self.sender().currentText()
         
     def _on_ac_menu_phase__activated(self):
         
@@ -139,65 +133,66 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     def _on_ac_radio_single__toggled(self):
         if self.ac_radio_single.isChecked():
             print("Single is selected")
-            self.ac_src.set_ac_config("single")
+            self.config["default"]["ac"]["ac_radio"] = "single"
             
     def _on_ac_radio_split__toggled(self):
         if self.ac_radio_split.isChecked():
             print("Split is selected")
-            self.ac_src.set_ac_config("split")
+            self.config["default"]["ac"]["ac_radio"] = "split"
             
     def _on_ac_radio_three__toggled(self):
         if self.ac_radio_three.isChecked():
             print("Three is selected")
-            self.ac_src.set_ac_config("three")
+            self.config["default"]["ac"]["ac_radio"] = "three"
         
     # Scope tab
     def _on_scope_butt_apply__clicked(self):
         print("Apply labels was clicked")
-        self.scope.label()
+        self.scope.label(self.config["default"]["scope"])
     
     def _on_scope_butt_cap__clicked(self):
         print("Capture was clicked")
-        self.scope.capture_display()
+        self.scope.capture_display(self.config["default"]["scope"])
         
     def _on_scope_check_auto__stateChanged(self):
         print ('Check is', self.sender().isChecked())
+        self.config["default"]["scope"]["scope_check_auto"] = self.sender().isChecked()
         if self.sender().isChecked():
-            self.scope.auto_capture_on()
+            self.scope.auto_capture_on(self.config["default"]["scope"])
         else:
             self.scope.auto_capture_off()
         
     def _on_scope_check_date__stateChanged(self):
         print ('Check is', self.sender().isChecked())
-        self.scope.set_date(self.sender().isChecked())
+        self.config["default"]["scope"]["scope_check_date"] = self.sender().isChecked()
         
     def _on_scope_check_invert__stateChanged(self):
         print ('Check is', self.sender().isChecked())
-        self.scope.set_invert(self.sender().isChecked())
+        self.config["default"]["scope"]["scope_check_invert"] = self.sender().isChecked()
         
     def _on_scope_line_cap_name__editingFinished(self):
         print("Capture name entered:", self.sender().text())
-        self.scope.set_name(self.sender().text())
+        self.config["default"]["scope"]["scope_line_cap_name"] = self.sender().text()
         
     def _on_scope_line_cap_path__editingFinished(self):
         print("Capture path entered:", self.sender().text())
-        self.scope.set_path(self.sender().text())
+        self.config["default"]["scope"]["scope_line_cap_path"] = self.sender().text()
     
     def _on_scope_line_ch1_lab__editingFinished(self):
         print("CH1 label entered:", self.sender().text())
-        self.scope.set_ch1(self.sender().text())
+        self.config["default"]["scope"]["scope_line_ch1_lab"] = self.sender().text()
         
     def _on_scope_line_ch2_lab__editingFinished(self):
         print("CH2 label entered:", self.sender().text())
-        self.scope.set_ch2(self.sender().text())
+        self.config["default"]["scope"]["scope_line_ch2_lab"] = self.sender().text()
         
     def _on_scope_line_ch3_lab__editingFinished(self):
         print("CH3 label entered:", self.sender().text())
-        self.scope.set_ch3(self.sender().text())
+        self.config["default"]["scope"]["scope_line_ch3_lab"] = self.sender().text()
         
     def _on_scope_line_ch4_lab__editingFinished(self):
         print("CH4 label entered:", self.sender().text())
-        self.scope.set_ch4(self.sender().text())
+        self.config["default"]["scope"]["scope_line_ch4_lab"] = self.sender().text()
         
     # RLC tab
     def _on_rlc_butt_off__clicked(self):
@@ -206,10 +201,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     
     def _on_rlc_butt_on__clicked(self):
         print("RLC on was clicked")
+
+        rlc_config = self.config["default"]["rlc"]
+
         try:
-            self.rlc.turn_on()
-            self.rlc_entry_real_pwr.setValue(round(self.rlc.SETTINGS["real_pwr"]))
-            self.rlc_entry_reactive_pwr.setValue(round(self.rlc.SETTINGS["reactive_pwr"]))
+            rlc_config = self.rlc.turn_on(rlc_config)
+            self.config["default"]["rlc"].update(rlc_config)
+            # self.rlc_entry_real_pwr.setValue(round(self.rlc.SETTINGS["real_pwr"]))
+            # self.rlc_entry_reactive_pwr.setValue(round(self.rlc.SETTINGS["reactive_pwr"]))
         except self.rlc.NoInput:
             self.errorMsg.showMessage("Why do I even exist?")
         except self.rlc.VoltageInvalid:
@@ -221,19 +220,19 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
 
     def _on_rlc_entry_ac_volts__valueChanged(self):
         print("Ac Volts entered:", self.sender().value())
-        self.rlc.set_ac_rms_volts(self.sender().value())
+        self.config["default"]["rlc"]["rlc_entry_ac_volts"] = self.sender().value()
 
     def _on_rlc_entry_freq__valueChanged(self):
         print("Frequency entered:", self.sender().value())
-        self.rlc.set_ac_freq(self.sender().value())
+        self.config["default"]["rlc"]["rlc_entry_freq"] = self.sender().value()
 
     def _on_rlc_entry_reactive_pwr__valueChanged(self):
         print("Reactive power entered:", self.sender().value())
-        self.rlc.set_reactive_pwr(self.sender().value())
+        self.config["default"]["rlc"]["rlc_entry_reactive_pwr"] = self.sender().value()
 
     def _on_rlc_entry_real_pwr__valueChanged(self):
         print("Real power entered:", self.sender().value())
-        self.rlc.set_real_pwr(self.sender().value())
+        self.config["default"]["rlc"]["rlc_entry_real_pwr"] = self.sender().value()
 
     # SAS tab
     def _on_sas_butt_off__clicked(self):
@@ -246,23 +245,23 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         
     def _on_sas_butt_apply__clicked(self):
         print("Apply was clicked")
-        self.sas.apply()
+        self.sas.apply(self.config["default"]["sas"])
 
     def _on_sas_entry_irrad__valueChanged(self):
         print("Irradiance entered:", self.sender().value())
-        self.sas.set_irrad(self.sender().value())
+        self.config["default"]["sas"]["sas_entry_irrad"] = self.sender().value()
 
     def _on_sas_entry_ff__valueChanged(self):
         print("Fill Factor entered:", self.sender().value())
-        self.sas.set_ff(self.sender().value())
+        self.config["default"]["sas"]["sas_entry_ff"] = self.sender().value()
 
     def _on_sas_entry_pmp__valueChanged(self):
         print("Pmp entered:", self.sender().value())
-        self.sas.set_pmp(self.sender().value())
+        self.config["default"]["sas"]["sas_entry_pmp"] = self.sender().value()
 
     def _on_sas_entry_vmp__valueChanged(self):
         print("Vmp entered:", self.sender().value())
-        self.sas.set_vmp(self.sender().value())
+        self.config["default"]["sas"]["sas_entry_vmp"] = self.sender().value()
         
 if __name__ == '__main__':
     

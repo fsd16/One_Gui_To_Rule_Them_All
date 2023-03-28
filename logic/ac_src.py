@@ -39,39 +39,31 @@ class AC_SRC(PPS_308):
             "Amanda_Welz_Florida":                         ('Amanda_Welz_Florida.wfd'),
         }
         
-        self.SETTINGS = {
-            "ac_rms_voltage": 240,
-            "ac_freq": 60,
-            "config": "split",
-            "abnormal": "IEC_77A_Class_1"
-        }
-    def get_config(self):
-        return self.SETTINGS
+    # def get_config(self):
+    #     return self.SETTINGS
     
-    def set_config(self, config):
-        self.SETTINGS = config
+    # def set_config(self, config):
+    #     self.SETTINGS = config
 
-    def set_ac_rms_volts(self, ac_rms_voltage):
-        self.SETTINGS["ac_rms_voltage"] = ac_rms_voltage
+    # def set_ac_rms_volts(self, ac_rms_voltage):
+    #     self.SETTINGS["ac_rms_voltage"] = ac_rms_voltage
         
-    def set_ac_freq(self, ac_freq):
-        self.SETTINGS["ac_freq"] = ac_freq
+    # def set_ac_freq(self, ac_freq):
+    #     self.SETTINGS["ac_freq"] = ac_freq
         
-    def set_ac_config(self, ac_config):
-        self.SETTINGS["config"] = ac_config
+    # def set_ac_config(self, ac_config):
+    #     self.SETTINGS["config"] = ac_config
         
-    # Callback to select abnormal waveform
-    def set_ab_waveform(self, choice):
-        self.SETTINGS["abnormal"] = choice
+    # # Callback to select abnormal waveform
+    # def set_ab_waveform(self, choice):
+    #     self.SETTINGS["abnormal"] = choice
     
     # def set_ac_profile(self, profile_key):
     #     profile = self.PROFILES[profile_key]
     #     self.SETTINGS.update(ac_rms_voltage=profile[0], ac_freq=profile[1], config=profile[2])
     
     # Callback to set ac voltage
-    def calc_ac_volts(self):
-        config = self.SETTINGS["config"]
-        ac_rms_voltage = self.SETTINGS["ac_rms_voltage"]
+    def calc_ac_volts(self, config, ac_rms_voltage):
         
         if config == "split":
             ac_voltage_tuple = (ac_rms_voltage / 2.0, ac_rms_voltage / 2.0)
@@ -83,19 +75,19 @@ class AC_SRC(PPS_308):
         return ac_voltage_tuple
 
     # Callback to apply settings to AC
-    def apply(self):
+    def apply(self, ac_config):
         
-        self.prog_voltage_line_voltages(99, self.calc_ac_volts(), self.SETTINGS["ac_freq"])
+        self.prog_voltage_line_voltages(99, self.calc_ac_volts(ac_config["ac_radio"], ac_config["ac_entry_ac_volts"]), ac_config["ac_entry_freq"])
         self.exec_program(99)
         print("AC updated ")
         
-    def apply_abnormal(self):
+    def apply_abnormal(self, ac_config):
         
-        choice = self.SETTINGS["abnormal"]
+        choice = ac_config["ac_menu_abnormal"]
         path = os.path.join(self.base_path, (self.AB_WAVEFORMS[choice]))
         continuous_waveform = Waveform.create_waveform_from_file(path)
         
-        self.set_steady_state(voltages=self.calc_ac_volts(), frequency=self.SETTINGS["ac_freq"], waveform=continuous_waveform)
+        self.set_steady_state(voltages=self.calc_ac_volts(ac_config["ac_radio"], ac_config["ac_entry_ac_volts"]), frequency=ac_config["ac_entry_freq"], waveform=continuous_waveform)
         
     # callback to apply settings and turn on ac output
     def turn_on(self):    
