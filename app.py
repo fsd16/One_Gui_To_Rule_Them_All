@@ -85,6 +85,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         # children += self.findChildren(QComboBox)
         print("Config loaded")
 
+    def _on_main_action_restore__clicked(self):
+        raise NotImplementedError
+    
     _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
     def _when_closers__clicked(self):
         print("Close was clicked")

@@ -11,21 +11,24 @@
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
+    QCursor, QFont, QFontDatabase, QGradient,
+    QIcon, QImage, QKeySequence, QLinearGradient,
+    QPainter, QPalette, QPixmap, QRadialGradient,
+    QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBox,
     QFormLayout, QGridLayout, QLabel, QLineEdit,
-    QMainWindow, QMenuBar, QPushButton, QRadioButton,
-    QSizePolicy, QSpinBox, QStatusBar, QTabWidget,
-    QWidget)
+    QMainWindow, QMenu, QMenuBar, QPushButton,
+    QRadioButton, QSizePolicy, QSpinBox, QStatusBar,
+    QTabWidget, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(462, 264)
+        self.main_action_restore = QAction(MainWindow)
+        self.main_action_restore.setObjectName(u"main_action_restore")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_7 = QGridLayout(self.centralwidget)
@@ -479,10 +482,15 @@ class Ui_MainWindow(object):
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
         self.menubar.setGeometry(QRect(0, 0, 462, 22))
+        self.menuOptions = QMenu(self.menubar)
+        self.menuOptions.setObjectName(u"menuOptions")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.menubar.addAction(self.menuOptions.menuAction())
+        self.menuOptions.addAction(self.main_action_restore)
 
         self.retranslateUi(MainWindow)
 
@@ -494,6 +502,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.main_action_restore.setText(QCoreApplication.translate("MainWindow", u"Restore Defaults", None))
         self.sas_butt_off.setText(QCoreApplication.translate("MainWindow", u"SAS Off", None))
         self.sas_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))
         self.sas_butt_on.setText(QCoreApplication.translate("MainWindow", u"SAS On", None))
@@ -540,5 +549,6 @@ class Ui_MainWindow(object):
 "(Hz)", None))
         self.rlc_butt_off.setText(QCoreApplication.translate("MainWindow", u"RLC off", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.rlc_tab), QCoreApplication.translate("MainWindow", u"RLC", None))
+        self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))
     # retranslateUi
 
