@@ -15,7 +15,7 @@ from logic.sas import SAS
 
 
 
-RUN_EQUIPMENT = False
+RUN_EQUIPMENT = True
 
 class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal): 
     def __init__(self, *args, **kwargs):
