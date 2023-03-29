@@ -3,16 +3,15 @@ import json
 import smartside.signal as smartsignal
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox
-from PySide6.QtCore import QSettings
-from pyqtconfig import ConfigManager
+from PySide6.QtCore import Qt
 from pydantic.utils import deep_update
+from pyqtgraph import PlotWidget
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
 from logic.ac_src import AC_SRC
 from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
-
 
 
 RUN_EQUIPMENT = True
@@ -84,7 +83,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         # Setting Menu may overide current values if they are different from the presets
         # children = []
         # children += self.findChildren(QComboBox)
-        
+    
     def load_config(self):
 
         with open("config.json", "r") as jsonfile:
@@ -310,7 +309,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     def _on_sas_butt_apply__clicked(self):
         print("Apply was clicked")
         if RUN_EQUIPMENT:
-            self.sas.apply(self.c_config["sas"])
+            vi_array, p_array =  self.sas.apply(self.c_config["sas"])
+            self.sas_plot.plot(vi_array[0], vi_array[1])
+            self.sas_plot.plot(p_array[0], p_array[1])
 
     def _on_sas_entry_irrad__valueChanged(self):
         state = self.sender().value()
@@ -331,9 +332,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         state = self.sender().value()
         print("Vmp entered:", state)
         self.c_config["sas"]["sas_entry_vmp"] = state
-        
-if __name__ == '__main__':
-    
+
+
+def main():
     # This call takes foooooreeeeeever.....
     app = QApplication(sys.argv)
 
@@ -341,3 +342,6 @@ if __name__ == '__main__':
     window.show()
 
     sys.exit(app.exec())
+
+if __name__ == '__main__':
+    main()

@@ -35,27 +35,14 @@ class SAS(AgilentE4360A):
                                         Vmp=sas_config["sas_entry_vmp"],
                                         FillFactor=sas_config["sas_entry_ff"],
                                         irradiance=sas_config["sas_entry_irrad"])
-
-        # # Update the plotting on the measurement panel
-        # measurement_panel = self.Parent.Parent.measurement_panel
-
-        # vi_array = np.array(sas_curve[1]).astype(np.float)
-        # p_array = vi_array[0] * vi_array[1]
-
-        # # Update plots
-        # for panel in [self, measurement_panel]:
-        #     panel.vi_curve.set_data(vi_array[0], vi_array[1])
-        #     panel.vi_axis.relim()
-        #     panel.vi_axis.autoscale_view(True, True, True)
-
-        #     panel.vp_curve.set_data(vi_array[0], p_array)
-        #     panel.vp_axis.relim()
-        #     panel.vp_axis.autoscale_view(True, True, True)
-
-        #     panel.canvas.draw()
+        
+        
+        vi_array = np.array(sas_curve[1]).astype(np.float)
+        p_array = [vi_array[0], vi_array[0] * vi_array[1]]
 
         self.select_table()
         self.select_table_mode()
+        return vi_array, p_array
 
     def turn_on(self):
         self.on()
