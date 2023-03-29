@@ -86,7 +86,7 @@ class Ui_MainWindow(object):
         self.sas_entry_vmp.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
         self.sas_entry_vmp.setAccelerated(False)
         self.sas_entry_vmp.setDecimals(1)
-        self.sas_entry_vmp.setMaximum(1000.000000000000000)
+        self.sas_entry_vmp.setMaximum(999.899999999999977)
         self.sas_entry_vmp.setValue(32.000000000000000)
 
         self.formLayout.setWidget(0, QFormLayout.FieldRole, self.sas_entry_vmp)
@@ -108,7 +108,7 @@ class Ui_MainWindow(object):
         self.sas_entry_ff.setFrame(True)
         self.sas_entry_ff.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
         self.sas_entry_ff.setAccelerated(False)
-        self.sas_entry_ff.setMaximum(999.990000000000009)
+        self.sas_entry_ff.setMaximum(999.899999999999977)
         self.sas_entry_ff.setValue(0.780000000000000)
 
         self.formLayout.setWidget(2, QFormLayout.FieldRole, self.sas_entry_ff)
@@ -138,6 +138,7 @@ class Ui_MainWindow(object):
         self.sas_entry_pmp.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
         self.sas_entry_pmp.setAccelerated(False)
         self.sas_entry_pmp.setDecimals(1)
+        self.sas_entry_pmp.setMaximum(1000.000000000000000)
         self.sas_entry_pmp.setValue(100.000000000000000)
 
         self.formLayout.setWidget(1, QFormLayout.FieldRole, self.sas_entry_pmp)

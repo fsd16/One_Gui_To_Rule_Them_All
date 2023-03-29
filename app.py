@@ -1,5 +1,7 @@
 import sys
 import json
+import smartside.signal as smartsignal
+
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox
 from PySide6.QtCore import QSettings
 from pyqtconfig import ConfigManager
@@ -11,7 +13,9 @@ from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
 
-import smartside.signal as smartsignal
+
+
+RUN_EQUIPMENT = False
 
 class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal): 
     def __init__(self, *args, **kwargs):
@@ -19,25 +23,22 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         self.setupUi(self)
 
         self.errorMsg = QErrorMessage()
-        
-        self.ac_src = AC_SRC("GPIB0::1::INSTR")
-        self.scope = Scope("GPIB0::28::INSTR")
-        self.rlc = RLC(relay_controller_comport='COM3',
-                    phase_controller_comport='COM4')
-        self.sas = SAS("GPIB0::15::INSTR")
+        if RUN_EQUIPMENT:
+            self.ac_src = AC_SRC("GPIB0::1::INSTR")
+            self.scope = Scope("GPIB0::28::INSTR")
+            self.rlc = RLC(relay_controller_comport='COM3',
+                        phase_controller_comport='COM4')
+            self.sas = SAS("GPIB0::15::INSTR")
 
         self.load_config()
         
-        self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
-        self.ac_menu_phase.addItems(self.ac_src.PROFILES)
+        if RUN_EQUIPMENT:
+            self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
+            self.ac_menu_phase.addItems(self.ac_src.PROFILES)
         
-        self.auto_connect()    
-    
-    def load_config(self):
-
-        with open("config.json", "r") as jsonfile:
-            self.config = json.load(jsonfile)
+        self.auto_connect()
         
+    def force_update_ui(self, config):
         children = []
         children += self.findChildren(QSpinBox)
         children += self.findChildren(QDoubleSpinBox)
@@ -50,7 +51,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
 
                 wgtobj = getattr(self, name)
                 if hasattr(wgtobj, "setValue"):
-                    wgtobj.setValue(self.config["current"][prefix][name])
+                    wgtobj.setValue(config[prefix][name])
                 
         
         children = []
@@ -64,7 +65,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
 
                 wgtobj = getattr(self, name)
                 if hasattr(wgtobj, "setText"):
-                    wgtobj.setText(self.config["current"][prefix][name])
+                    wgtobj.setText(config[prefix][name])
         
         children = []
         children += self.findChildren(QCheckBox)
@@ -78,15 +79,25 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
 
                 wgtobj = getattr(self, name)
                 if hasattr(wgtobj, "setChecked"):
-                    wgtobj.setChecked(self.config["current"][prefix][name])
-        
+                    wgtobj.setChecked(config[prefix][name])
+                    
         # Setting Menu may overide current values if they are different from the presets
         # children = []
         # children += self.findChildren(QComboBox)
+        
+    def load_config(self):
+
+        with open("config.json", "r") as jsonfile:
+            self.config = json.load(jsonfile)
+        self.c_config = self.config["current"]
+        self.d_config = self.config["default"]
+        self.force_update_ui(self.c_config)
+        
         print("Config loaded")
 
-    def _on_main_action_restore__clicked(self):
-        raise NotImplementedError
+    def _on_main_action_restore__triggered(self):
+        print("Restore defaults triggered")
+        self.force_update_ui(self.d_config)
     
     _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
     def _when_closers__clicked(self):
@@ -102,44 +113,55 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     # AC Tab
     def _on_ac_butt_off__clicked(self):
         print("AC off was clicked")
-        self.ac_src.turn_off()
+        if RUN_EQUIPMENT:
+            self.ac_src.turn_off()
     
     def _on_ac_butt_on__clicked(self):
         print("AC on was clicked")
-        self.ac_src.turn_on()
+        if RUN_EQUIPMENT:
+            self.ac_src.turn_on()
         
     def _on_ac_butt_apply__clicked(self):
         print("Apply was clicked")
         
-        if self.ac_check_abnormal.isChecked():
-            self.ac_src.apply_abnormal(self.config["current"]["ac"])
+        if self.c_config["ac"]["ac_check_abnormal"]:
+            if RUN_EQUIPMENT:
+                self.ac_src.apply_abnormal(self.c_config["ac"])
         else:
-            self.ac_src.apply(self.config["current"]["ac"])
+            if RUN_EQUIPMENT:
+                self.ac_src.apply(self.c_config["ac"])
         
     def _on_ac_check_abnormal__stateChanged(self):
-        print ('Abnormal was checked', self.sender().isChecked())
+        state = self.sender().value()
+        print ('Abnormal was checked', state)
+        self.c_config["ac"]["ac_check_abnormal"] = state
 
     def _on_ac_entry_ac_volts__valueChanged(self):
-        print("Ac Volts entered:", self.sender().value())
-        self.config["current"]["ac"]["ac_entry_ac_volts"] = self.sender().value()
+        state = self.sender().value()
+        print("Ac Volts entered:", state)
+        self.c_config["ac"]["ac_entry_ac_volts"] = state
 
     def _on_ac_entry_freq__valueChanged(self):
-        print("Frequency entered:", self.sender().value())
-        self.config["current"]["ac"]["ac_entry_freq"] = self.sender().value()
+        state = self.sender().value()
+        print("Frequency entered:", state)
+        self.c_config["ac"]["ac_entry_freq"] = state
         
     def _on_ac_entry_step_size__valueChanged(self):
-        print("Step size entered:", self.sender().value())
-        self.config["current"]["ac"]["ac_entry_step_size"] = self.sender().value()
+        state = self.sender().value()
+        print("Step size entered:", state)
+        self.c_config["ac"]["ac_entry_step_size"] = state
     
     def _on_ac_menu_abnormal__activated(self):
-        print("Abnormal waveform selected:", self.sender().currentText())
-        self.config["current"]["ac"]["ac_manu_abnormal"] = self.sender().currentText()
+        state = self.sender().currentText()
+        print("Abnormal waveform selected:", state)
+        self.c_config["ac"]["ac_manu_abnormal"] = state
         
     def _on_ac_menu_phase__activated(self):
-        
-        print("Profile selected:", self.sender().currentText())
+        state = self.sender().currentText()
+        print("Profile selected:", state)
         # self.ac_src.set_ac_profile(self.sender().currentText())
-        profile = self.ac_src.PROFILES[self.sender().currentText()]
+        if RUN_EQUIPMENT:
+            profile = self.ac_src.PROFILES[state]
         self.ac_entry_ac_volts.setValue(profile[0])
         self.ac_entry_freq.setValue(profile[1])
         
@@ -151,83 +173,98 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
             self.ac_radio_three.setChecked(True)
 
     def _on_ac_radio_single__toggled(self):
-        self.config["current"]["ac"]["ac_radio_single"] = self.ac_radio_single.isChecked()
-        if self.ac_radio_single.isChecked():
+        self.c_config["ac"]["ac_radio_single"] = self.ac_radio_single.isChecked()
+        if self.c_config["ac"]["ac_radio_single"]:
             print("Single is selected")
             
             
     def _on_ac_radio_split__toggled(self):
-        self.config["current"]["ac"]["ac_radio_split"] = self.ac_radio_split.isChecked()
-        if self.ac_radio_split.isChecked():
+        self.c_config["ac"]["ac_radio_split"] = self.ac_radio_split.isChecked()
+        if self.c_config["ac"]["ac_radio_split"]:
             print("Split is selected")
             
     def _on_ac_radio_three__toggled(self):
-        self.config["current"]["ac"]["ac_radio_three"] = self.ac_radio_three.isChecked()
-        if self.ac_radio_three.isChecked():
+        self.c_config["ac"]["ac_radio_three"] = self.ac_radio_three.isChecked()
+        if self.c_config["ac"]["ac_radio_three"]:
             print("Three is selected")
         
     # Scope tab
     def _on_scope_butt_apply__clicked(self):
         print("Apply labels was clicked")
-        self.scope.label(self.config["current"]["scope"])
+        if RUN_EQUIPMENT:
+            self.scope.label(self.c_config["scope"])
     
     def _on_scope_butt_cap__clicked(self):
         print("Capture was clicked")
-        self.scope.capture_display(self.config["current"]["scope"])
+        if RUN_EQUIPMENT:
+            self.scope.capture_display(self.c_config["scope"])
         
     def _on_scope_check_auto__stateChanged(self):
-        print ('Check is', self.sender().isChecked())
-        self.config["current"]["scope"]["scope_check_auto"] = self.sender().isChecked()
-        if self.sender().isChecked():
-            self.scope.auto_capture_on(self.config["current"]["scope"])
+        state = self.sender().isChecked()
+        print ('Check is', state)
+        self.c_config["scope"]["scope_check_auto"] = state
+        if state:
+            if RUN_EQUIPMENT:    
+                self.scope.auto_capture_on(self.c_config["scope"])
         else:
-            self.scope.auto_capture_off()
+            if RUN_EQUIPMENT:
+                self.scope.auto_capture_off()
         
     def _on_scope_check_date__stateChanged(self):
-        print ('Check is', self.sender().isChecked())
-        self.config["current"]["scope"]["scope_check_date"] = self.sender().isChecked()
+        state = self.sender().isChecked()
+        print ('Check is', state)
+        self.c_config["scope"]["scope_check_date"] = state
         
     def _on_scope_check_invert__stateChanged(self):
-        print ('Check is', self.sender().isChecked())
-        self.config["current"]["scope"]["scope_check_invert"] = self.sender().isChecked()
+        state = self.sender().isChecked()
+        print ('Check is', state)
+        self.c_config["scope"]["scope_check_invert"] = state
         
     def _on_scope_line_cap_name__editingFinished(self):
-        print("Capture name entered:", self.sender().text())
-        self.config["current"]["scope"]["scope_line_cap_name"] = self.sender().text()
+        state = self.sender().text()
+        print("Capture name entered:", state)
+        self.c_config["scope"]["scope_line_cap_name"] = state
         
     def _on_scope_line_cap_path__editingFinished(self):
-        print("Capture path entered:", self.sender().text())
-        self.config["current"]["scope"]["scope_line_cap_path"] = self.sender().text()
+        state = self.sender().text()
+        print("Capture path entered:", state)
+        self.c_config["scope"]["scope_line_cap_path"] = state
     
     def _on_scope_line_ch1_lab__editingFinished(self):
-        print("CH1 label entered:", self.sender().text())
-        self.config["current"]["scope"]["scope_line_ch1_lab"] = self.sender().text()
+        state = self.sender().text()
+        print("CH1 label entered:", state)
+        self.c_config["scope"]["scope_line_ch1_lab"] = state
         
     def _on_scope_line_ch2_lab__editingFinished(self):
-        print("CH2 label entered:", self.sender().text())
-        self.config["current"]["scope"]["scope_line_ch2_lab"] = self.sender().text()
+        state = self.sender().text()
+        print("CH2 label entered:", state)
+        self.c_config["scope"]["scope_line_ch2_lab"] = state
         
     def _on_scope_line_ch3_lab__editingFinished(self):
-        print("CH3 label entered:", self.sender().text())
-        self.config["current"]["scope"]["scope_line_ch3_lab"] = self.sender().text()
+        state = self.sender().text()
+        print("CH3 label entered:", state)
+        self.c_config["scope"]["scope_line_ch3_lab"] = state
         
     def _on_scope_line_ch4_lab__editingFinished(self):
-        print("CH4 label entered:", self.sender().text())
-        self.config["current"]["scope"]["scope_line_ch4_lab"] = self.sender().text()
+        state = self.sender().text()
+        print("CH4 label entered:", state)
+        self.c_config["scope"]["scope_line_ch4_lab"] = state
         
     # RLC tab
     def _on_rlc_butt_off__clicked(self):
         print("RLC off was clicked")
-        self.rlc.turn_off()
+        if RUN_EQUIPMENT:
+            self.rlc.turn_off()
     
     def _on_rlc_butt_on__clicked(self):
         print("RLC on was clicked")
 
-        rlc_config = self.config["current"]["rlc"]
+        rlc_config = self.c_config["rlc"]
 
         try:
-            rlc_config = self.rlc.turn_on(rlc_config)
-            self.config["current"]["rlc"].update(rlc_config)
+            if RUN_EQUIPMENT:
+                rlc_config = self.rlc.turn_on(rlc_config)
+            self.c_config["rlc"].update(rlc_config)
             # self.rlc_entry_real_pwr.setValue(round(self.rlc.SETTINGS["real_pwr"]))
             # self.rlc_entry_reactive_pwr.setValue(round(self.rlc.SETTINGS["reactive_pwr"]))
         except self.rlc.NoInput:
@@ -240,52 +277,64 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
             self.errorMsg.showMessage("Need to specify frequency with reactive power")
 
     def _on_rlc_entry_ac_volts__valueChanged(self):
-        print("Ac Volts entered:", self.sender().value())
-        self.config["current"]["rlc"]["rlc_entry_ac_volts"] = self.sender().value()
+        state = self.sender().value()
+        print("Ac Volts entered:", state)
+        self.c_config["rlc"]["rlc_entry_ac_volts"] = state
 
     def _on_rlc_entry_freq__valueChanged(self):
-        print("Frequency entered:", self.sender().value())
-        self.config["current"]["rlc"]["rlc_entry_freq"] = self.sender().value()
+        state = self.sender().value()
+        print("Frequency entered:", state)
+        self.c_config["rlc"]["rlc_entry_freq"] = state
 
     def _on_rlc_entry_reactive_pwr__valueChanged(self):
-        print("Reactive power entered:", self.sender().value())
-        self.config["current"]["rlc"]["rlc_entry_reactive_pwr"] = self.sender().value()
+        state = self.sender().value()
+        print("Reactive power entered:", state)
+        self.c_config["rlc"]["rlc_entry_reactive_pwr"] = state
 
     def _on_rlc_entry_real_pwr__valueChanged(self):
-        print("Real power entered:", self.sender().value())
-        self.config["current"]["rlc"]["rlc_entry_real_pwr"] = self.sender().value()
+        state = self.sender().value()
+        print("Real power entered:", state)
+        self.c_config["rlc"]["rlc_entry_real_pwr"] = state
 
     # SAS tab
     def _on_sas_butt_off__clicked(self):
         print("SAS off was clicked")
-        self.sas.turn_off()
+        if RUN_EQUIPMENT:
+            self.sas.turn_off()
     
     def _on_sas_butt_on__clicked(self):
         print("SAS on was clicked")
-        self.sas.turn_on()
+        if RUN_EQUIPMENT:
+            self.sas.turn_on()
         
     def _on_sas_butt_apply__clicked(self):
         print("Apply was clicked")
-        self.sas.apply(self.config["current"]["sas"])
+        if RUN_EQUIPMENT:
+            self.sas.apply(self.c_config["sas"])
 
     def _on_sas_entry_irrad__valueChanged(self):
-        print("Irradiance entered:", self.sender().value())
-        self.config["current"]["sas"]["sas_entry_irrad"] = self.sender().value()
+        state = self.sender().value()
+        print("Irradiance entered:", state)
+        self.c_config["sas"]["sas_entry_irrad"] = state
 
     def _on_sas_entry_ff__valueChanged(self):
-        print("Fill Factor entered:", self.sender().value())
-        self.config["current"]["sas"]["sas_entry_ff"] = self.sender().value()
+        state = self.sender().value()
+        print("Fill Factor entered:", state)
+        self.c_config["sas"]["sas_entry_ff"] = state
 
     def _on_sas_entry_pmp__valueChanged(self):
-        print("Pmp entered:", self.sender().value())
-        self.config["current"]["sas"]["sas_entry_pmp"] = self.sender().value()
+        state = self.sender().value()
+        print("Pmp entered:", state)
+        self.c_config["sas"]["sas_entry_pmp"] = state
 
     def _on_sas_entry_vmp__valueChanged(self):
-        print("Vmp entered:", self.sender().value())
-        self.config["current"]["sas"]["sas_entry_vmp"] = self.sender().value()
+        state = self.sender().value()
+        print("Vmp entered:", state)
+        self.c_config["sas"]["sas_entry_vmp"] = state
         
 if __name__ == '__main__':
     
+    # This call takes foooooreeeeeever.....
     app = QApplication(sys.argv)
 
     window = MainWindow()
