@@ -145,7 +145,7 @@
                <number>1</number>
               </property>
               <property name="maximum">
-               <double>1000.000000000000000</double>
+               <double>999.899999999999977</double>
               </property>
               <property name="value">
                <double>32.000000000000000</double>
@@ -190,7 +190,7 @@
                <bool>false</bool>
               </property>
               <property name="maximum">
-               <double>999.990000000000009</double>
+               <double>999.899999999999977</double>
               </property>
               <property name="value">
                <double>0.780000000000000</double>
@@ -260,6 +260,9 @@
               </property>
               <property name="decimals">
                <number>1</number>
+              </property>
+              <property name="maximum">
+               <double>1000.000000000000000</double>
               </property>
               <property name="value">
                <double>100.000000000000000</double>
@@ -941,8 +944,20 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="main_action_restore"/>
+   </widget>
+   <addaction name="menuOptions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="main_action_restore">
+   <property name="text">
+    <string>Restore Defaults</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
