@@ -27,36 +27,6 @@ class Scope(AgilentDSO):
             counter += 1
 
         return path
-
-    # def get_config(self):
-    #     return self.SETTINGS
-    
-    # def set_config(self, config):
-    #     self.SETTINGS = config
-
-    # def set_path(self, path):
-    #     self.SETTINGS["path"] = path
-    
-    # def set_name(self, name):
-    #     self.SETTINGS["name"] = name
-        
-    # def set_date(self, date):
-    #     self.SETTINGS["date"] = date
-    
-    # def set_invert(self, invert):
-    #     self.SETTINGS["invert"] = invert
-
-    # def set_ch1(self, label):
-    #     self.SETTINGS["ch1"] = label
-    
-    # def set_ch2(self, label):
-    #     self.SETTINGS["ch2"] = label
-    
-    # def set_ch3(self, label):
-    #     self.SETTINGS["ch3"] = label
-    
-    # def set_ch4(self, label):
-    #     self.SETTINGS["ch4"] = label
         
     # callback to take the scope capture
     def capture_display(self, sas_config):

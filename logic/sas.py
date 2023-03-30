@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+import time
+
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_wxagg import (
     FigureCanvasWxAgg as FigureCanvas,
@@ -8,27 +10,33 @@ from matplotlib.backends.backend_wxagg import (
 from enphase_station.station_obj import STATION
 from enphase_equipment.solar_array_simulator.agilent import AgilentE4360A
 
+from threading import Thread
+
 class SAS(AgilentE4360A):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    # def get_config(self):
-    #     return self.SETTINGS
-    
-    # def set_config(self, config):
-    #     self.SETTINGS = config
+        self.update_vi_run = False
+        self.measured_pi = {
+            "p": 0,
+            "i": 0
+        }
 
-    # def set_vmp(self, vmp):
-    #     self.SETTINGS["vmp"] = vmp
+    # Create thread for auto measure to run in
+    def update_vi(self):
 
-    # def set_pmp(self, pmp):
-    #     self.SETTINGS["pmp"] = pmp
+        while self.update_vi_run:
+            sas_measurement = self.measurement()
 
-    # def set_ff(self, ff):
-    #     self.SETTINGS["ff"] = ff
+            measured_v = sas_measurement['dc_volts']
+            measured_i = sas_measurement['dc_amps']
+            calculated_p = measured_v * measured_i
 
-    # def set_irrad(self, irrad):
-    #     self.SETTINGS["irrad"] = irrad
+            self.measured_pi["i"] = measured_i
+            self.measured_pi["v"] = measured_i
+            print("updated")
+            time.sleep(0.5)
+
 
     def apply(self, sas_config):
         sas_curve = self.create_table(Pmp=sas_config["sas_entry_pmp"],
@@ -54,7 +62,13 @@ class SAS(AgilentE4360A):
     def turn_on(self):
         self.on()
         print("SAS on")
+        self.update_vi_run = True
+        update_vi_thread = Thread(target=self.update_vi)
+        update_vi_thread.start()
+        
 
     def turn_off(self):
+        self.update_vi_run = False
         self.off()
         print("SAS off")
+        
