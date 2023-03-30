@@ -27,7 +27,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         self.setup_sas_plot()
 
         self.sas_timer = QTimer()
-        self.sas_timer.setInterval(500)
+        self.sas_timer.setInterval(100)
         self.sas_timer.timeout.connect(self.sas_update_plot_pv)
 
         self.errorMsg = QErrorMessage()
@@ -77,11 +77,17 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         right_curve = pg.PlotCurveItem(voltage, current, pen='r')
         self.right_vb.addItem(right_curve)
 
+        self.left_vb.disableAutoRange()
+        self.right_vb.disableAutoRange()
+
+        self.pv_point = pg.ScatterPlotItem()
+        self.left_vb.addItem(self.pv_point)
+
     def sas_update_plot_pv(self):
         power, voltage = self.sas.get_sas_pv()
-        print(f"Power: {power}, Voltage: {voltage}")
-        left_curve = pg.ScatterPlotItem(np.array([voltage]), np.array([power]), symbol='o')
-        self.left_vb.addItem(left_curve)
+        # print(f"Power: {power}, Voltage: {voltage}")
+        self.pv_point.clear()
+        self.pv_point.addPoints(np.array([voltage]), np.array([power]), pen='g', symbol='o')
 
     def force_update_ui(self, config):
         children = []
@@ -146,7 +152,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
     def _when_closers__clicked(self):
         print("Close was clicked")
-
+        self.sas_timer.stop()
+        self.ac_butt_off.click()
+        self.rlc_butt_off.click()
+        self.sas_butt_off.click()
         # save config
         with open("config.json", "w") as jsonfile:
             json.dump(self.config, jsonfile)
@@ -344,21 +353,19 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     def _on_sas_butt_off__clicked(self):
         print("SAS off was clicked")
         if RUN_EQUIPMENT:
-            self.sas_timer.stop()
             self.sas.turn_off()
     
     def _on_sas_butt_on__clicked(self):
         print("SAS on was clicked")
         if RUN_EQUIPMENT:
             self.sas.turn_on()
-            self.sas_timer.start()
 
-        
     def _on_sas_butt_apply__clicked(self):
         print("Apply was clicked")
         if RUN_EQUIPMENT:
             sas_data =  self.sas.apply(self.c_config["sas"])
             self.sas_plot_pvi(sas_data)
+            self.sas_timer.start()
 
     def _on_sas_entry_irrad__valueChanged(self):
         state = self.sender().value()
