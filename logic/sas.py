@@ -36,13 +36,20 @@ class SAS(AgilentE4360A):
                                         FillFactor=sas_config["sas_entry_ff"],
                                         irradiance=sas_config["sas_entry_irrad"])
         
-        
         vi_array = np.array(sas_curve[1]).astype(np.float)
-        p_array = [vi_array[0], vi_array[0] * vi_array[1]]
+        p_array =  vi_array[0]* vi_array[1]
+        
+        sas_data  = {
+            "i": vi_array[0],
+            "v": vi_array[1],
+            "p": p_array
+        }
+
+        
 
         self.select_table()
         self.select_table_mode()
-        return vi_array, p_array
+        return sas_data
 
     def turn_on(self):
         self.on()
