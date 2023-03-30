@@ -5,18 +5,14 @@ import time
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox
 from PySide6.QtCore import QTimer
-from pydantic.utils import deep_update
 import pyqtgraph as pg
 import numpy as np
-import matplotlib.pyplot as plt
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
 from logic.ac_src import AC_SRC
 from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
-
-from threading import Thread
 
 
 RUN_EQUIPMENT = True
