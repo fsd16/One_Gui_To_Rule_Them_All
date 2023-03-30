@@ -38,29 +38,6 @@ class AC_SRC(PPS_308):
             "ross_vL1n":                                   ('ross_vL1n.wfd'),
             "Amanda_Welz_Florida":                         ('Amanda_Welz_Florida.wfd'),
         }
-        
-    # def get_config(self):
-    #     return self.SETTINGS
-    
-    # def set_config(self, config):
-    #     self.SETTINGS = config
-
-    # def set_ac_rms_volts(self, ac_rms_voltage):
-    #     self.SETTINGS["ac_rms_voltage"] = ac_rms_voltage
-        
-    # def set_ac_freq(self, ac_freq):
-    #     self.SETTINGS["ac_freq"] = ac_freq
-        
-    # def set_ac_config(self, ac_config):
-    #     self.SETTINGS["config"] = ac_config
-        
-    # # Callback to select abnormal waveform
-    # def set_ab_waveform(self, choice):
-    #     self.SETTINGS["abnormal"] = choice
-    
-    # def set_ac_profile(self, profile_key):
-    #     profile = self.PROFILES[profile_key]
-    #     self.SETTINGS.update(ac_rms_voltage=profile[0], ac_freq=profile[1], config=profile[2])
     
     # Callback to set ac voltage
     def calc_ac_volts(self, config, ac_rms_voltage):
@@ -76,18 +53,32 @@ class AC_SRC(PPS_308):
 
     # Callback to apply settings to AC
     def apply(self, ac_config):
-        
-        self.prog_voltage_line_voltages(99, self.calc_ac_volts(ac_config["ac_radio"], ac_config["ac_entry_ac_volts"]), ac_config["ac_entry_freq"])
+
+        if ac_config["ac_radio_single"]:
+            phase_config = "single"
+        elif ac_config["ac_radio_split"]:
+            phase_config = "split"
+        elif ac_config["ac_radio_three"]:
+            phase_config = "three"
+
+        self.prog_voltage_line_voltages(99, self.calc_ac_volts(phase_config, ac_config["ac_entry_ac_volts"]), ac_config["ac_entry_freq"])
         self.exec_program(99)
         print("AC updated ")
         
     def apply_abnormal(self, ac_config):
         
         choice = ac_config["ac_menu_abnormal"]
+        if ac_config["ac_radio_single"]:
+            phase_config = "single"
+        elif ac_config["ac_radio_split"]:
+            phase_config = "split"
+        elif ac_config["ac_radio_three"]:
+            phase_config = "three"
+
         path = os.path.join(self.base_path, (self.AB_WAVEFORMS[choice]))
         continuous_waveform = Waveform.create_waveform_from_file(path)
         
-        self.set_steady_state(voltages=self.calc_ac_volts(ac_config["ac_radio"], ac_config["ac_entry_ac_volts"]), frequency=ac_config["ac_entry_freq"], waveform=continuous_waveform)
+        self.set_steady_state(voltages=self.calc_ac_volts(phase_config, ac_config["ac_entry_ac_volts"]), frequency=ac_config["ac_entry_freq"], waveform=continuous_waveform)
         
     # callback to apply settings and turn on ac output
     def turn_on(self):    

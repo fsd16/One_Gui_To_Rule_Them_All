@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'One_GUI_To_Rule_Them_All.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.2
+## Created by: Qt User Interface Compiler version 6.4.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -21,6 +21,8 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
     QMainWindow, QMenu, QMenuBar, QPushButton,
     QRadioButton, QSizePolicy, QSpinBox, QStatusBar,
     QTabWidget, QWidget)
+
+from pyqtgraph import PlotWidget
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -145,6 +147,11 @@ class Ui_MainWindow(object):
 
 
         self.gridLayout_8.addLayout(self.formLayout, 0, 2, 1, 2)
+
+        self.sas_plot = PlotWidget(self.sas_tab)
+        self.sas_plot.setObjectName(u"sas_plot")
+
+        self.gridLayout_8.addWidget(self.sas_plot, 0, 4, 1, 1)
 
 
         self.gridLayout_9.addLayout(self.gridLayout_8, 0, 0, 1, 1)

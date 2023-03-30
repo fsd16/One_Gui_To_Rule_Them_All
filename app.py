@@ -1,11 +1,14 @@
 import sys
 import json
 import smartside.signal as smartsignal
+import time
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox
-from PySide6.QtCore import QSettings
-from pyqtconfig import ConfigManager
+from PySide6.QtCore import QTimer
 from pydantic.utils import deep_update
+import pyqtgraph as pg
+import numpy as np
+import matplotlib.pyplot as plt
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
 from logic.ac_src import AC_SRC
@@ -13,14 +16,19 @@ from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
 
+from threading import Thread
 
 
 RUN_EQUIPMENT = True
-
 class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal): 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
+        self.setup_sas_plot()
+
+        self.sas_timer = QTimer()
+        self.sas_timer.setInterval(100)
+        self.sas_timer.timeout.connect(self.sas_update_plot_pv)
 
         self.errorMsg = QErrorMessage()
         if RUN_EQUIPMENT:
@@ -37,7 +45,50 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
             self.ac_menu_phase.addItems(self.ac_src.PROFILES)
         
         self.auto_connect()
-        
+    
+    def setup_sas_plot(self):
+        self.sas_plot.setBackground('w')
+
+        # Set up plot item
+        plot = self.sas_plot.plotItem
+        plot.showAxis('left')
+        plot.showAxis('right')
+        plot.setLabel(axis='left', text='Power', units='W')
+        plot.setLabel(axis='right', text='Current', units='A')
+        plot.invertY()
+
+        # Set up view box
+        self.left_vb = pg.ViewBox(lockAspect=False)
+        self.right_vb = pg.ViewBox(lockAspect=False)
+
+        plot.addItem(self.left_vb)
+        plot.addItem(self.right_vb)
+
+        plot.getAxis('left').linkToView(self.left_vb)
+        plot.getAxis('right').linkToView(self.right_vb)
+
+    def sas_plot_pvi(self, data):
+        current = data["i"]
+        voltage = data["v"]
+        power = data["p"]
+        left_curve = pg.PlotCurveItem(voltage, power, pen='b')
+        self.left_vb.addItem(left_curve)
+
+        right_curve = pg.PlotCurveItem(voltage, current, pen='r')
+        self.right_vb.addItem(right_curve)
+
+        self.left_vb.disableAutoRange()
+        self.right_vb.disableAutoRange()
+
+        self.pv_point = pg.ScatterPlotItem()
+        self.left_vb.addItem(self.pv_point)
+
+    def sas_update_plot_pv(self):
+        power, voltage = self.sas.get_sas_pv()
+        # print(f"Power: {power}, Voltage: {voltage}")
+        self.pv_point.clear()
+        self.pv_point.addPoints(np.array([voltage]), np.array([power]), pen='g', symbol='o')
+
     def force_update_ui(self, config):
         children = []
         children += self.findChildren(QSpinBox)
@@ -53,7 +104,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
                 if hasattr(wgtobj, "setValue"):
                     wgtobj.setValue(config[prefix][name])
                 
-        
         children = []
         children += self.findChildren(QLineEdit)
         
@@ -84,7 +134,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         # Setting Menu may overide current values if they are different from the presets
         # children = []
         # children += self.findChildren(QComboBox)
-        
+    
     def load_config(self):
 
         with open("config.json", "r") as jsonfile:
@@ -102,7 +152,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
     def _when_closers__clicked(self):
         print("Close was clicked")
-
+        self.sas_timer.stop()
+        self.ac_butt_off.click()
+        self.rlc_butt_off.click()
+        self.sas_butt_off.click()
         # save config
         with open("config.json", "w") as jsonfile:
             json.dump(self.config, jsonfile)
@@ -306,11 +359,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         print("SAS on was clicked")
         if RUN_EQUIPMENT:
             self.sas.turn_on()
-        
+
     def _on_sas_butt_apply__clicked(self):
         print("Apply was clicked")
         if RUN_EQUIPMENT:
-            self.sas.apply(self.c_config["sas"])
+            sas_data =  self.sas.apply(self.c_config["sas"])
+            self.sas_plot_pvi(sas_data)
+            self.sas_timer.start()
 
     def _on_sas_entry_irrad__valueChanged(self):
         state = self.sender().value()
@@ -331,13 +386,21 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         state = self.sender().value()
         print("Vmp entered:", state)
         self.c_config["sas"]["sas_entry_vmp"] = state
-        
-if __name__ == '__main__':
-    
-    # This call takes foooooreeeeeever.....
-    app = QApplication(sys.argv)
 
+
+def main():
+    # This call takes foooooreeeeeever.....
+    start_time = time.time()
+    app = QApplication(sys.argv)
+    app_time = time.time()
+    print(f"App time: {app_time - start_time}")
     window = MainWindow()
+    window_time = time.time()
+    print(f"App time: {window_time - app_time}")
     window.show()
 
     sys.exit(app.exec())
+    
+
+if __name__ == '__main__':
+    main()

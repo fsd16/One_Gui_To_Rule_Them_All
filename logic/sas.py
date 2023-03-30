@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+import time
+
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_wxagg import (
     FigureCanvasWxAgg as FigureCanvas,
@@ -8,59 +10,51 @@ from matplotlib.backends.backend_wxagg import (
 from enphase_station.station_obj import STATION
 from enphase_equipment.solar_array_simulator.agilent import AgilentE4360A
 
+from threading import Thread
+
 class SAS(AgilentE4360A):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    # def get_config(self):
-    #     return self.SETTINGS
-    
-    # def set_config(self, config):
-    #     self.SETTINGS = config
+    # Create thread for auto measure to run in
+    def get_sas_pv(self):
 
-    # def set_vmp(self, vmp):
-    #     self.SETTINGS["vmp"] = vmp
+        sas_measurement = self.measurement()
 
-    # def set_pmp(self, pmp):
-    #     self.SETTINGS["pmp"] = pmp
+        measured_v = sas_measurement['dc_volts']
+        measured_i = sas_measurement['dc_amps']
+        calculated_p = measured_v * measured_i
 
-    # def set_ff(self, ff):
-    #     self.SETTINGS["ff"] = ff
+        return calculated_p, measured_v
 
-    # def set_irrad(self, irrad):
-    #     self.SETTINGS["irrad"] = irrad
 
     def apply(self, sas_config):
         sas_curve = self.create_table(Pmp=sas_config["sas_entry_pmp"],
                                         Vmp=sas_config["sas_entry_vmp"],
                                         FillFactor=sas_config["sas_entry_ff"],
                                         irradiance=sas_config["sas_entry_irrad"])
+        
+        vi_array = np.array(sas_curve[1]).astype(np.float)
+        p_array =  vi_array[0]* vi_array[1]
+        
+        sas_data  = {
+            "v": vi_array[0],
+            "i": vi_array[1],
+            "p": p_array
+        }
 
-        # # Update the plotting on the measurement panel
-        # measurement_panel = self.Parent.Parent.measurement_panel
-
-        # vi_array = np.array(sas_curve[1]).astype(np.float)
-        # p_array = vi_array[0] * vi_array[1]
-
-        # # Update plots
-        # for panel in [self, measurement_panel]:
-        #     panel.vi_curve.set_data(vi_array[0], vi_array[1])
-        #     panel.vi_axis.relim()
-        #     panel.vi_axis.autoscale_view(True, True, True)
-
-        #     panel.vp_curve.set_data(vi_array[0], p_array)
-        #     panel.vp_axis.relim()
-        #     panel.vp_axis.autoscale_view(True, True, True)
-
-        #     panel.canvas.draw()
+        
 
         self.select_table()
         self.select_table_mode()
+        return sas_data
 
     def turn_on(self):
         self.on()
         print("SAS on")
+        
 
     def turn_off(self):
         self.off()
         print("SAS off")
+        
