@@ -4,7 +4,7 @@ import smartside.signal as smartsignal
 import time
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox
-from PySide6 import QtCore
+from PySide6.QtCore import QTimer
 from pydantic.utils import deep_update
 import pyqtgraph as pg
 import numpy as np
@@ -20,34 +20,15 @@ from threading import Thread
 
 
 RUN_EQUIPMENT = True
-
-
-class GlobalObject(QtCore.QObject):
-    def __init__(self):
-        super().__init__()
-        self._events = {}
-
-    def addEventListener(self, name, func):
-        if name not in self._events:
-            self._events[name] = [func]
-        else:
-            self._events[name].append(func)
-
-    def dispatchEvent(self, name):
-        functions = self._events.get(name, [])
-        for func in functions:
-            QtCore.QTimer.singleShot(0, func)
-
 class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal): 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
         self.setup_sas_plot()
 
-        # GlobalObject().addEventListener("sas_update_pi", self.sas_update_plot_pi)
-
-        # figure out how to dispatch when a measurment is gathered
-        # GlobalObject().dispatchEvent("sas_update_pi")
+        self.sas_timer = QTimer()
+        self.sas_timer.setInterval(500)
+        self.sas_timer.timeout.connect(self.sas_update_plot_pv)
 
         self.errorMsg = QErrorMessage()
         if RUN_EQUIPMENT:
@@ -73,7 +54,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         plot.showAxis('left')
         plot.showAxis('right')
         plot.setLabel(axis='left', text='Power', units='W')
-        plot.setLabel(axis='right', text='Voltage', units='V')
+        plot.setLabel(axis='right', text='Current', units='A')
         plot.invertY()
 
         # Set up view box
@@ -88,20 +69,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
 
     def sas_plot_pvi(self, data):
         current = data["i"]
-        voltage = data["v"]*10 # *10 is a fudge factor, really don't understand I have to use it...
+        voltage = data["v"]
         power = data["p"]
-        left_curve = pg.PlotCurveItem(current, power, pen='r')
+        left_curve = pg.PlotCurveItem(voltage, power, pen='b')
         self.left_vb.addItem(left_curve)
 
-        right_curve = pg.PlotCurveItem(current, voltage, pen='b')
+        right_curve = pg.PlotCurveItem(voltage, current, pen='r')
         self.right_vb.addItem(right_curve)
 
-    def sas_update_plot_pi(self):
-        current = np.array([self.sas.measured_pi["i"]])
-        power = np.array([self.sas.measured_pi["p"]])
-        print(current)
-        print(power)
-        left_curve = pg.ScatterPlotItem(current, power, symbol='o')
+    def sas_update_plot_pv(self):
+        power, voltage = self.sas.get_sas_pv()
+        print(f"Power: {power}, Voltage: {voltage}")
+        left_curve = pg.ScatterPlotItem(np.array([voltage]), np.array([power]), symbol='o')
         self.left_vb.addItem(left_curve)
 
     def force_update_ui(self, config):
@@ -365,12 +344,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     def _on_sas_butt_off__clicked(self):
         print("SAS off was clicked")
         if RUN_EQUIPMENT:
+            self.sas_timer.stop()
             self.sas.turn_off()
     
     def _on_sas_butt_on__clicked(self):
         print("SAS on was clicked")
         if RUN_EQUIPMENT:
             self.sas.turn_on()
+            self.sas_timer.start()
 
         
     def _on_sas_butt_apply__clicked(self):
@@ -378,7 +359,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         if RUN_EQUIPMENT:
             sas_data =  self.sas.apply(self.c_config["sas"])
             self.sas_plot_pvi(sas_data)
-            self.sas_update_plot_pi()
 
     def _on_sas_entry_irrad__valueChanged(self):
         state = self.sender().value()
