@@ -14,6 +14,10 @@ from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
 
+# TODO: Auto import station
+# TODO: Add connect button to start connection to equipment
+# TODO: Add loading screen
+# TODO: Add connect button to start connection to equipment
 
 RUN_EQUIPMENT = True
 class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal): 
