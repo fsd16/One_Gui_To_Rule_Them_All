@@ -573,102 +573,37 @@
        <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="0" column="0" alignment="Qt::AlignBottom">
-           <widget class="QLabel" name="label_6">
+          <item row="5" column="4" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="scope_butt_close">
             <property name="minimumSize">
              <size>
-              <width>100</width>
+              <width>80</width>
               <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
              </size>
             </property>
             <property name="text">
-             <string>CH1 Label</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1" colspan="2" alignment="Qt::AlignBottom">
-           <widget class="QLabel" name="label_7">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>CH2 Label</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3" colspan="2" alignment="Qt::AlignBottom">
-           <widget class="QLabel" name="label_8">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>CH3 Label</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="5" alignment="Qt::AlignBottom">
-           <widget class="QLabel" name="label_9">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>CH4 Label</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QLineEdit" name="scope_line_ch1_lab">
-            <property name="minimumSize">
-             <size>
-              <width>90</width>
-              <height>0</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QLineEdit" name="scope_line_ch2_lab">
-            <property name="minimumSize">
-             <size>
-              <width>90</width>
-              <height>0</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QLineEdit" name="scope_line_ch3_lab">
-            <property name="minimumSize">
-             <size>
-              <width>90</width>
-              <height>0</height>
-             </size>
+             <string>Close</string>
             </property>
            </widget>
           </item>
           <item row="1" column="5" alignment="Qt::AlignHCenter|Qt::AlignTop">
            <widget class="QLineEdit" name="scope_line_ch4_lab">
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QLineEdit" name="scope_line_ch1_lab">
             <property name="minimumSize">
              <size>
               <width>90</width>
@@ -693,8 +628,18 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="3" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignBottom">
-           <widget class="QLabel" name="label_5">
+          <item row="1" column="3" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QLineEdit" name="scope_line_ch3_lab">
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3" colspan="2" alignment="Qt::AlignBottom">
+           <widget class="QLabel" name="label_8">
             <property name="minimumSize">
              <size>
               <width>100</width>
@@ -702,88 +647,10 @@
              </size>
             </property>
             <property name="text">
-             <string>Capture Name</string>
+             <string>CH3 Label</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QLineEdit" name="scope_line_cap_path">
-            <property name="minimumSize">
-             <size>
-              <width>180</width>
-              <height>0</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="3" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QLineEdit" name="scope_line_cap_name">
-            <property name="minimumSize">
-             <size>
-              <width>180</width>
-              <height>0</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-           <widget class="QCheckBox" name="scope_check_date">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Date Prefix</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="2" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-           <widget class="QCheckBox" name="scope_check_invert">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Invert Colours</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="4" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-           <widget class="QCheckBox" name="scope_check_auto">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Auto Capture</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
-           <widget class="QPushButton" name="scope_butt_apply">
-            <property name="minimumSize">
-             <size>
-              <width>80</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>80</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Apply Labels</string>
             </property>
            </widget>
           </item>
@@ -806,8 +673,18 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="4" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
-           <widget class="QPushButton" name="scope_butt_close">
+          <item row="1" column="1" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QLineEdit" name="scope_line_ch2_lab">
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QPushButton" name="scope_butt_apply">
             <property name="minimumSize">
              <size>
               <width>80</width>
@@ -821,7 +698,143 @@
              </size>
             </property>
             <property name="text">
-             <string>Close</string>
+             <string>Apply Labels</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="4" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QCheckBox" name="scope_check_auto">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Auto Capture</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QLabel" name="label_5">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Capture Name</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="5" alignment="Qt::AlignBottom">
+           <widget class="QLabel" name="label_9">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>CH4 Label</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" alignment="Qt::AlignBottom">
+           <widget class="QLabel" name="label_6">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>CH1 Label</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QCheckBox" name="scope_check_invert">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Invert Colours</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QCheckBox" name="scope_check_date">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Date Prefix</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="2" alignment="Qt::AlignBottom">
+           <widget class="QLabel" name="label_7">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>CH2 Label</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QPushButton" name="scope_butt_browse">
+            <property name="maximumSize">
+             <size>
+              <width>60</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Browse</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3" colspan="3" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QLineEdit" name="scope_line_cap_name">
+            <property name="minimumSize">
+             <size>
+              <width>180</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QLineEdit" name="scope_line_cap_path">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
            </widget>
           </item>

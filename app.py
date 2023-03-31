@@ -3,7 +3,7 @@ import json
 import smartside.signal as smartsignal
 import time
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox, QFileDialog
 from PySide6.QtCore import QTimer
 import pyqtgraph as pg
 import numpy as np
@@ -186,7 +186,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
                 self.ac_src.apply(self.c_config["ac"])
         
     def _on_ac_check_abnormal__stateChanged(self):
-        state = self.sender().value()
+        state = self.sender().isChecked()
         print ('Abnormal was checked', state)
         self.c_config["ac"]["ac_check_abnormal"] = state
 
@@ -247,6 +247,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         print("Apply labels was clicked")
         if RUN_EQUIPMENT:
             self.scope.label(self.c_config["scope"])
+
+    def _on_scope_butt_browse__clicked(self):
+        path = str(QFileDialog.getExistingDirectory())
+        self.scope_line_cap_path.setText(path)
+        print("Capture path entered:", path)
+        self.c_config["scope"]["scope_line_cap_path"] = path
+
     
     def _on_scope_butt_cap__clicked(self):
         print("Capture was clicked")
@@ -319,8 +326,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
             if RUN_EQUIPMENT:
                 rlc_config = self.rlc.turn_on(rlc_config)
             self.c_config["rlc"].update(rlc_config)
-            # self.rlc_entry_real_pwr.setValue(round(self.rlc.SETTINGS["real_pwr"]))
-            # self.rlc_entry_reactive_pwr.setValue(round(self.rlc.SETTINGS["reactive_pwr"]))
         except self.rlc.NoInput:
             self.errorMsg.showMessage("Why do I even exist?")
         except self.rlc.VoltageInvalid:

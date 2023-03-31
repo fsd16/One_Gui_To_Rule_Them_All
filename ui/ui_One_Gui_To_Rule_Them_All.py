@@ -295,57 +295,24 @@ class Ui_MainWindow(object):
         self.gridLayout_6.setObjectName(u"gridLayout_6")
         self.gridLayout_3 = QGridLayout()
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.label_6 = QLabel(self.scope_tab)
-        self.label_6.setObjectName(u"label_6")
-        self.label_6.setMinimumSize(QSize(100, 0))
-        self.label_6.setAlignment(Qt.AlignCenter)
+        self.scope_butt_close = QPushButton(self.scope_tab)
+        self.scope_butt_close.setObjectName(u"scope_butt_close")
+        self.scope_butt_close.setMinimumSize(QSize(80, 0))
+        self.scope_butt_close.setMaximumSize(QSize(80, 16777215))
 
-        self.gridLayout_3.addWidget(self.label_6, 0, 0, 1, 1, Qt.AlignBottom)
-
-        self.label_7 = QLabel(self.scope_tab)
-        self.label_7.setObjectName(u"label_7")
-        self.label_7.setMinimumSize(QSize(100, 0))
-        self.label_7.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_3.addWidget(self.label_7, 0, 1, 1, 2, Qt.AlignBottom)
-
-        self.label_8 = QLabel(self.scope_tab)
-        self.label_8.setObjectName(u"label_8")
-        self.label_8.setMinimumSize(QSize(100, 0))
-        self.label_8.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_3.addWidget(self.label_8, 0, 3, 1, 2, Qt.AlignBottom)
-
-        self.label_9 = QLabel(self.scope_tab)
-        self.label_9.setObjectName(u"label_9")
-        self.label_9.setMinimumSize(QSize(100, 0))
-        self.label_9.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_3.addWidget(self.label_9, 0, 5, 1, 1, Qt.AlignBottom)
-
-        self.scope_line_ch1_lab = QLineEdit(self.scope_tab)
-        self.scope_line_ch1_lab.setObjectName(u"scope_line_ch1_lab")
-        self.scope_line_ch1_lab.setMinimumSize(QSize(90, 0))
-
-        self.gridLayout_3.addWidget(self.scope_line_ch1_lab, 1, 0, 1, 1, Qt.AlignHCenter|Qt.AlignTop)
-
-        self.scope_line_ch2_lab = QLineEdit(self.scope_tab)
-        self.scope_line_ch2_lab.setObjectName(u"scope_line_ch2_lab")
-        self.scope_line_ch2_lab.setMinimumSize(QSize(90, 0))
-
-        self.gridLayout_3.addWidget(self.scope_line_ch2_lab, 1, 1, 1, 2, Qt.AlignHCenter|Qt.AlignTop)
-
-        self.scope_line_ch3_lab = QLineEdit(self.scope_tab)
-        self.scope_line_ch3_lab.setObjectName(u"scope_line_ch3_lab")
-        self.scope_line_ch3_lab.setMinimumSize(QSize(90, 0))
-
-        self.gridLayout_3.addWidget(self.scope_line_ch3_lab, 1, 3, 1, 2, Qt.AlignHCenter|Qt.AlignTop)
+        self.gridLayout_3.addWidget(self.scope_butt_close, 5, 4, 1, 2, Qt.AlignHCenter|Qt.AlignBottom)
 
         self.scope_line_ch4_lab = QLineEdit(self.scope_tab)
         self.scope_line_ch4_lab.setObjectName(u"scope_line_ch4_lab")
         self.scope_line_ch4_lab.setMinimumSize(QSize(90, 0))
 
         self.gridLayout_3.addWidget(self.scope_line_ch4_lab, 1, 5, 1, 1, Qt.AlignHCenter|Qt.AlignTop)
+
+        self.scope_line_ch1_lab = QLineEdit(self.scope_tab)
+        self.scope_line_ch1_lab.setObjectName(u"scope_line_ch1_lab")
+        self.scope_line_ch1_lab.setMinimumSize(QSize(90, 0))
+
+        self.gridLayout_3.addWidget(self.scope_line_ch1_lab, 1, 0, 1, 1, Qt.AlignHCenter|Qt.AlignTop)
 
         self.label_4 = QLabel(self.scope_tab)
         self.label_4.setObjectName(u"label_4")
@@ -354,49 +321,18 @@ class Ui_MainWindow(object):
 
         self.gridLayout_3.addWidget(self.label_4, 2, 0, 1, 3, Qt.AlignHCenter|Qt.AlignBottom)
 
-        self.label_5 = QLabel(self.scope_tab)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setMinimumSize(QSize(100, 0))
-        self.label_5.setAlignment(Qt.AlignCenter)
+        self.scope_line_ch3_lab = QLineEdit(self.scope_tab)
+        self.scope_line_ch3_lab.setObjectName(u"scope_line_ch3_lab")
+        self.scope_line_ch3_lab.setMinimumSize(QSize(90, 0))
 
-        self.gridLayout_3.addWidget(self.label_5, 2, 3, 1, 3, Qt.AlignHCenter|Qt.AlignBottom)
+        self.gridLayout_3.addWidget(self.scope_line_ch3_lab, 1, 3, 1, 2, Qt.AlignHCenter|Qt.AlignTop)
 
-        self.scope_line_cap_path = QLineEdit(self.scope_tab)
-        self.scope_line_cap_path.setObjectName(u"scope_line_cap_path")
-        self.scope_line_cap_path.setMinimumSize(QSize(180, 0))
+        self.label_8 = QLabel(self.scope_tab)
+        self.label_8.setObjectName(u"label_8")
+        self.label_8.setMinimumSize(QSize(100, 0))
+        self.label_8.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_3.addWidget(self.scope_line_cap_path, 3, 0, 1, 3, Qt.AlignHCenter|Qt.AlignTop)
-
-        self.scope_line_cap_name = QLineEdit(self.scope_tab)
-        self.scope_line_cap_name.setObjectName(u"scope_line_cap_name")
-        self.scope_line_cap_name.setMinimumSize(QSize(180, 0))
-
-        self.gridLayout_3.addWidget(self.scope_line_cap_name, 3, 3, 1, 3, Qt.AlignHCenter|Qt.AlignTop)
-
-        self.scope_check_date = QCheckBox(self.scope_tab)
-        self.scope_check_date.setObjectName(u"scope_check_date")
-        self.scope_check_date.setMinimumSize(QSize(100, 0))
-
-        self.gridLayout_3.addWidget(self.scope_check_date, 4, 0, 1, 2, Qt.AlignHCenter|Qt.AlignVCenter)
-
-        self.scope_check_invert = QCheckBox(self.scope_tab)
-        self.scope_check_invert.setObjectName(u"scope_check_invert")
-        self.scope_check_invert.setMinimumSize(QSize(100, 0))
-
-        self.gridLayout_3.addWidget(self.scope_check_invert, 4, 2, 1, 2, Qt.AlignHCenter|Qt.AlignVCenter)
-
-        self.scope_check_auto = QCheckBox(self.scope_tab)
-        self.scope_check_auto.setObjectName(u"scope_check_auto")
-        self.scope_check_auto.setMinimumSize(QSize(100, 0))
-
-        self.gridLayout_3.addWidget(self.scope_check_auto, 4, 4, 1, 2, Qt.AlignHCenter|Qt.AlignVCenter)
-
-        self.scope_butt_apply = QPushButton(self.scope_tab)
-        self.scope_butt_apply.setObjectName(u"scope_butt_apply")
-        self.scope_butt_apply.setMinimumSize(QSize(80, 0))
-        self.scope_butt_apply.setMaximumSize(QSize(80, 16777215))
-
-        self.gridLayout_3.addWidget(self.scope_butt_apply, 5, 0, 1, 2, Qt.AlignHCenter|Qt.AlignBottom)
+        self.gridLayout_3.addWidget(self.label_8, 0, 3, 1, 2, Qt.AlignBottom)
 
         self.scope_butt_cap = QPushButton(self.scope_tab)
         self.scope_butt_cap.setObjectName(u"scope_butt_cap")
@@ -405,12 +341,82 @@ class Ui_MainWindow(object):
 
         self.gridLayout_3.addWidget(self.scope_butt_cap, 5, 2, 1, 2, Qt.AlignHCenter|Qt.AlignBottom)
 
-        self.scope_butt_close = QPushButton(self.scope_tab)
-        self.scope_butt_close.setObjectName(u"scope_butt_close")
-        self.scope_butt_close.setMinimumSize(QSize(80, 0))
-        self.scope_butt_close.setMaximumSize(QSize(80, 16777215))
+        self.scope_line_ch2_lab = QLineEdit(self.scope_tab)
+        self.scope_line_ch2_lab.setObjectName(u"scope_line_ch2_lab")
+        self.scope_line_ch2_lab.setMinimumSize(QSize(90, 0))
 
-        self.gridLayout_3.addWidget(self.scope_butt_close, 5, 4, 1, 2, Qt.AlignHCenter|Qt.AlignBottom)
+        self.gridLayout_3.addWidget(self.scope_line_ch2_lab, 1, 1, 1, 2, Qt.AlignHCenter|Qt.AlignTop)
+
+        self.scope_butt_apply = QPushButton(self.scope_tab)
+        self.scope_butt_apply.setObjectName(u"scope_butt_apply")
+        self.scope_butt_apply.setMinimumSize(QSize(80, 0))
+        self.scope_butt_apply.setMaximumSize(QSize(80, 16777215))
+
+        self.gridLayout_3.addWidget(self.scope_butt_apply, 5, 0, 1, 2, Qt.AlignHCenter|Qt.AlignBottom)
+
+        self.scope_check_auto = QCheckBox(self.scope_tab)
+        self.scope_check_auto.setObjectName(u"scope_check_auto")
+        self.scope_check_auto.setMinimumSize(QSize(100, 0))
+
+        self.gridLayout_3.addWidget(self.scope_check_auto, 4, 4, 1, 2, Qt.AlignHCenter|Qt.AlignVCenter)
+
+        self.label_5 = QLabel(self.scope_tab)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setMinimumSize(QSize(100, 0))
+        self.label_5.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_3.addWidget(self.label_5, 2, 3, 1, 3, Qt.AlignHCenter|Qt.AlignBottom)
+
+        self.label_9 = QLabel(self.scope_tab)
+        self.label_9.setObjectName(u"label_9")
+        self.label_9.setMinimumSize(QSize(100, 0))
+        self.label_9.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_3.addWidget(self.label_9, 0, 5, 1, 1, Qt.AlignBottom)
+
+        self.label_6 = QLabel(self.scope_tab)
+        self.label_6.setObjectName(u"label_6")
+        self.label_6.setMinimumSize(QSize(100, 0))
+        self.label_6.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_3.addWidget(self.label_6, 0, 0, 1, 1, Qt.AlignBottom)
+
+        self.scope_check_invert = QCheckBox(self.scope_tab)
+        self.scope_check_invert.setObjectName(u"scope_check_invert")
+        self.scope_check_invert.setMinimumSize(QSize(100, 0))
+
+        self.gridLayout_3.addWidget(self.scope_check_invert, 4, 2, 1, 2, Qt.AlignHCenter|Qt.AlignVCenter)
+
+        self.scope_check_date = QCheckBox(self.scope_tab)
+        self.scope_check_date.setObjectName(u"scope_check_date")
+        self.scope_check_date.setMinimumSize(QSize(100, 0))
+
+        self.gridLayout_3.addWidget(self.scope_check_date, 4, 0, 1, 2, Qt.AlignHCenter|Qt.AlignVCenter)
+
+        self.label_7 = QLabel(self.scope_tab)
+        self.label_7.setObjectName(u"label_7")
+        self.label_7.setMinimumSize(QSize(100, 0))
+        self.label_7.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_3.addWidget(self.label_7, 0, 1, 1, 2, Qt.AlignBottom)
+
+        self.scope_butt_browse = QPushButton(self.scope_tab)
+        self.scope_butt_browse.setObjectName(u"scope_butt_browse")
+        self.scope_butt_browse.setMaximumSize(QSize(60, 16777215))
+
+        self.gridLayout_3.addWidget(self.scope_butt_browse, 3, 2, 1, 1)
+
+        self.scope_line_cap_name = QLineEdit(self.scope_tab)
+        self.scope_line_cap_name.setObjectName(u"scope_line_cap_name")
+        self.scope_line_cap_name.setMinimumSize(QSize(180, 0))
+
+        self.gridLayout_3.addWidget(self.scope_line_cap_name, 3, 3, 1, 3, Qt.AlignHCenter|Qt.AlignTop)
+
+        self.scope_line_cap_path = QLineEdit(self.scope_tab)
+        self.scope_line_cap_path.setObjectName(u"scope_line_cap_path")
+        self.scope_line_cap_path.setMinimumSize(QSize(0, 0))
+
+        self.gridLayout_3.addWidget(self.scope_line_cap_path, 3, 0, 1, 2)
 
 
         self.gridLayout_6.addLayout(self.gridLayout_3, 0, 0, 1, 1)
@@ -556,18 +562,19 @@ class Ui_MainWindow(object):
         self.ac_radio_three.setText(QCoreApplication.translate("MainWindow", u"Three Phase", None))
         self.ac_check_abnormal.setText(QCoreApplication.translate("MainWindow", u"Abnormal Waveform", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ac_tab), QCoreApplication.translate("MainWindow", u"AC Source", None))
-        self.label_6.setText(QCoreApplication.translate("MainWindow", u"CH1 Label", None))
-        self.label_7.setText(QCoreApplication.translate("MainWindow", u"CH2 Label", None))
-        self.label_8.setText(QCoreApplication.translate("MainWindow", u"CH3 Label", None))
-        self.label_9.setText(QCoreApplication.translate("MainWindow", u"CH4 Label", None))
-        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Capture Path", None))
-        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Capture Name", None))
-        self.scope_check_date.setText(QCoreApplication.translate("MainWindow", u"Date Prefix", None))
-        self.scope_check_invert.setText(QCoreApplication.translate("MainWindow", u"Invert Colours", None))
-        self.scope_check_auto.setText(QCoreApplication.translate("MainWindow", u"Auto Capture", None))
-        self.scope_butt_apply.setText(QCoreApplication.translate("MainWindow", u"Apply Labels", None))
-        self.scope_butt_cap.setText(QCoreApplication.translate("MainWindow", u"Capture", None))
         self.scope_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Capture Path", None))
+        self.label_8.setText(QCoreApplication.translate("MainWindow", u"CH3 Label", None))
+        self.scope_butt_cap.setText(QCoreApplication.translate("MainWindow", u"Capture", None))
+        self.scope_butt_apply.setText(QCoreApplication.translate("MainWindow", u"Apply Labels", None))
+        self.scope_check_auto.setText(QCoreApplication.translate("MainWindow", u"Auto Capture", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Capture Name", None))
+        self.label_9.setText(QCoreApplication.translate("MainWindow", u"CH4 Label", None))
+        self.label_6.setText(QCoreApplication.translate("MainWindow", u"CH1 Label", None))
+        self.scope_check_invert.setText(QCoreApplication.translate("MainWindow", u"Invert Colours", None))
+        self.scope_check_date.setText(QCoreApplication.translate("MainWindow", u"Date Prefix", None))
+        self.label_7.setText(QCoreApplication.translate("MainWindow", u"CH2 Label", None))
+        self.scope_butt_browse.setText(QCoreApplication.translate("MainWindow", u"Browse", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.scope_tab), QCoreApplication.translate("MainWindow", u"Scope", None))
         self.label_12.setText(QCoreApplication.translate("MainWindow", u"Real Power\n"
 "(W)", None))
