@@ -14,6 +14,7 @@ from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
 
+# TODO: Tidy up GUI layout
 # TODO: Auto import station
 # TODO: Add connect button to start connection to equipment
 # TODO: Add loading screen

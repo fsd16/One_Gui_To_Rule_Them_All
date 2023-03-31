@@ -21,22 +21,22 @@ class AC_SRC(PPS_308):
         self.base_path = 'C:/Users/fdrabsch/Envs/enphase_env/workspace/hw_testcases/src/hw_testcases/abnormal_waveform_test/waveforms'
 
         self.AB_WAVEFORMS = {
-            "IEC_77A_Class_1":                             ('IEC_77A_Class_1.wfd'),
-            "IEC_77A_Class_2":                             ('IEC_77A_Class_2.wfd'),
-            "_208_120_NastyCurrentSpiker":                 ('_208_120_NastyCurrentSpiker.wfd'),
-            "Clip 12% THD":                                ('Clip 12% THD.wfd'),
+            "IEC 77A Class 1":                             ('IEC_77A_Class_1.wfd'),
+            "IEC 77A Class 2":                             ('IEC_77A_Class_2.wfd'),
+            "_208_120 NastyCurrentSpiker":                 ('_208_120_NastyCurrentSpiker.wfd'),
+            "Clip 12% THD":                                ('Clip_12%_THD.wfd'),
             "MINV17":                                      ('MINV17.wfd'),
             "MINV18":                                      ('MINV18.wfd'),
-            "Giles_5_19_17":                               ('Giles_5_19_17.wfd'),
+            "Giles 5 19 17":                               ('Giles_5_19_17.wfd'),
             "InductiveCurrent":                            ('InductiveCurrent.wfd'),
-            "InductiveCurrent_With_A_HintOfCapacitance":   ('InductiveCurrent_With_A_HintOfCapacitance.wfd'),
-            "LangLake_Zero_Cross_Distortion":              ('LangLake_Zero_Cross_Distortion.wfd'),
+            "InductiveCurrent WaHoC":   ('InductiveCurrent_With_A_HintOfCapacitance.wfd'),
+            "LangLake Zero Cross Distortion":              ('LangLake_Zero_Cross_Distortion.wfd'),
             "NastyCurrentSpiker":                          ('NastyCurrentSpiker.wfd'),
             "Poleshek":                                    ('Poleshek.wfd'),
-            "TWACS_VL1Na":                                 ('TWACS_VL1Na.wfd'),
+            "TWACS VL1Na":                                 ('TWACS_VL1Na.wfd'),
             "Triangle":                                    ('Triangle.wfd'),
-            "ross_vL1n":                                   ('ross_vL1n.wfd'),
-            "Amanda_Welz_Florida":                         ('Amanda_Welz_Florida.wfd'),
+            "ross vL1n":                                   ('ross_vL1n.wfd'),
+            "Amanda Welz Florida":                         ('Amanda_Welz_Florida.wfd'),
         }
     
     # Callback to set ac voltage
