@@ -26,11 +26,11 @@ class Ui_Dialog(object):
         Dialog.resize(259, 196)
         self.gridLayout = QGridLayout(Dialog)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.checkBox = QCheckBox(Dialog)
-        self.checkBox.setObjectName(u"checkBox")
-        self.checkBox.setChecked(True)
+        self.device_entry_startup = QCheckBox(Dialog)
+        self.device_entry_startup.setObjectName(u"device_entry_startup")
+        self.device_entry_startup.setChecked(True)
 
-        self.gridLayout.addWidget(self.checkBox, 4, 0, 1, 1)
+        self.gridLayout.addWidget(self.device_entry_startup, 4, 0, 1, 1)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -49,11 +49,6 @@ class Ui_Dialog(object):
 
         self.formLayout = QFormLayout()
         self.formLayout.setObjectName(u"formLayout")
-        self.label = QLabel(Dialog)
-        self.label.setObjectName(u"label")
-
-        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label)
-
         self.ac_entry_device = QLineEdit(Dialog)
         self.ac_entry_device.setObjectName(u"ac_entry_device")
 
@@ -89,6 +84,11 @@ class Ui_Dialog(object):
 
         self.formLayout.setWidget(3, QFormLayout.FieldRole, self.sas_entry_device)
 
+        self.label = QLabel(Dialog)
+        self.label.setObjectName(u"label")
+
+        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label)
+
 
         self.gridLayout.addLayout(self.formLayout, 2, 0, 1, 1)
 
@@ -101,9 +101,8 @@ class Ui_Dialog(object):
     # setupUi
 
     def retranslateUi(self, Dialog):
-        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
-        self.checkBox.setText(QCoreApplication.translate("Dialog", u"Show on Startup", None))
-        self.label.setText(QCoreApplication.translate("Dialog", u"AC Source", None))
+        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Device Connection", None))
+        self.device_entry_startup.setText(QCoreApplication.translate("Dialog", u"Show on Startup", None))
         self.ac_entry_device.setPlaceholderText(QCoreApplication.translate("Dialog", u"GPIB0::<address>::INSTR", None))
         self.label_2.setText(QCoreApplication.translate("Dialog", u"Scope", None))
         self.scope_entry_device.setPlaceholderText(QCoreApplication.translate("Dialog", u"GPIB0::<address>::INSTR", None))
@@ -111,5 +110,6 @@ class Ui_Dialog(object):
         self.rlc_entry_device.setPlaceholderText(QCoreApplication.translate("Dialog", u"COM<address>,COM<address>", None))
         self.label_4.setText(QCoreApplication.translate("Dialog", u"SAS", None))
         self.sas_entry_device.setPlaceholderText(QCoreApplication.translate("Dialog", u"GPIB0::<address>::INSTR", None))
+        self.label.setText(QCoreApplication.translate("Dialog", u"AC Source", None))
     # retranslateUi
 

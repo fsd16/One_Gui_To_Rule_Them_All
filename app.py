@@ -15,11 +15,12 @@ from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
 from serial.serialutil import SerialException
+
 # TODO: Tidy up GUI layout
 # TODO: Auto import station
-# TODO: Add connect button to start connection to equipment
 # TODO: Add loading screen
-# TODO: Add connect button to start connection to equipment
+# TODO: Improve handling of pps and ametek
+# TODO: Improve logging
 
 RUN_EQUIPMENT = True
 
@@ -38,6 +39,7 @@ class Dialog(QDialog, Ui_Dialog, smartsignal.SmartSignal):
         self.scope_entry_device.setText(config["scope"]["scope_entry_device"])
         self.rlc_entry_device.setText(config["rlc"]["rlc_entry_device"])
         self.sas_entry_device.setText(config["sas"]["sas_entry_device"])
+        self.device_entry_startup.setChecked(config["setup_devices"])
 
         self.auto_connect()
 
@@ -60,7 +62,7 @@ class Dialog(QDialog, Ui_Dialog, smartsignal.SmartSignal):
             print(state)
             self.sas_device = state
 
-    def _on_device_entry_startup_stateChanged(self):
+    def _on_device_entry_startup__stateChanged(self):
         state = self.sender().isChecked()
         print (f"Startup behaviour set to: {state}")
         self.startup = state

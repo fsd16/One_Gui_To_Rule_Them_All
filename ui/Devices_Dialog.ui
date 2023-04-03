@@ -11,11 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Device Connection</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="4" column="0">
-    <widget class="QCheckBox" name="checkBox">
+    <widget class="QCheckBox" name="device_entry_startup">
      <property name="text">
       <string>Show on Startup</string>
      </property>
@@ -62,13 +62,6 @@
    </item>
    <item row="2" column="0">
     <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>AC Source</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="ac_entry_device">
        <property name="placeholderText">
@@ -115,6 +108,13 @@
       <widget class="QLineEdit" name="sas_entry_device">
        <property name="placeholderText">
         <string>GPIB0::&lt;address&gt;::INSTR</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>AC Source</string>
        </property>
       </widget>
      </item>

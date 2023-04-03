@@ -1,1 +1,84 @@
-{"default": {"setup_devices": true, "ac": {"ac_entry_device": "GPIB0::1::INSTR", "ac_entry_ac_volts": 240, "ac_entry_freq": 60, "ac_radio_single": false, "ac_radio_split": true, "ac_radio_three": false, "ac_menu_phase": "240v, 60hz, Split Phase (NA)", "ac_menu_abnormal": "IEC_77A_Class_1", "ac_check_abnormal": false, "ac_entry_step_size": 1}, "scope": {"scope_entry_device": "GPIB0::28::INSTR", "scope_line_cap_path": "c:\\Users\\fdrabsch\\OneDrive - Enphase Energy\\Documents\\Control Scripts\\One Gui To Rule Them All\\captures", "scope_line_cap_name": "foo", "scope_check_date": false, "scope_check_invert": false, "scope_check_auto": false, "scope_line_ch1_lab": "CH1", "scope_line_ch2_lab": "CH2", "scope_line_ch3_lab": "CH3", "scope_line_ch4_lab": "CH4"}, "rlc": {"rlc_entry_device": "COM3,COM4", "rlc_entry_ac_volts": 240, "rlc_entry_freq": 60, "rlc_entry_real_pwr": 0, "rlc_entry_reactive_pwr": 0}, "sas": {"sas_entry_device": "GPIB0::15::INSTR", "sas_entry_vmp": 32, "sas_entry_pmp": 100, "sas_entry_ff": 0.78, "sas_entry_irrad": 1}}, "current": {"setup_devices": true, "ac": {"ac_entry_device": "GPIB0::1::INSTR", "ac_entry_ac_volts": 240, "ac_entry_freq": 60, "ac_radio_single": false, "ac_radio_split": true, "ac_radio_three": false, "ac_menu_phase": "240v, 60hz, Split Phase (NA)", "ac_menu_abnormal": "IEC_77A_Class_1", "ac_check_abnormal": false, "ac_entry_step_size": 1}, "scope": {"scope_entry_device": "GPIB0::28::INSTR", "scope_line_cap_path": "c:\\Users\\fdrabsch\\OneDrive - Enphase Energy\\Documents\\Control Scripts\\One Gui To Rule Them All\\captures", "scope_line_cap_name": "foo", "scope_check_date": false, "scope_check_invert": false, "scope_check_auto": false, "scope_line_ch1_lab": "CH1", "scope_line_ch2_lab": "CH2", "scope_line_ch3_lab": "CH3", "scope_line_ch4_lab": "CH4"}, "rlc": {"rlc_entry_device": "COM3,COM4", "rlc_entry_ac_volts": 240, "rlc_entry_freq": 60, "rlc_entry_real_pwr": 5.4779097333310816, "rlc_entry_reactive_pwr": -0.06487881061572703}, "sas": {"sas_entry_device": "GPIB0::15::INSTR", "sas_entry_vmp": 32, "sas_entry_pmp": 100, "sas_entry_ff": 0.78, "sas_entry_irrad": 1}}}
+{
+  "default": {
+    "setup_devices": true,
+    "ac": {
+      "ac_entry_device": "GPIB0::1::INSTR",
+      "ac_entry_ac_volts": 240,
+      "ac_entry_freq": 60,
+      "ac_radio_single": false,
+      "ac_radio_split": true,
+      "ac_radio_three": false,
+      "ac_menu_phase": "240v, 60hz, Split Phase (NA)",
+      "ac_menu_abnormal": "IEC_77A_Class_1",
+      "ac_check_abnormal": false,
+      "ac_entry_step_size": 1
+    },
+    "scope": {
+      "scope_entry_device": "GPIB0::28::INSTR",
+      "scope_line_cap_path": "c:\\Users\\fdrabsch\\OneDrive - Enphase Energy\\Documents\\Control Scripts\\One Gui To Rule Them All\\captures",
+      "scope_line_cap_name": "foo",
+      "scope_check_date": false,
+      "scope_check_invert": false,
+      "scope_check_auto": false,
+      "scope_line_ch1_lab": "CH1",
+      "scope_line_ch2_lab": "CH2",
+      "scope_line_ch3_lab": "CH3",
+      "scope_line_ch4_lab": "CH4"
+    },
+    "rlc": {
+      "rlc_entry_device": "COM3,COM4",
+      "rlc_entry_ac_volts": 240,
+      "rlc_entry_freq": 60,
+      "rlc_entry_real_pwr": 0,
+      "rlc_entry_reactive_pwr": 0
+    },
+    "sas": {
+      "sas_entry_device": "GPIB0::15::INSTR",
+      "sas_entry_vmp": 32,
+      "sas_entry_pmp": 100,
+      "sas_entry_ff": 0.78,
+      "sas_entry_irrad": 1
+    }
+  },
+  "current": {
+    "setup_devices": true,
+    "ac": {
+      "ac_entry_device": "GPIB0::1::INSTR",
+      "ac_entry_ac_volts": 240,
+      "ac_entry_freq": 60,
+      "ac_radio_single": false,
+      "ac_radio_split": true,
+      "ac_radio_three": false,
+      "ac_menu_phase": "240v, 60hz, Split Phase (NA)",
+      "ac_menu_abnormal": "IEC_77A_Class_1",
+      "ac_check_abnormal": false,
+      "ac_entry_step_size": 1
+    },
+    "scope": {
+      "scope_entry_device": "GPIB0::28::INSTR",
+      "scope_line_cap_path": "c:\\Users\\fdrabsch\\OneDrive - Enphase Energy\\Documents\\Control Scripts\\One Gui To Rule Them All\\captures",
+      "scope_line_cap_name": "foo",
+      "scope_check_date": false,
+      "scope_check_invert": false,
+      "scope_check_auto": false,
+      "scope_line_ch1_lab": "CH1",
+      "scope_line_ch2_lab": "CH2",
+      "scope_line_ch3_lab": "CH3",
+      "scope_line_ch4_lab": "CH4"
+    },
+    "rlc": {
+      "rlc_entry_device": "COM3,COM4",
+      "rlc_entry_ac_volts": 240,
+      "rlc_entry_freq": 60,
+      "rlc_entry_real_pwr": 5.4779097333310816,
+      "rlc_entry_reactive_pwr": -0.06487881061572703
+    },
+    "sas": {
+      "sas_entry_device": "GPIB0::15::INSTR",
+      "sas_entry_vmp": 32,
+      "sas_entry_pmp": 100,
+      "sas_entry_ff": 0.78,
+      "sas_entry_irrad": 1
+    }
+  }
+}
