@@ -2,14 +2,22 @@ import math
 import os
 from enphase_equipment.ac_source.interface import Waveform
 from enphase_equipment.ac_source.pacific_power_source import PPS_308
+from enphase_equipment.ac_source.ametek import AmetekAsterion
 
+class AC_SRC():
+        
+    def __init__(self, resource_name, ac_source="PPS", *args, **kwargs):
+        if ac_source == "PPS":
+            self.__class__ = type(self.__class__.__name__,
+                              (PPS_308, object),
+                              dict(self.__class__.__dict__))
+        elif ac_source == "Ametek":
+            self.__class__ = type(self.__class__.__name__,
+                              (AmetekAsterion, object),
+                              dict(self.__class__.__dict__))
+            
+        super(self.__class__, self).__init__(resource_name, *args, **kwargs)
 
-class AC_SRC(PPS_308):
-        
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        self.reset()
         # pre defined profiles
         self.PROFILES = {
             "240v, 60hz, Split Phase (NA)":   (240, 60, "split"), # North American (NA)
@@ -53,7 +61,7 @@ class AC_SRC(PPS_308):
 
     # Callback to apply settings to AC
     def apply(self, ac_config):
-
+ 
         if ac_config["ac_radio_single"]:
             phase_config = "single"
         elif ac_config["ac_radio_split"]:
@@ -61,24 +69,19 @@ class AC_SRC(PPS_308):
         elif ac_config["ac_radio_three"]:
             phase_config = "three"
 
-        self.prog_voltage_line_voltages(99, self.calc_ac_volts(phase_config, ac_config["ac_entry_ac_volts"]), ac_config["ac_entry_freq"])
-        self.exec_program(99)
-        print("AC updated ")
-        
-    def apply_abnormal(self, ac_config):
-        
-        choice = ac_config["ac_menu_abnormal"]
-        if ac_config["ac_radio_single"]:
-            phase_config = "single"
-        elif ac_config["ac_radio_split"]:
-            phase_config = "split"
-        elif ac_config["ac_radio_three"]:
-            phase_config = "three"
+        ac_voltage_tuple = self.calc_ac_volts(phase_config, ac_config["ac_entry_ac_volts"])
 
-        path = os.path.join(self.base_path, (self.AB_WAVEFORMS[choice]))
-        continuous_waveform = Waveform.create_waveform_from_file(path)
-        
-        self.set_steady_state(voltages=self.calc_ac_volts(phase_config, ac_config["ac_entry_ac_volts"]), frequency=ac_config["ac_entry_freq"], waveform=continuous_waveform)
+        ac_freq = ac_config["ac_entry_freq"]
+
+        if ac_config["ac_check_abnormal"]:
+            choice = ac_config["ac_menu_abnormal"]
+            path = os.path.join(self.base_path, (self.AB_WAVEFORMS[choice]))
+            continuous_waveform = Waveform.create_waveform_from_file(path)
+            self.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq, waveform=continuous_waveform)
+            print("AC updated with abnormal")
+        else:
+            self.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq)
+            print("AC updated ")
         
     # callback to apply settings and turn on ac output
     def turn_on(self):    

@@ -92,7 +92,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     
     def setup_equipment(self):
         if RUN_EQUIPMENT:
-            self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"])
+            self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "PPS")
             self.scope = Scope(self.c_config["scope"]["scope_entry_device"])
             rcc, split, pcc = self.c_config["rlc"]["rlc_entry_device"].partition(',')
             try:
@@ -254,13 +254,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         
     def _on_ac_butt_apply__clicked(self):
         print("Apply was clicked")
-        
-        if self.c_config["ac"]["ac_check_abnormal"]:
-            if RUN_EQUIPMENT:
-                self.ac_src.apply_abnormal(self.c_config["ac"])
-        else:
-            if RUN_EQUIPMENT:
-                self.ac_src.apply(self.c_config["ac"])
+        if RUN_EQUIPMENT:
+            self.ac_src.apply(self.c_config["ac"])
         
     def _on_ac_check_abnormal__stateChanged(self):
         state = self.sender().isChecked()
