@@ -1,8 +1,6 @@
 from pathlib import Path
-from time import strftime, localtime
-import os
-import time
-from configparser import ConfigParser
+from time import strftime, localtime, sleep
+from os.path import splitext, exists
 from concurrent import futures
 from enphase_equipment.oscilloscope.agilent import AgilentDSO
 from threading import Thread
@@ -18,15 +16,15 @@ class Scope(AgilentDSO):
         self.auto_cap_run = False
     
     # Ensure file name is unique
-    def uniquify(self, path):
-        filename, extension = os.path.splitext(path)
+    def uniquify(self, filepath):
+        filename, extension = splitext(filepath)
         counter = 1
 
-        while os.path.exists(path):
-            path = filename + " (" + str(counter) + ")" + extension
+        while exists(filepath):
+            filepath = filename + " (" + str(counter) + ")" + extension
             counter += 1
 
-        return path
+        return filepath
         
     # callback to take the scope capture
     def capture_display(self, sas_config):
@@ -62,7 +60,7 @@ class Scope(AgilentDSO):
         while self.auto_cap_run:
             if bool(int(self.ask(":TER?"))): # True when a trigger has occured
                 print("Capture Scope Data")
-                time.sleep(0.5)
+                sleep(0.5)
                 self.capture_display(sas_config)
                 self.write(":Single")
 

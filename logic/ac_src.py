@@ -1,6 +1,6 @@
-import math
-import os
-from enphase_equipment.ac_source.interface import Waveform
+from math import sqrt
+from os.path import join
+from enphase_equipment.ac_source.interface import Waveform 
 from enphase_equipment.ac_source.pacific_power_source import PPS_308
 from enphase_equipment.ac_source.ametek import AmetekAsterion
 
@@ -55,7 +55,7 @@ class AC_SRC():
         elif config == "single":
             ac_voltage_tuple = (ac_rms_voltage, 0)
         elif config == "three":
-            ac_voltage_tuple = (round(ac_rms_voltage/math.sqrt(3)), round(ac_rms_voltage/math.sqrt(3)), round(ac_rms_voltage/math.sqrt(3)))
+            ac_voltage_tuple = (round(ac_rms_voltage/sqrt(3)), round(ac_rms_voltage/sqrt(3)), round(ac_rms_voltage/sqrt(3)))
         
         return ac_voltage_tuple
 
@@ -75,8 +75,8 @@ class AC_SRC():
 
         if ac_config["ac_check_abnormal"]:
             choice = ac_config["ac_menu_abnormal"]
-            path = os.path.join(self.base_path, (self.AB_WAVEFORMS[choice]))
-            continuous_waveform = Waveform.create_waveform_from_file(path)
+            filepath = join(self.base_path, (self.AB_WAVEFORMS[choice]))
+            continuous_waveform = Waveform.create_waveform_from_file(filepath)
             self.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq, waveform=continuous_waveform)
             print("AC updated with abnormal")
         else:

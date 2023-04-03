@@ -1,16 +1,5 @@
-# -*- coding: utf-8 -*-
 import numpy as np
-import time
-
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_wxagg import (
-    FigureCanvasWxAgg as FigureCanvas,
-    NavigationToolbar2WxAgg as NavigationToolbar
-)
-from enphase_station.station_obj import STATION
 from enphase_equipment.solar_array_simulator.agilent import AgilentE4360A
-
-from threading import Thread
 
 class SAS(AgilentE4360A):
     def __init__(self, *args, **kwargs):

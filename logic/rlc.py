@@ -1,7 +1,6 @@
-import math
+
 from enphase_equipment.rlc_load.enphase_rlc_v2 import EnphaseRLCV2
 from enphase_equipment.rlc_load.common import calculate_rlc_from_real_and_reactive_power
-from enphase_equipment.rlc_load.common import calculate_real_and_reactive_power_from_rlc
 
 class RLC(EnphaseRLCV2):
     def __init__(self, *args, **kwargs):
