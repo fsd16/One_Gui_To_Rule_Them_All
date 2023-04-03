@@ -3,6 +3,7 @@ from os.path import join
 from enphase_equipment.ac_source.interface import Waveform 
 from enphase_equipment.ac_source.pacific_power_source import PPS_308
 from enphase_equipment.ac_source.ametek import AmetekAsterion
+import pyvisa as visa
 
 class AC_SRC():
         
@@ -46,6 +47,9 @@ class AC_SRC():
             "ross vL1n":                                   ('ross_vL1n.wfd'),
             "Amanda Welz Florida":                         ('Amanda_Welz_Florida.wfd'),
         }
+
+        self.rm = visa.ResourceManager()
+        self.vl = self.rm.visalib
     
     # Callback to set ac voltage
     def calc_ac_volts(self, config, ac_rms_voltage):
@@ -92,3 +96,9 @@ class AC_SRC():
     def turn_off(self):
         self.off()
         print("ac off")
+    
+    def return_manual(self):
+        # Put Ametek back into manual control after gui_test_runner test case leaves it in remote control
+        b = self.rm.open_resource(self.resource_name)
+        #vl.gpib_control_ren(b.session, visa.highlevel.constants.VI_GPIB_REN_DEASSERT)
+        self.vl.gpib_control_ren(b.session, visa.highlevel.constants.VI_GPIB_REN_DEASSERT)
