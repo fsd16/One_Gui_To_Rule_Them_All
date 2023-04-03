@@ -17,6 +17,7 @@ from logic.ac_src import AC_SRC
 from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
+from logic.signal import SmartSignal
 from serial.serialutil import SerialException
 
 import_time = time.time()
@@ -30,7 +31,7 @@ print(f"Import time: {import_time - start_time}")
 
 RUN_EQUIPMENT = True
 
-class Dialog(QDialog, Ui_Dialog, smartsignal.SmartSignal):
+class Dialog(QDialog, Ui_Dialog, SmartSignal):
     def __init__(self, config, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ac_device = None
@@ -73,7 +74,7 @@ class Dialog(QDialog, Ui_Dialog, smartsignal.SmartSignal):
         print (f"Startup behaviour set to: {state}")
         self.startup = state
 
-class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal): 
+class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal): 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
