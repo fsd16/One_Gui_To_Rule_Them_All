@@ -96,8 +96,9 @@ class AC_SRC():
     def turn_off(self):
         self.off()
         print("ac off")
+    
+    def return_manual(self):
         # Put Ametek back into manual control after gui_test_runner test case leaves it in remote control
         b = self.rm.open_resource(self.resource_name)
         #vl.gpib_control_ren(b.session, visa.highlevel.constants.VI_GPIB_REN_DEASSERT)
         self.vl.gpib_control_ren(b.session, visa.highlevel.constants.VI_GPIB_REN_DEASSERT)
-        print("manual control returned")

@@ -244,6 +244,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         print("Close was clicked")
         self.sas_timer.stop()
         self.ac_butt_off.click()
+        self.ac_src.return_manual()
         self.rlc_butt_off.click()
         self.sas_butt_off.click()
 
