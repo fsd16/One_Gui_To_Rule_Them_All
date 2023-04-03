@@ -1,7 +1,0 @@
-Add graph for sas
-Auto import station on first run
-Add functionality to restore defaults
-Make auto capture more robust
-Use threads to speed up startup
-Add connect button to start connection to equipment
-Add loading screen

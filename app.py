@@ -3,19 +3,70 @@ import json
 import smartside.signal as smartsignal
 import time
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox, QFileDialog
 from PySide6.QtCore import QTimer
 import pyqtgraph as pg
 import numpy as np
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
+from ui.ui_Devices_Dialog import Ui_Dialog
 from logic.ac_src import AC_SRC
 from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
+from serial.serialutil import SerialException
 
+# TODO: Tidy up GUI layout
+# TODO: Auto import station
+# TODO: Add loading screen
+# TODO: Improve handling of pps and ametek
+# TODO: Improve logging
 
 RUN_EQUIPMENT = True
+
+class Dialog(QDialog, Ui_Dialog, smartsignal.SmartSignal):
+    def __init__(self, config, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.ac_device = None
+        self.scope_device = None
+        self.rlc_device = None
+        self.sas_device = None
+        self.startup = None
+
+        self.setupUi(self)
+
+        self.ac_entry_device.setText(config["ac"]["ac_entry_device"])
+        self.scope_entry_device.setText(config["scope"]["scope_entry_device"])
+        self.rlc_entry_device.setText(config["rlc"]["rlc_entry_device"])
+        self.sas_entry_device.setText(config["sas"]["sas_entry_device"])
+        self.device_entry_startup.setChecked(config["setup_devices"])
+
+        self.auto_connect()
+
+    _dialog_entries = 'ac_entry_device, scope_entry_device, rlc_entry_device, sas_entry_device'
+    def _when_dialog_entries__editingFinished(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.text()
+        
+        if obj_name == "ac_entry_device":
+            print(state)
+            self.ac_device = state
+        elif obj_name == "scope_entry_device":
+            print(state)
+            self.scope_device = state
+        elif obj_name == "rlc_entry_device":
+            print(state)
+            self.rlc_device = state
+        elif obj_name == "sas_entry_device":
+            print(state)
+            self.sas_device = state
+
+    def _on_device_entry_startup__stateChanged(self):
+        state = self.sender().isChecked()
+        print (f"Startup behaviour set to: {state}")
+        self.startup = state
+
 class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal): 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -27,14 +78,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         self.sas_timer.timeout.connect(self.sas_update_plot_pv)
 
         self.errorMsg = QErrorMessage()
-        if RUN_EQUIPMENT:
-            self.ac_src = AC_SRC("GPIB0::1::INSTR")
-            self.scope = Scope("GPIB0::28::INSTR")
-            self.rlc = RLC(relay_controller_comport='COM3',
-                        phase_controller_comport='COM4')
-            self.sas = SAS("GPIB0::15::INSTR")
-
+        
         self.load_config()
+
+        if self.c_config["setup_devices"]:
+            self._on_main_action_devices__triggered()
+
+        self.setup_equipment()
         
         if RUN_EQUIPMENT:
             self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
@@ -42,6 +92,25 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         
         self.auto_connect()
     
+    def setup_equipment(self):
+        if RUN_EQUIPMENT:
+            try:
+                self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "Ametek")
+            except RuntimeError:
+                self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "PPS")
+            
+            self.scope = Scope(self.c_config["scope"]["scope_entry_device"])
+            rcc, split, pcc = self.c_config["rlc"]["rlc_entry_device"].partition(',')
+            try:
+                self.rlc = RLC(relay_controller_comport=rcc,
+                            phase_controller_comport=pcc)
+            except SerialException:
+                self.rlc.close()
+                self.rlc = RLC(relay_controller_comport=rcc,
+                            phase_controller_comport=pcc)
+            self.sas = SAS(self.c_config["sas"]["sas_entry_device"])
+            print("Equipment is setup")
+
     def setup_sas_plot(self):
         self.sas_plot.setBackground('w')
 
@@ -141,6 +210,25 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         
         print("Config loaded")
 
+    def _on_main_action_reconnect__triggered(self):
+        self.setup_equipment()
+
+    def _on_main_action_devices__triggered(self):
+        dlg = Dialog(self.c_config)
+        dlg.exec()
+
+        if QDialog.Accepted:
+            if not dlg.ac_device == None:
+                self.c_config["ac"]["ac_entry_device"] = dlg.ac_device
+            if not dlg.scope_device == None:
+                self.c_config["scope"]["scope_entry_device"] = dlg.scope_device
+            if not dlg.rlc_device == None:
+                self.c_config["rlc"]["rlc_entry_device"] = dlg.rlc_device
+            if not dlg.sas_device == None:
+                self.c_config["sas"]["sas_entry_device"] = dlg.sas_device
+            if not dlg.startup == None:
+                self.c_config["setup_devices"] = dlg.startup
+
     def _on_main_action_restore__triggered(self):
         print("Restore defaults triggered")
         self.force_update_ui(self.d_config)
@@ -152,6 +240,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         self.ac_butt_off.click()
         self.rlc_butt_off.click()
         self.sas_butt_off.click()
+
         # save config
         with open("config.json", "w") as jsonfile:
             json.dump(self.config, jsonfile)
@@ -172,16 +261,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         
     def _on_ac_butt_apply__clicked(self):
         print("Apply was clicked")
-        
-        if self.c_config["ac"]["ac_check_abnormal"]:
-            if RUN_EQUIPMENT:
-                self.ac_src.apply_abnormal(self.c_config["ac"])
-        else:
-            if RUN_EQUIPMENT:
-                self.ac_src.apply(self.c_config["ac"])
+        if RUN_EQUIPMENT:
+            self.ac_src.apply(self.c_config["ac"])
         
     def _on_ac_check_abnormal__stateChanged(self):
-        state = self.sender().value()
+        state = self.sender().isChecked()
         print ('Abnormal was checked', state)
         self.c_config["ac"]["ac_check_abnormal"] = state
 
@@ -242,6 +326,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         print("Apply labels was clicked")
         if RUN_EQUIPMENT:
             self.scope.label(self.c_config["scope"])
+
+    def _on_scope_butt_browse__clicked(self):
+        path = str(QFileDialog.getExistingDirectory())
+        self.scope_line_cap_path.setText(path)
+        print("Capture path entered:", path)
+        self.c_config["scope"]["scope_line_cap_path"] = path
+
     
     def _on_scope_butt_cap__clicked(self):
         print("Capture was clicked")
@@ -314,8 +405,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
             if RUN_EQUIPMENT:
                 rlc_config = self.rlc.turn_on(rlc_config)
             self.c_config["rlc"].update(rlc_config)
-            # self.rlc_entry_real_pwr.setValue(round(self.rlc.SETTINGS["real_pwr"]))
-            # self.rlc_entry_reactive_pwr.setValue(round(self.rlc.SETTINGS["reactive_pwr"]))
         except self.rlc.NoInput:
             self.errorMsg.showMessage("Why do I even exist?")
         except self.rlc.VoltageInvalid:
