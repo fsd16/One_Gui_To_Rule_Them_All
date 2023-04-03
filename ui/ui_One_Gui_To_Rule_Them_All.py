@@ -31,8 +31,10 @@ class Ui_MainWindow(object):
         MainWindow.resize(600, 400)
         self.main_action_restore = QAction(MainWindow)
         self.main_action_restore.setObjectName(u"main_action_restore")
-        self.actionConnect_Equipment = QAction(MainWindow)
-        self.actionConnect_Equipment.setObjectName(u"actionConnect_Equipment")
+        self.main_action_devices = QAction(MainWindow)
+        self.main_action_devices.setObjectName(u"main_action_devices")
+        self.main_action_reconnect = QAction(MainWindow)
+        self.main_action_reconnect.setObjectName(u"main_action_reconnect")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_7 = QGridLayout(self.centralwidget)
@@ -527,7 +529,8 @@ class Ui_MainWindow(object):
 
         self.menubar.addAction(self.menuOptions.menuAction())
         self.menuOptions.addAction(self.main_action_restore)
-        self.menuOptions.addAction(self.actionConnect_Equipment)
+        self.menuOptions.addAction(self.main_action_devices)
+        self.menuOptions.addAction(self.main_action_reconnect)
 
         self.retranslateUi(MainWindow)
 
@@ -538,9 +541,10 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"One Gui To Rule Them All", None))
         self.main_action_restore.setText(QCoreApplication.translate("MainWindow", u"Restore Defaults", None))
-        self.actionConnect_Equipment.setText(QCoreApplication.translate("MainWindow", u"Connect Equipment", None))
+        self.main_action_devices.setText(QCoreApplication.translate("MainWindow", u"Configure Equipment", None))
+        self.main_action_reconnect.setText(QCoreApplication.translate("MainWindow", u"Reconnect Equipment", None))
         self.sas_butt_off.setText(QCoreApplication.translate("MainWindow", u"SAS Off", None))
         self.sas_butt_on.setText(QCoreApplication.translate("MainWindow", u"SAS On", None))
         self.sas_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))

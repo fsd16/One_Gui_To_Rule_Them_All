@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>One Gui To Rule Them All</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_7">
@@ -1054,7 +1054,8 @@
      <string>Options</string>
     </property>
     <addaction name="main_action_restore"/>
-    <addaction name="actionConnect_Equipment"/>
+    <addaction name="main_action_devices"/>
+    <addaction name="main_action_reconnect"/>
    </widget>
    <addaction name="menuOptions"/>
   </widget>
@@ -1064,9 +1065,14 @@
     <string>Restore Defaults</string>
    </property>
   </action>
-  <action name="actionConnect_Equipment">
+  <action name="main_action_devices">
    <property name="text">
-    <string>Connect Equipment</string>
+    <string>Configure Equipment</string>
+   </property>
+  </action>
+  <action name="main_action_reconnect">
+   <property name="text">
+    <string>Reconnect Equipment</string>
    </property>
   </action>
  </widget>
