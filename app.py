@@ -92,7 +92,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
     
     def setup_equipment(self):
         if RUN_EQUIPMENT:
-            self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "PPS")
+            try:
+                self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "Ametek")
+            except RuntimeError:
+                self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "PPS")
+            
             self.scope = Scope(self.c_config["scope"]["scope_entry_device"])
             rcc, split, pcc = self.c_config["rlc"]["rlc_entry_device"].partition(',')
             try:
@@ -234,6 +238,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         self.ac_butt_off.click()
         self.rlc_butt_off.click()
         self.sas_butt_off.click()
+
         # save config
         with open("config.json", "w") as jsonfile:
             json.dump(self.config, jsonfile)
