@@ -1,12 +1,15 @@
+import time
+start_time = time.time()
+
 import sys
 import json
 import smartside.signal as smartsignal
-import time
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QComboBox, QFileDialog
+
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QFileDialog
 from PySide6.QtCore import QTimer
-import pyqtgraph as pg
-import numpy as np
+from pyqtgraph import ViewBox, PlotCurveItem, ScatterPlotItem
+from numpy import array
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
 from ui.ui_Devices_Dialog import Ui_Dialog
@@ -15,6 +18,9 @@ from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
 from serial.serialutil import SerialException
+
+import_time = time.time()
+print(f"Import time: {import_time - start_time}")
 
 # TODO: Tidy up GUI layout
 # TODO: Auto import station
@@ -123,8 +129,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         plot.invertY()
 
         # Set up view box
-        self.left_vb = pg.ViewBox(lockAspect=False)
-        self.right_vb = pg.ViewBox(lockAspect=False)
+        self.left_vb = ViewBox(lockAspect=False)
+        self.right_vb = ViewBox(lockAspect=False)
 
         plot.addItem(self.left_vb)
         plot.addItem(self.right_vb)
@@ -136,23 +142,23 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         current = data["i"]
         voltage = data["v"]
         power = data["p"]
-        left_curve = pg.PlotCurveItem(voltage, power, pen='b')
+        left_curve = PlotCurveItem(voltage, power, pen='b')
         self.left_vb.addItem(left_curve)
 
-        right_curve = pg.PlotCurveItem(voltage, current, pen='r')
+        right_curve = PlotCurveItem(voltage, current, pen='r')
         self.right_vb.addItem(right_curve)
 
         self.left_vb.disableAutoRange()
         self.right_vb.disableAutoRange()
 
-        self.pv_point = pg.ScatterPlotItem()
+        self.pv_point = ScatterPlotItem()
         self.left_vb.addItem(self.pv_point)
 
     def sas_update_plot_pv(self):
         power, voltage = self.sas.get_sas_pv()
         # print(f"Power: {power}, Voltage: {voltage}")
         self.pv_point.clear()
-        self.pv_point.addPoints(np.array([voltage]), np.array([power]), pen='g', symbol='o')
+        self.pv_point.addPoints(array([voltage]), array([power]), pen='g', symbol='o')
 
     def force_update_ui(self, config):
         children = []
@@ -238,6 +244,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
         print("Close was clicked")
         self.sas_timer.stop()
         self.ac_butt_off.click()
+        self.ac_src.return_manual()
         self.rlc_butt_off.click()
         self.sas_butt_off.click()
 
@@ -475,13 +482,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, smartsignal.SmartSignal):
 
 def main():
     # This call takes foooooreeeeeever.....
-    start_time = time.time()
     app = QApplication(sys.argv)
     app_time = time.time()
-    print(f"App time: {app_time - start_time}")
+    print(f"App time: {app_time - import_time}")
     window = MainWindow()
     window_time = time.time()
-    print(f"App time: {window_time - app_time}")
+    print(f"MainWindow time: {window_time - app_time}")
     window.show()
 
     sys.exit(app.exec())

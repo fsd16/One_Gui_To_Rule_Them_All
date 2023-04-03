@@ -1,8 +1,9 @@
-import math
-import os
-from enphase_equipment.ac_source.interface import Waveform
+from math import sqrt
+from os.path import join
+from enphase_equipment.ac_source.interface import Waveform 
 from enphase_equipment.ac_source.pacific_power_source import PPS_308
 from enphase_equipment.ac_source.ametek import AmetekAsterion
+import pyvisa as visa
 
 class AC_SRC():
         
@@ -46,6 +47,9 @@ class AC_SRC():
             "ross vL1n":                                   ('ross_vL1n.wfd'),
             "Amanda Welz Florida":                         ('Amanda_Welz_Florida.wfd'),
         }
+
+        self.rm = visa.ResourceManager()
+        self.vl = self.rm.visalib
     
     # Callback to set ac voltage
     def calc_ac_volts(self, config, ac_rms_voltage):
@@ -55,7 +59,7 @@ class AC_SRC():
         elif config == "single":
             ac_voltage_tuple = (ac_rms_voltage, 0)
         elif config == "three":
-            ac_voltage_tuple = (round(ac_rms_voltage/math.sqrt(3)), round(ac_rms_voltage/math.sqrt(3)), round(ac_rms_voltage/math.sqrt(3)))
+            ac_voltage_tuple = (round(ac_rms_voltage/sqrt(3)), round(ac_rms_voltage/sqrt(3)), round(ac_rms_voltage/sqrt(3)))
         
         return ac_voltage_tuple
 
@@ -75,8 +79,8 @@ class AC_SRC():
 
         if ac_config["ac_check_abnormal"]:
             choice = ac_config["ac_menu_abnormal"]
-            path = os.path.join(self.base_path, (self.AB_WAVEFORMS[choice]))
-            continuous_waveform = Waveform.create_waveform_from_file(path)
+            filepath = join(self.base_path, (self.AB_WAVEFORMS[choice]))
+            continuous_waveform = Waveform.create_waveform_from_file(filepath)
             self.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq, waveform=continuous_waveform)
             print("AC updated with abnormal")
         else:
@@ -92,3 +96,9 @@ class AC_SRC():
     def turn_off(self):
         self.off()
         print("ac off")
+    
+    def return_manual(self):
+        # Put Ametek back into manual control after gui_test_runner test case leaves it in remote control
+        b = self.rm.open_resource(self.resource_name)
+        #vl.gpib_control_ren(b.session, visa.highlevel.constants.VI_GPIB_REN_DEASSERT)
+        self.vl.gpib_control_ren(b.session, visa.highlevel.constants.VI_GPIB_REN_DEASSERT)
