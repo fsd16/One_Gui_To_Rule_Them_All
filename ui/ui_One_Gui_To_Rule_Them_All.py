@@ -70,6 +70,7 @@ class Ui_MainWindow(object):
 
         self.formLayout = QFormLayout()
         self.formLayout.setObjectName(u"formLayout")
+        self.formLayout.setFieldGrowthPolicy(QFormLayout.FieldsStayAtSizeHint)
         self.formLayout.setLabelAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.formLayout.setFormAlignment(Qt.AlignHCenter|Qt.AlignTop)
         self.label_14 = QLabel(self.sas_tab)
@@ -79,7 +80,7 @@ class Ui_MainWindow(object):
 
         self.sas_entry_vmp = QDoubleSpinBox(self.sas_tab)
         self.sas_entry_vmp.setObjectName(u"sas_entry_vmp")
-        self.sas_entry_vmp.setMinimumSize(QSize(50, 0))
+        self.sas_entry_vmp.setMinimumSize(QSize(60, 0))
         self.sas_entry_vmp.setMaximumSize(QSize(16777215, 16777215))
         self.sas_entry_vmp.setFrame(True)
         self.sas_entry_vmp.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
@@ -97,7 +98,7 @@ class Ui_MainWindow(object):
 
         self.sas_entry_pmp = QDoubleSpinBox(self.sas_tab)
         self.sas_entry_pmp.setObjectName(u"sas_entry_pmp")
-        self.sas_entry_pmp.setMinimumSize(QSize(50, 0))
+        self.sas_entry_pmp.setMinimumSize(QSize(60, 0))
         self.sas_entry_pmp.setMaximumSize(QSize(16777215, 16777215))
         self.sas_entry_pmp.setFrame(True)
         self.sas_entry_pmp.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
@@ -115,7 +116,7 @@ class Ui_MainWindow(object):
 
         self.sas_entry_ff = QDoubleSpinBox(self.sas_tab)
         self.sas_entry_ff.setObjectName(u"sas_entry_ff")
-        self.sas_entry_ff.setMinimumSize(QSize(50, 0))
+        self.sas_entry_ff.setMinimumSize(QSize(60, 0))
         self.sas_entry_ff.setMaximumSize(QSize(16777215, 16777215))
         self.sas_entry_ff.setFrame(True)
         self.sas_entry_ff.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
@@ -132,7 +133,7 @@ class Ui_MainWindow(object):
 
         self.sas_entry_irrad = QDoubleSpinBox(self.sas_tab)
         self.sas_entry_irrad.setObjectName(u"sas_entry_irrad")
-        self.sas_entry_irrad.setMinimumSize(QSize(50, 0))
+        self.sas_entry_irrad.setMinimumSize(QSize(60, 0))
         self.sas_entry_irrad.setMaximumSize(QSize(16777215, 16777215))
         self.sas_entry_irrad.setFrame(True)
         self.sas_entry_irrad.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)

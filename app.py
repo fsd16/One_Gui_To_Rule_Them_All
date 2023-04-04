@@ -31,16 +31,14 @@ print(f"Import time: {import_time - start_time}")
 
 RUN_EQUIPMENT = True
 
-class LoadingDialog(QProgressDialog):# QDialog, Ui_LoadingDialog):
+class LoadingDialog(QDialog, Ui_LoadingDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.setMinimumDuration(0)
+        self.setupUi(self)
         self.setWindowModality(Qt.ApplicationModal)
-    #     self.setupUi(self)
 
     def set_progress(self, value):
-        # self.progressBar.setValue(value)
-        self.setValue(value)
+        self.progressBar.setValue(value)
 
 class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
     def __init__(self, config, *args, **kwargs):
@@ -109,18 +107,21 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     def setup_equipment(self):
         if RUN_EQUIPMENT:
-            # self.setEnabled(False)
-            loading_dlg = LoadingDialog('Work in progress', None, 0, 100000, self)
+            loading_dlg = LoadingDialog()
+            loading_dlg.set_progress(0)
             loading_dlg.show()
             QApplication.processEvents()
+
             try:
                 self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "Ametek")
             except RuntimeError:
                 self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "PPS")
             loading_dlg.set_progress(25)
+            QApplication.processEvents()
             
             self.scope = Scope(self.c_config["scope"]["scope_entry_device"])
             loading_dlg.set_progress(50)
+            QApplication.processEvents()
 
             rcc, split, pcc = self.c_config["rlc"]["rlc_entry_device"].partition(',')
             try:
@@ -131,11 +132,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.rlc = RLC(relay_controller_comport=rcc,
                             phase_controller_comport=pcc)
             loading_dlg.set_progress(75)
+            QApplication.processEvents()
 
             self.sas = SAS(self.c_config["sas"]["sas_entry_device"])
             loading_dlg.set_progress(100)
-            loading_dlg.reset()
-            # self.setEnabled(True)
+            QApplication.processEvents()
+            loading_dlg.close()
             print("Equipment setup")
 
     def setup_sas_plot(self):

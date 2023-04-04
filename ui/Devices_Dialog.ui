@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>259</width>
-    <height>196</height>
+    <height>222</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -62,59 +62,68 @@
    </item>
    <item row="2" column="0">
     <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="1">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+     </property>
+     <property name="labelAlignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="formAlignment">
+      <set>Qt::AlignHCenter|Qt::AlignTop</set>
+     </property>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>AC Source</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
       <widget class="QLineEdit" name="ac_entry_device">
        <property name="placeholderText">
         <string>GPIB0::&lt;address&gt;::INSTR</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Scope</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
+     <item row="2" column="1">
       <widget class="QLineEdit" name="scope_entry_device">
        <property name="placeholderText">
         <string>GPIB0::&lt;address&gt;::INSTR</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="3" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>RLC Load</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="3" column="1">
       <widget class="QLineEdit" name="rlc_entry_device">
        <property name="placeholderText">
         <string>COM&lt;address&gt;,COM&lt;address&gt;</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
+     <item row="4" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>SAS</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="4" column="1">
       <widget class="QLineEdit" name="sas_entry_device">
        <property name="placeholderText">
         <string>GPIB0::&lt;address&gt;::INSTR</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>AC Source</string>
        </property>
       </widget>
      </item>
