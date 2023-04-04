@@ -82,23 +82,24 @@ class AC_SRC():
             filepath = join(self.base_path, (self.AB_WAVEFORMS[choice]))
             continuous_waveform = Waveform.create_waveform_from_file(filepath)
             self.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq, waveform=continuous_waveform)
-            print("AC updated with abnormal")
+            print(f"AC parameters applied: Voltages = {ac_voltage_tuple}, Frequency = {ac_freq}, Waveform = {choice}")
         else:
             self.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq)
-            print("AC updated ")
+            print(f"AC parameters applied: Voltages = {ac_voltage_tuple}, Frequency = {ac_freq}")
         
     # callback to apply settings and turn on ac output
     def turn_on(self):    
         self.on()
-        print("ac on")
+        print("AC on")
     
     # callback to turn off ac output
     def turn_off(self):
         self.off()
-        print("ac off")
+        print("AC off")
     
     def return_manual(self):
         # Put Ametek back into manual control after gui_test_runner test case leaves it in remote control
         b = self.rm.open_resource(self.resource_name)
         #vl.gpib_control_ren(b.session, visa.highlevel.constants.VI_GPIB_REN_DEASSERT)
         self.vl.gpib_control_ren(b.session, visa.highlevel.constants.VI_GPIB_REN_DEASSERT)
+        print("Manual control of AC source restored")

@@ -5,7 +5,6 @@ class SAS(AgilentE4360A):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    # Create thread for auto measure to run in
     def get_sas_pv(self):
 
         sas_measurement = self.measurement()
@@ -16,12 +15,15 @@ class SAS(AgilentE4360A):
 
         return calculated_p, measured_v
 
-
     def apply(self, sas_config):
-        sas_curve = self.create_table(Pmp=sas_config["sas_entry_pmp"],
-                                        Vmp=sas_config["sas_entry_vmp"],
-                                        FillFactor=sas_config["sas_entry_ff"],
-                                        irradiance=sas_config["sas_entry_irrad"])
+        Pmp = sas_config["sas_entry_pmp"]
+        Vmp = sas_config["sas_entry_vmp"]
+        ff = sas_config["sas_entry_ff"]
+        irrad = sas_config["sas_entry_irrad"]
+        sas_curve = self.create_table(Pmp=Pmp,
+                                        Vmp=Vmp,
+                                        FillFactor=ff,
+                                        irradiance=irrad)
         
         vi_array = np.array(sas_curve[1]).astype(np.float)
         p_array =  vi_array[0]* vi_array[1]
@@ -32,16 +34,14 @@ class SAS(AgilentE4360A):
             "p": p_array
         }
 
-        
-
         self.select_table()
         self.select_table_mode()
+        print(f"SAS parameters applied: Pmp = {Pmp}, Vmp = {Vmp}, FF = {ff}, Irradiance = {irrad}")
         return sas_data
 
     def turn_on(self):
         self.on()
         print("SAS on")
-        
 
     def turn_off(self):
         self.off()
