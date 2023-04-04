@@ -33,8 +33,8 @@ class Ui_MainWindow(object):
         self.main_action_restore.setObjectName(u"main_action_restore")
         self.main_action_devices = QAction(MainWindow)
         self.main_action_devices.setObjectName(u"main_action_devices")
-        self.main_action_reconnect = QAction(MainWindow)
-        self.main_action_reconnect.setObjectName(u"main_action_reconnect")
+        self.main_action_connect = QAction(MainWindow)
+        self.main_action_connect.setObjectName(u"main_action_connect")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_7 = QGridLayout(self.centralwidget)
@@ -530,7 +530,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuOptions.menuAction())
         self.menuOptions.addAction(self.main_action_restore)
         self.menuOptions.addAction(self.main_action_devices)
-        self.menuOptions.addAction(self.main_action_reconnect)
+        self.menuOptions.addAction(self.main_action_connect)
 
         self.retranslateUi(MainWindow)
 
@@ -544,7 +544,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"One Gui To Rule Them All", None))
         self.main_action_restore.setText(QCoreApplication.translate("MainWindow", u"Restore Defaults", None))
         self.main_action_devices.setText(QCoreApplication.translate("MainWindow", u"Configure Equipment", None))
-        self.main_action_reconnect.setText(QCoreApplication.translate("MainWindow", u"Reconnect Equipment", None))
+        self.main_action_connect.setText(QCoreApplication.translate("MainWindow", u"Reconnect Equipment", None))
         self.sas_butt_off.setText(QCoreApplication.translate("MainWindow", u"SAS Off", None))
         self.sas_butt_on.setText(QCoreApplication.translate("MainWindow", u"SAS On", None))
         self.sas_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))

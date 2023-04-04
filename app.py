@@ -4,19 +4,21 @@ start_time = time.time()
 import sys
 import json
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QFileDialog
-from PySide6.QtCore import QTimer
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QFileDialog, QProgressDialog 
+from PySide6.QtCore import QTimer, Qt
 from pyqtgraph import ViewBox, PlotCurveItem, ScatterPlotItem
 from numpy import array
 
 from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
-from ui.ui_Devices_Dialog import Ui_Dialog
+from ui.ui_Devices_Dialog import Ui_DevicesDialog
+from ui.ui_Loading_Dialog import Ui_LoadingDialog
 from logic.ac_src import AC_SRC
 from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
 from logic.signal import SmartSignal
 from serial.serialutil import SerialException
+from pyvisa.errors import VisaIOError
 
 import_time = time.time()
 print(f"Import time: {import_time - start_time}")
@@ -29,7 +31,18 @@ print(f"Import time: {import_time - start_time}")
 
 RUN_EQUIPMENT = True
 
-class Dialog(QDialog, Ui_Dialog, SmartSignal):
+class LoadingDialog(QProgressDialog):# QDialog, Ui_LoadingDialog):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setMinimumDuration(0)
+        self.setWindowModality(Qt.ApplicationModal)
+    #     self.setupUi(self)
+
+    def set_progress(self, value):
+        # self.progressBar.setValue(value)
+        self.setValue(value)
+
+class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
     def __init__(self, config, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ac_device = None
@@ -82,29 +95,33 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.sas_timer.setInterval(100)
         self.sas_timer.timeout.connect(self.sas_update_plot_pv)
 
-        self.errorMsg = QErrorMessage()
-        
+        self.error_msg = QErrorMessage()
+        self.error_msg.setWindowModality(Qt.ApplicationModal)
+
         self.load_config()
 
         if self.c_config["setup_devices"]:
             self._on_main_action_devices__triggered()
 
-        self.setup_equipment()
-        
-        if RUN_EQUIPMENT:
-            self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
-            self.ac_menu_phase.addItems(self.ac_src.PROFILES)
-        
+        self._on_main_action_connect__triggered()
+            
         self.auto_connect()
-    
+
     def setup_equipment(self):
         if RUN_EQUIPMENT:
+            # self.setEnabled(False)
+            loading_dlg = LoadingDialog('Work in progress', None, 0, 100000, self)
+            loading_dlg.show()
+            QApplication.processEvents()
             try:
                 self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "Ametek")
             except RuntimeError:
                 self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "PPS")
+            loading_dlg.set_progress(25)
             
             self.scope = Scope(self.c_config["scope"]["scope_entry_device"])
+            loading_dlg.set_progress(50)
+
             rcc, split, pcc = self.c_config["rlc"]["rlc_entry_device"].partition(',')
             try:
                 self.rlc = RLC(relay_controller_comport=rcc,
@@ -113,7 +130,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.rlc.close()
                 self.rlc = RLC(relay_controller_comport=rcc,
                             phase_controller_comport=pcc)
+            loading_dlg.set_progress(75)
+
             self.sas = SAS(self.c_config["sas"]["sas_entry_device"])
+            loading_dlg.set_progress(100)
+            loading_dlg.reset()
+            # self.setEnabled(True)
             print("Equipment setup")
 
     def setup_sas_plot(self):
@@ -215,13 +237,21 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         
         print("Config loaded")
 
-    def _on_main_action_reconnect__triggered(self):
-        print("Equipment reconnect triggered")
-        self.setup_equipment()
+    def _on_main_action_connect__triggered(self):
+        print("Equipment connect triggered")
+        try:
+            if RUN_EQUIPMENT:
+                self.setup_equipment()
+                self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
+                self.ac_menu_phase.addItems(self.ac_src.PROFILES)
+        except VisaIOError:
+            self.error_msg.setWindowTitle("Connection failed")
+            self.error_msg.showMessage("Ensure equipment is on and address is correct<br/>Retry connection:<br/>(Options->Reconnect Equipment)")
+            self.error_msg.exec()
 
     def _on_main_action_devices__triggered(self):
         print("Device setup triggered")
-        dlg = Dialog(self.c_config)
+        dlg = DevicesDialog(self.c_config)
         dlg.exec()
 
         if QDialog.Accepted:
@@ -243,18 +273,21 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
     def _when_closers__clicked(self):
         print("Close clicked")
-        self.ac_src.turn_off()
-        self.ac_src.return_manual()
-        self.scope.turn_off()
-        self.rlc.turn_off()
-        self.sas.turn_off()
+        try:
+            self.ac_src.turn_off()
+            self.ac_src.return_manual()
+            self.scope.turn_off()
+            self.rlc.turn_off()
+            self.sas.turn_off()
 
-        print("Equipment turned off")
+            print("Equipment turned off")
 
-        # save config
-        with open("config.json", "w") as jsonfile:
-            json.dump(self.config, jsonfile)
-        print("Config saved")
+            # save config
+            with open("config.json", "w") as jsonfile:
+                json.dump(self.config, jsonfile)
+            print("Config saved")
+        except AttributeError:
+            pass
 
         sys.exit()
     
@@ -414,13 +447,17 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 rlc_config = self.rlc.turn_on(rlc_config)
             self.c_config["rlc"].update(rlc_config)
         except self.rlc.NoInput:
-            self.errorMsg.showMessage("Why do I even exist?")
+            self.error_msg.setWindowTitle("No Inputs")
+            self.error_msg.showMessage("Why do I even exist?")
         except self.rlc.VoltageInvalid:
-            self.errorMsg.showMessage("Need to specify voltage")
+            self.error_msg.setWindowTitle("Voltage Invalid")
+            self.error_msg.showMessage("Need to specify voltage")
         except self.rlc.PowerInvalid:
-            self.errorMsg.showMessage("Need to specify real and/or reactive power")
+            self.error_msg.setWindowTitle("Power Invalid")
+            self.error_msg.showMessage("Need to specify real and/or reactive power")
         except self.rlc.FrequencyInvalid:
-            self.errorMsg.showMessage("Need to specify frequency with reactive power")
+            self.error_msg.setWindowTitle("Frequency Invalid")
+            self.error_msg.showMessage("Need to specify frequency with reactive power")
 
     def _on_rlc_entry_ac_volts__valueChanged(self):
         state = self.sender().value()

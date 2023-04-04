@@ -1055,7 +1055,7 @@
     </property>
     <addaction name="main_action_restore"/>
     <addaction name="main_action_devices"/>
-    <addaction name="main_action_reconnect"/>
+    <addaction name="main_action_connect"/>
    </widget>
    <addaction name="menuOptions"/>
   </widget>
@@ -1070,7 +1070,7 @@
     <string>Configure Equipment</string>
    </property>
   </action>
-  <action name="main_action_reconnect">
+  <action name="main_action_connect">
    <property name="text">
     <string>Reconnect Equipment</string>
    </property>
