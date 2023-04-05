@@ -32,7 +32,7 @@ class Scope(AgilentDSO):
         
         if not Path(capture_folder).exists():
             Path(capture_folder).mkdir(parents=True)
-            print("made filepath: {}".format(capture_folder))
+            print(f"Made filepath: {capture_folder}")
 
         date_prefix = ''
         if sas_config["scope_check_date"]:
@@ -45,13 +45,13 @@ class Scope(AgilentDSO):
         capture_path = self.uniquify(capture_folder / (date_prefix + capture_name_str))
         self.capture(capture_path, invert_graticule=sas_config["scope_check_invert"])
         
-        print("Captured to: {}".format(capture_path))
+        print(f"Scope display captured to: {capture_path}")
 
     # callback to apply the labels
     def label(self, sas_config):
         ch1, ch2 , ch3, ch4 = [sas_config.get(k) for k in ["scope_line_ch1_lab", "scope_line_ch2_lab" , "scope_line_ch3_lab", "scope_line_ch4_lab"]]
-        self.write(':DISPLAY:LABEL ON;:CHAN1:LABel "{}";:CHAN2:LABel "{}";:CHAN3:LABel "{}";:CHAN4:LABel "{}"'.format(ch1, ch2 ,ch3 ,ch4))
-        print("labelled {}, {}, {}, {}".format(ch1, ch2 ,ch3 ,ch4))
+        self.write(f':DISPLAY:LABEL ON;:CHAN1:LABel "{ch1}";:CHAN2:LABel "{ch2}";:CHAN3:LABel "{ch3}";:CHAN4:LABel "{ch4}"')
+        print(f"Scope channel labels applied: CH1 = {ch1}, CH2 = {ch2}, CH3 = {ch3}, CH4 = {ch4}")
 
     # Automatically scope capture if trigger occurs
     def auto_capture(self, sas_config):
@@ -69,11 +69,13 @@ class Scope(AgilentDSO):
         auto_capture_thread = Thread(target=self.auto_capture, args=[sas_config])
         auto_capture_thread.start()
         self.auto_cap_run = True
+        print("Auto capture started")
 
     def auto_capture_off(self):
         self.auto_cap_run = False
+        print("Auto capture stopped")
         
     # callback to clean up and exit, used by the Close button
-    def exit_clean(self):
-        print("Bye ...")
+    def turn_off(self):
         self.close()
+        print("Scope conection closed")

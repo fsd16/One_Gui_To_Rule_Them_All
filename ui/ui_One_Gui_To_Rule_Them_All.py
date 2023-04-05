@@ -33,8 +33,8 @@ class Ui_MainWindow(object):
         self.main_action_restore.setObjectName(u"main_action_restore")
         self.main_action_devices = QAction(MainWindow)
         self.main_action_devices.setObjectName(u"main_action_devices")
-        self.main_action_reconnect = QAction(MainWindow)
-        self.main_action_reconnect.setObjectName(u"main_action_reconnect")
+        self.main_action_connect = QAction(MainWindow)
+        self.main_action_connect.setObjectName(u"main_action_connect")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_7 = QGridLayout(self.centralwidget)
@@ -70,6 +70,7 @@ class Ui_MainWindow(object):
 
         self.formLayout = QFormLayout()
         self.formLayout.setObjectName(u"formLayout")
+        self.formLayout.setFieldGrowthPolicy(QFormLayout.FieldsStayAtSizeHint)
         self.formLayout.setLabelAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.formLayout.setFormAlignment(Qt.AlignHCenter|Qt.AlignTop)
         self.label_14 = QLabel(self.sas_tab)
@@ -79,7 +80,7 @@ class Ui_MainWindow(object):
 
         self.sas_entry_vmp = QDoubleSpinBox(self.sas_tab)
         self.sas_entry_vmp.setObjectName(u"sas_entry_vmp")
-        self.sas_entry_vmp.setMinimumSize(QSize(50, 0))
+        self.sas_entry_vmp.setMinimumSize(QSize(60, 0))
         self.sas_entry_vmp.setMaximumSize(QSize(16777215, 16777215))
         self.sas_entry_vmp.setFrame(True)
         self.sas_entry_vmp.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
@@ -97,7 +98,7 @@ class Ui_MainWindow(object):
 
         self.sas_entry_pmp = QDoubleSpinBox(self.sas_tab)
         self.sas_entry_pmp.setObjectName(u"sas_entry_pmp")
-        self.sas_entry_pmp.setMinimumSize(QSize(50, 0))
+        self.sas_entry_pmp.setMinimumSize(QSize(60, 0))
         self.sas_entry_pmp.setMaximumSize(QSize(16777215, 16777215))
         self.sas_entry_pmp.setFrame(True)
         self.sas_entry_pmp.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
@@ -115,7 +116,7 @@ class Ui_MainWindow(object):
 
         self.sas_entry_ff = QDoubleSpinBox(self.sas_tab)
         self.sas_entry_ff.setObjectName(u"sas_entry_ff")
-        self.sas_entry_ff.setMinimumSize(QSize(50, 0))
+        self.sas_entry_ff.setMinimumSize(QSize(60, 0))
         self.sas_entry_ff.setMaximumSize(QSize(16777215, 16777215))
         self.sas_entry_ff.setFrame(True)
         self.sas_entry_ff.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
@@ -132,7 +133,7 @@ class Ui_MainWindow(object):
 
         self.sas_entry_irrad = QDoubleSpinBox(self.sas_tab)
         self.sas_entry_irrad.setObjectName(u"sas_entry_irrad")
-        self.sas_entry_irrad.setMinimumSize(QSize(50, 0))
+        self.sas_entry_irrad.setMinimumSize(QSize(60, 0))
         self.sas_entry_irrad.setMaximumSize(QSize(16777215, 16777215))
         self.sas_entry_irrad.setFrame(True)
         self.sas_entry_irrad.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
@@ -274,14 +275,16 @@ class Ui_MainWindow(object):
 
         self.ac_menu_abnormal = QComboBox(self.ac_tab)
         self.ac_menu_abnormal.setObjectName(u"ac_menu_abnormal")
+        self.ac_menu_abnormal.setMinimumSize(QSize(188, 0))
         self.ac_menu_abnormal.setMaximumSize(QSize(234, 16777215))
 
         self.gridLayout.addWidget(self.ac_menu_abnormal, 1, 4, 1, 4, Qt.AlignHCenter)
 
-        self.ac_menu_phase = QComboBox(self.ac_tab)
-        self.ac_menu_phase.setObjectName(u"ac_menu_phase")
+        self.ac_menu_profile = QComboBox(self.ac_tab)
+        self.ac_menu_profile.setObjectName(u"ac_menu_profile")
+        self.ac_menu_profile.setMinimumSize(QSize(188, 0))
 
-        self.gridLayout.addWidget(self.ac_menu_phase, 0, 4, 1, 4, Qt.AlignHCenter)
+        self.gridLayout.addWidget(self.ac_menu_profile, 0, 4, 1, 4, Qt.AlignHCenter)
 
 
         self.gridLayout_2.addLayout(self.gridLayout, 1, 0, 1, 1)
@@ -530,11 +533,12 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuOptions.menuAction())
         self.menuOptions.addAction(self.main_action_restore)
         self.menuOptions.addAction(self.main_action_devices)
-        self.menuOptions.addAction(self.main_action_reconnect)
+        self.menuOptions.addAction(self.main_action_connect)
 
         self.retranslateUi(MainWindow)
 
         self.tabWidget.setCurrentIndex(0)
+        self.ac_menu_abnormal.setCurrentIndex(-1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -544,7 +548,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"One Gui To Rule Them All", None))
         self.main_action_restore.setText(QCoreApplication.translate("MainWindow", u"Restore Defaults", None))
         self.main_action_devices.setText(QCoreApplication.translate("MainWindow", u"Configure Equipment", None))
-        self.main_action_reconnect.setText(QCoreApplication.translate("MainWindow", u"Reconnect Equipment", None))
+        self.main_action_connect.setText(QCoreApplication.translate("MainWindow", u"Reconnect Equipment", None))
         self.sas_butt_off.setText(QCoreApplication.translate("MainWindow", u"SAS Off", None))
         self.sas_butt_on.setText(QCoreApplication.translate("MainWindow", u"SAS On", None))
         self.sas_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))
@@ -564,7 +568,10 @@ class Ui_MainWindow(object):
         self.ac_radio_split.setText(QCoreApplication.translate("MainWindow", u"Split Phase", None))
         self.ac_radio_single.setText(QCoreApplication.translate("MainWindow", u"Single Phase", None))
         self.ac_radio_three.setText(QCoreApplication.translate("MainWindow", u"Three Phase", None))
-        self.ac_check_abnormal.setText(QCoreApplication.translate("MainWindow", u"Abnormal Waveform", None))
+        self.ac_check_abnormal.setText(QCoreApplication.translate("MainWindow", u"Enable Abnormal Waveform", None))
+        self.ac_menu_abnormal.setCurrentText("")
+        self.ac_menu_abnormal.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Select Abnormal", None))
+        self.ac_menu_profile.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Select Profile", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ac_tab), QCoreApplication.translate("MainWindow", u"AC Source", None))
         self.scope_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Capture Path", None))
