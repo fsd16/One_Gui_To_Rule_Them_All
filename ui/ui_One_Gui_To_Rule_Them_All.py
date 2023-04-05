@@ -275,14 +275,16 @@ class Ui_MainWindow(object):
 
         self.ac_menu_abnormal = QComboBox(self.ac_tab)
         self.ac_menu_abnormal.setObjectName(u"ac_menu_abnormal")
+        self.ac_menu_abnormal.setMinimumSize(QSize(188, 0))
         self.ac_menu_abnormal.setMaximumSize(QSize(234, 16777215))
 
         self.gridLayout.addWidget(self.ac_menu_abnormal, 1, 4, 1, 4, Qt.AlignHCenter)
 
-        self.ac_menu_phase = QComboBox(self.ac_tab)
-        self.ac_menu_phase.setObjectName(u"ac_menu_phase")
+        self.ac_menu_profile = QComboBox(self.ac_tab)
+        self.ac_menu_profile.setObjectName(u"ac_menu_profile")
+        self.ac_menu_profile.setMinimumSize(QSize(188, 0))
 
-        self.gridLayout.addWidget(self.ac_menu_phase, 0, 4, 1, 4, Qt.AlignHCenter)
+        self.gridLayout.addWidget(self.ac_menu_profile, 0, 4, 1, 4, Qt.AlignHCenter)
 
 
         self.gridLayout_2.addLayout(self.gridLayout, 1, 0, 1, 1)
@@ -536,6 +538,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
 
         self.tabWidget.setCurrentIndex(0)
+        self.ac_menu_abnormal.setCurrentIndex(-1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -565,7 +568,10 @@ class Ui_MainWindow(object):
         self.ac_radio_split.setText(QCoreApplication.translate("MainWindow", u"Split Phase", None))
         self.ac_radio_single.setText(QCoreApplication.translate("MainWindow", u"Single Phase", None))
         self.ac_radio_three.setText(QCoreApplication.translate("MainWindow", u"Three Phase", None))
-        self.ac_check_abnormal.setText(QCoreApplication.translate("MainWindow", u"Abnormal Waveform", None))
+        self.ac_check_abnormal.setText(QCoreApplication.translate("MainWindow", u"Enable Abnormal Waveform", None))
+        self.ac_menu_abnormal.setCurrentText("")
+        self.ac_menu_abnormal.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Select Abnormal", None))
+        self.ac_menu_profile.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Select Profile", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.ac_tab), QCoreApplication.translate("MainWindow", u"AC Source", None))
         self.scope_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Capture Path", None))

@@ -25,12 +25,14 @@ print(f"Import time: {import_time - start_time}")
 
 # TODO: Tidy up GUI layout
 # TODO: Auto import station
-# TODO: Add loading screen
 # TODO: Improve handling of pps and ametek
 # TODO: Improve logging
 
 RUN_EQUIPMENT = True
 
+#--------------------------------------------------------
+#                   Loading Dialog                      #
+#--------------------------------------------------------
 class LoadingDialog(QDialog, Ui_LoadingDialog):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -40,6 +42,9 @@ class LoadingDialog(QDialog, Ui_LoadingDialog):
     def set_progress(self, value):
         self.progressBar.setValue(value)
 
+#--------------------------------------------------------
+#                   Devices Dialog                      #
+#--------------------------------------------------------
 class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
     def __init__(self, config, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -83,6 +88,9 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         print (f"Startup behaviour checked: {state}")
         self.startup = state
 
+#--------------------------------------------------------
+#                   Main Window                         #
+#--------------------------------------------------------
 class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal): 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -105,6 +113,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             
         self.auto_connect()
 
+    #--------------------------------------------------------
+    #                       Helpers                         #
+    #--------------------------------------------------------    
     def setup_equipment(self):
         if RUN_EQUIPMENT:
             loading_dlg = LoadingDialog()
@@ -224,10 +235,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 wgtobj = getattr(self, name)
                 if hasattr(wgtobj, "setChecked"):
                     wgtobj.setChecked(config[prefix][name])
-                    
-        # Setting Menu may overide current values if they are different from the presets
-        # children = []
-        # children += self.findChildren(QComboBox)
     
     def load_config(self):
 
@@ -239,13 +246,16 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         
         print("Config loaded")
 
+    #--------------------------------------------------------
+    #                       Main Items                      #
+    #--------------------------------------------------------
     def _on_main_action_connect__triggered(self):
         print("Equipment connect triggered")
         try:
             if RUN_EQUIPMENT:
                 self.setup_equipment()
                 self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
-                self.ac_menu_phase.addItems(self.ac_src.PROFILES)
+                self.ac_menu_profile.addItems(self.ac_src.PROFILES)
         except VisaIOError:
             self.error_msg.setWindowTitle("Connection failed")
             self.error_msg.showMessage("Ensure equipment is on and address is correct<br/>Retry connection:<br/>(Options->Reconnect Equipment)")
@@ -292,233 +302,240 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             pass
 
         sys.exit()
-    
-    # AC Tab
-    def _on_ac_butt_off__clicked(self):
-        print("AC off clicked")
-        if RUN_EQUIPMENT:
-            self.ac_src.turn_off()
-    
-    def _on_ac_butt_on__clicked(self):
-        print("AC on clicked")
-        if RUN_EQUIPMENT:
-            self.ac_src.turn_on()
-        
-    def _on_ac_butt_apply__clicked(self):
-        print("Apply clicked")
-        if RUN_EQUIPMENT:
-            self.ac_src.apply(self.c_config["ac"])
+
+    #--------------------------------------------------------
+    #                       AC Tab                          #
+    #--------------------------------------------------------
+    _ac_buttons = 'ac_butt_apply, ac_butt_off, ac_butt_on'
+    def _when_ac_buttons__clicked(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+
+        if obj_name == "ac_butt_apply":
+            print("Apply clicked")
+            if RUN_EQUIPMENT:
+                self.ac_src.apply(self.c_config["ac"])
+        elif obj_name == "ac_butt_on":
+            print("AC on clicked")
+            if RUN_EQUIPMENT:
+                self.ac_src.turn_on()
+        elif obj_name == "ac_butt_off":
+            print("AC off clicked")
+            if RUN_EQUIPMENT:
+                self.ac_src.turn_off()
         
     def _on_ac_check_abnormal__stateChanged(self):
         state = self.sender().isChecked()
         print (f"Abnormal checked: {state}")
         self.c_config["ac"]["ac_check_abnormal"] = state
 
-    def _on_ac_entry_ac_volts__valueChanged(self):
-        state = self.sender().value()
-        print(f"Ac Volts entered: {state}")
-        self.c_config["ac"]["ac_entry_ac_volts"] = state
+    _ac_entries = 'ac_entry_step_size, ac_entry_freq, ac_entry_ac_volts'
+    def _when_ac_entries__valueChanged(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.value()
 
-    def _on_ac_entry_freq__valueChanged(self):
-        state = self.sender().value()
-        print(f"Frequency entered: {state}")
-        self.c_config["ac"]["ac_entry_freq"] = state
-        
-    def _on_ac_entry_step_size__valueChanged(self):
-        state = self.sender().value()
-        print(f"Step size entered: {state}")
-        self.c_config["ac"]["ac_entry_step_size"] = state
-    
-    def _on_ac_menu_abnormal__activated(self):
-        state = self.sender().currentText()
-        print(f"Abnormal waveform selected: {state}")
-        self.c_config["ac"]["ac_manu_abnormal"] = state
-        
-    def _on_ac_menu_phase__activated(self):
-        state = self.sender().currentText()
-        print(f"Profile selected: {state}")
-        # self.ac_src.set_ac_profile(self.sender().currentText())
-        if RUN_EQUIPMENT:
-            profile = self.ac_src.PROFILES[state]
-        self.ac_entry_ac_volts.setValue(profile[0])
-        self.ac_entry_freq.setValue(profile[1])
-        
-        if profile[2] == "split":
-            self.ac_radio_split.setChecked(True)
-        elif profile[2] == "single":
-            self.ac_radio_single.setChecked(True)
-        elif profile[2] == "three":
-            self.ac_radio_three.setChecked(True)
+        self.c_config["ac"][obj_name] = state
 
-    def _on_ac_radio_single__toggled(self):
-        self.c_config["ac"]["ac_radio_single"] = self.ac_radio_single.isChecked()
-        if self.c_config["ac"]["ac_radio_single"]:
+        if obj_name == "ac_entry_step_size":
+            print(f"Step size entered: {state}")
+        elif obj_name == "ac_entry_freq":
+            print(f"Frequency entered: {state}")
+        elif obj_name == "ac_entry_ac_volts":
+            print(f"Ac Volts entered: {state}")
+
+    _ac_menus = 'ac_menu_abnormal, ac_menu_profile'
+    def _when_ac_menus__activated(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.currentText()
+
+        self.c_config["ac"][obj_name] = state
+
+        if obj_name == "ac_menu_abnormal":
+            print(f"Abnormal waveform selected: {state}")
+        elif obj_name == "ac_menu_profile":
+            print(f"Profile selected: {state}")
+            if RUN_EQUIPMENT:
+                profile = self.ac_src.PROFILES[state]
+            self.ac_entry_ac_volts.setValue(profile[0])
+            self.ac_entry_freq.setValue(profile[1])
+            
+            if profile[2] == "split":
+                self.ac_radio_split.setChecked(True)
+            elif profile[2] == "single":
+                self.ac_radio_single.setChecked(True)
+            elif profile[2] == "three":
+                self.ac_radio_three.setChecked(True)
+
+    _ac_radios = 'ac_radio_single, ac_radio_split, ac_radio_three'
+    def _when_ac_radios__toggled(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.isChecked()
+
+        self.c_config["ac"][obj_name] = state
+
+        if obj_name == "ac_radio_single" and state:
             print("Single selected")
-            
-    def _on_ac_radio_split__toggled(self):
-        self.c_config["ac"]["ac_radio_split"] = self.ac_radio_split.isChecked()
-        if self.c_config["ac"]["ac_radio_split"]:
+        elif obj_name == "ac_radio_split" and state:
             print("Split selected")
-            
-    def _on_ac_radio_three__toggled(self):
-        self.c_config["ac"]["ac_radio_three"] = self.ac_radio_three.isChecked()
-        if self.c_config["ac"]["ac_radio_three"]:
+        elif obj_name == "ac_radio_three" and state:
             print("Three selected")
-        
-    # Scope tab
-    def _on_scope_butt_apply__clicked(self):
-        print("Apply labels clicked")
-        if RUN_EQUIPMENT:
-            self.scope.label(self.c_config["scope"])
 
-    def _on_scope_butt_browse__clicked(self):
-        path = str(QFileDialog.getExistingDirectory())
-        self.scope_line_cap_path.setText(path)
-        print(f"Capture path entered: {path}")
-        self.c_config["scope"]["scope_line_cap_path"] = path
-    
-    def _on_scope_butt_cap__clicked(self):
-        print("Capture clicked")
-        if RUN_EQUIPMENT:
-            self.scope.capture_display(self.c_config["scope"])
-        
-    def _on_scope_check_auto__stateChanged(self):
-        state = self.sender().isChecked()
-        print (f"Auto capture checked: {state}")
-        self.c_config["scope"]["scope_check_auto"] = state
-        if state:
-            if RUN_EQUIPMENT:    
-                self.scope.auto_capture_on(self.c_config["scope"])
-        else:
+    #--------------------------------------------------------
+    #                       RLC Tab                         #
+    #--------------------------------------------------------
+    _rlc_buttons = 'rlc_butt_off, rlc_butt_on'
+    def _when_rlc_buttons__clicked(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+
+        if obj_name == "rlc_butt_off":
+            print("RLC off clicked")
             if RUN_EQUIPMENT:
-                self.scope.auto_capture_off()
-        
-    def _on_scope_check_date__stateChanged(self):
-        state = self.sender().isChecked()
-        print (f"Date checked: {state}")
-        self.c_config["scope"]["scope_check_date"] = state
-        
-    def _on_scope_check_invert__stateChanged(self):
-        state = self.sender().isChecked()
-        print (f"Invert Checked: {state}")
-        self.c_config["scope"]["scope_check_invert"] = state
-        
-    def _on_scope_line_cap_name__editingFinished(self):
-        state = self.sender().text()
-        print("Capture name entered:", state)
-        self.c_config["scope"]["scope_line_cap_name"] = state
-        
-    def _on_scope_line_cap_path__editingFinished(self):
-        state = self.sender().text()
-        print(f"Capture path entered: {state}")
-        self.c_config["scope"]["scope_line_cap_path"] = state
-    
-    def _on_scope_line_ch1_lab__editingFinished(self):
-        state = self.sender().text()
-        print(f"CH1 label entered: {state}")
-        self.c_config["scope"]["scope_line_ch1_lab"] = state
-        
-    def _on_scope_line_ch2_lab__editingFinished(self):
-        state = self.sender().text()
-        print(f"CH2 label entered: {state}")
-        self.c_config["scope"]["scope_line_ch2_lab"] = state
-        
-    def _on_scope_line_ch3_lab__editingFinished(self):
-        state = self.sender().text()
-        print(f"CH3 label entered: {state}")
-        self.c_config["scope"]["scope_line_ch3_lab"] = state
-        
-    def _on_scope_line_ch4_lab__editingFinished(self):
-        state = self.sender().text()
-        print(f"CH4 label entered: {state}")
-        self.c_config["scope"]["scope_line_ch4_lab"] = state
-        
-    # RLC tab
-    def _on_rlc_butt_off__clicked(self):
-        print("RLC off clicked")
-        if RUN_EQUIPMENT:
-            self.rlc.turn_off()
-    
-    def _on_rlc_butt_on__clicked(self):
-        print("RLC on clicked")
+                self.rlc.turn_off()
+        elif obj_name == "rlc_butt_on":
+            print("RLC on clicked")
+            rlc_config = self.c_config["rlc"]
+            try:
+                if RUN_EQUIPMENT:
+                    rlc_config = self.rlc.turn_on(rlc_config)
+                self.c_config["rlc"].update(rlc_config)
+            except self.rlc.NoInput:
+                self.error_msg.setWindowTitle("No Inputs")
+                self.error_msg.showMessage("Why do I even exist?")
+            except self.rlc.VoltageInvalid:
+                self.error_msg.setWindowTitle("Voltage Invalid")
+                self.error_msg.showMessage("Need to specify voltage")
+            except self.rlc.PowerInvalid:
+                self.error_msg.setWindowTitle("Power Invalid")
+                self.error_msg.showMessage("Need to specify real and/or reactive power")
+            except self.rlc.FrequencyInvalid:
+                self.error_msg.setWindowTitle("Frequency Invalid")
+                self.error_msg.showMessage("Need to specify frequency with reactive power")
 
-        rlc_config = self.c_config["rlc"]
+    _rlc_entries = 'rlc_entry_ac_volts, rlc_entry_freq, rlc_entry_reactive_pwr, rlc_entry_real_pwr'
+    def when_rlc_entries__valueChanged(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.value()
 
-        try:
+        self.c_config["rlc"][obj_name] = state
+
+        if obj_name == "rlc_entry_ac_volts":
+            print(f"Ac Volts entered: {state}")
+        elif obj_name == "rlc_entry_freq":
+            print(f"Frequency entered: {state}")
+        elif obj_name == "rlc_entry_reactive_pwr":
+            print(f"Reactive power entered: {state}")
+        elif obj_name == "rlc_entry_real_pwr":
+            print(f"Real power entered: {state}")
+
+    #--------------------------------------------------------
+    #                       SAS Tab                         #
+    #--------------------------------------------------------
+    _sas_buttons = 'sas_butt_off, sas_butt_on, sas_butt_apply'
+    def _when_sas_buttons__clicked(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.text()
+
+        if obj_name == "sas_butt_off":
+            print("SAS off clicked")
             if RUN_EQUIPMENT:
-                rlc_config = self.rlc.turn_on(rlc_config)
-            self.c_config["rlc"].update(rlc_config)
-        except self.rlc.NoInput:
-            self.error_msg.setWindowTitle("No Inputs")
-            self.error_msg.showMessage("Why do I even exist?")
-        except self.rlc.VoltageInvalid:
-            self.error_msg.setWindowTitle("Voltage Invalid")
-            self.error_msg.showMessage("Need to specify voltage")
-        except self.rlc.PowerInvalid:
-            self.error_msg.setWindowTitle("Power Invalid")
-            self.error_msg.showMessage("Need to specify real and/or reactive power")
-        except self.rlc.FrequencyInvalid:
-            self.error_msg.setWindowTitle("Frequency Invalid")
-            self.error_msg.showMessage("Need to specify frequency with reactive power")
+                self.sas.turn_off()
+        elif obj_name == "sas_butt_on":
+            print("SAS on clicked")
+            if RUN_EQUIPMENT:
+                self.sas.turn_on()
+        elif obj_name == "sas_butt_apply":
+            print("Apply clicked")
+            if RUN_EQUIPMENT:
+                sas_data =  self.sas.apply(self.c_config["sas"])
+                self.sas_plot_pvi(sas_data)
+                self.sas_timer.start()
 
-    def _on_rlc_entry_ac_volts__valueChanged(self):
-        state = self.sender().value()
-        print(f"Ac Volts entered: {state}")
-        self.c_config["rlc"]["rlc_entry_ac_volts"] = state
+    _sas_entries = 'sas_entry_vmp, sas_entry_pmp, sas_entry_ff, sas_entry_irrad'
+    def _when_sas_entries__editingFinished(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.text()
 
-    def _on_rlc_entry_freq__valueChanged(self):
-        state = self.sender().value()
-        print(f"Frequency entered: {state}")
-        self.c_config["rlc"]["rlc_entry_freq"] = state
+        self.c_config["sas"][obj_name] = state
+        
+        if obj_name == "sas_entry_vmp":
+            print(f"Vmp entered: {state}")
+        elif obj_name == "sas_entry_pmp":
+            print(f"Pmp entered: {state}")
+        elif obj_name == "sas_entry_ff":
+            print(f"Fill Factor entered: {state}")
+        elif obj_name == "sas_entry_irrad":
+            print(f"Irradiance entered: {state}")
 
-    def _on_rlc_entry_reactive_pwr__valueChanged(self):
-        state = self.sender().value()
-        print(f"Reactive power entered: {state}")
-        self.c_config["rlc"]["rlc_entry_reactive_pwr"] = state
+    #--------------------------------------------------------
+    #                       Scope Tab                       #
+    #--------------------------------------------------------
+    _scope_buttons = 'scope_butt_cap, scope_butt_apply, scope_butt_browse'
+    def _when_scope_buttons__clicked(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
 
-    def _on_rlc_entry_real_pwr__valueChanged(self):
-        state = self.sender().value()
-        print(f"Real power entered: {state}")
-        self.c_config["rlc"]["rlc_entry_real_pwr"] = state
+        if obj_name == "scope_butt_cap":
+            print("Capture clicked")
+            if RUN_EQUIPMENT:
+                self.scope.capture_display(self.c_config["scope"])
+        elif obj_name == "scope_butt_apply":
+            print("Apply labels clicked")
+            if RUN_EQUIPMENT:
+                self.scope.label(self.c_config["scope"])
+        elif obj_name == "scope_butt_browse":
+            path = str(QFileDialog.getExistingDirectory())
+            self.scope_line_cap_path.setText(path)
+            print(f"Capture path entered: {path}")
+            self.c_config["scope"][obj_name] = path
+        
+    _scope_checks = 'scope_check_auto, scope_check_date, scope_check_invert'
+    def _when_scope_checks__stateChanged(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.isChecked()
 
-    # SAS tab
-    def _on_sas_butt_off__clicked(self):
-        print("SAS off clicked")
-        if RUN_EQUIPMENT:
-            self.sas.turn_off()
+        self.c_config["scope"][obj_name] = state
+
+        if obj_name == "scope_check_auto":
+            print (f"Auto capture checked: {state}")
+            if state:
+                if RUN_EQUIPMENT:    
+                    self.scope.auto_capture_on(self.c_config["scope"])
+            else:
+                if RUN_EQUIPMENT:
+                    self.scope.auto_capture_off()
+        elif obj_name == "scope_check_date":
+            print (f"Date checked: {state}")
+        elif obj_name == "scope_check_invert":
+            print (f"Invert checked: {state}")
     
-    def _on_sas_butt_on__clicked(self):
-        print("SAS on clicked")
-        if RUN_EQUIPMENT:
-            self.sas.turn_on()
+    _scope_entries = 'scope_line_cap_name, scope_line_cap_path, scope_line_ch1_lab, scope_line_ch2_lab, scope_line_ch3_lab, scope_line_ch4_lab'
+    def _when_scope_entries__editingFinished(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.text()
+        
+        self.c_config["scope"][obj_name] = state
 
-    def _on_sas_butt_apply__clicked(self):
-        print("Apply clicked")
-        if RUN_EQUIPMENT:
-            sas_data =  self.sas.apply(self.c_config["sas"])
-            self.sas_plot_pvi(sas_data)
-            self.sas_timer.start()
-
-    def _on_sas_entry_irrad__valueChanged(self):
-        state = self.sender().value()
-        print(f"Irradiance entered: {state}")
-        self.c_config["sas"]["sas_entry_irrad"] = state
-
-    def _on_sas_entry_ff__valueChanged(self):
-        state = self.sender().value()
-        print(f"Fill Factor entered: {state}")
-        self.c_config["sas"]["sas_entry_ff"] = state
-
-    def _on_sas_entry_pmp__valueChanged(self):
-        state = self.sender().value()
-        print(f"Pmp entered: {state}")
-        self.c_config["sas"]["sas_entry_pmp"] = state
-
-    def _on_sas_entry_vmp__valueChanged(self):
-        state = self.sender().value()
-        print(f"Vmp entered: {state}")
-        self.c_config["sas"]["sas_entry_vmp"] = state
-
+        if obj_name == "scope_line_cap_name":
+            print(f"Capture name entered: {state}")
+        elif obj_name == "scope_line_cap_path":
+            print(f"Capture path entered: {state}")
+        elif obj_name == "scope_line_ch1_lab":
+            print(f"CH1 label entered: {state}")
+        elif obj_name == "scope_line_ch2_lab":
+            print(f"CH2 label entered: {state}")
+        elif obj_name == "scope_line_ch3_lab":
+            print(f"CH3 label entered: {state}")
+        elif obj_name == "scope_line_ch4_lab":
+            print(f"CH4 label entered: {state}")
 
 def main():
     app = QApplication(sys.argv)

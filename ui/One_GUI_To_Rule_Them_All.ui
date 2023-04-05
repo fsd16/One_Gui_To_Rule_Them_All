@@ -532,22 +532,47 @@
           <item row="2" column="4" colspan="4" alignment="Qt::AlignHCenter">
            <widget class="QCheckBox" name="ac_check_abnormal">
             <property name="text">
-             <string>Abnormal Waveform</string>
+             <string>Enable Abnormal Waveform</string>
             </property>
            </widget>
           </item>
           <item row="1" column="4" colspan="4" alignment="Qt::AlignHCenter">
            <widget class="QComboBox" name="ac_menu_abnormal">
+            <property name="minimumSize">
+             <size>
+              <width>188</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="maximumSize">
              <size>
               <width>234</width>
               <height>16777215</height>
              </size>
             </property>
+            <property name="currentText">
+             <string/>
+            </property>
+            <property name="currentIndex">
+             <number>-1</number>
+            </property>
+            <property name="placeholderText">
+             <string>Select Abnormal</string>
+            </property>
            </widget>
           </item>
           <item row="0" column="4" colspan="4" alignment="Qt::AlignHCenter">
-           <widget class="QComboBox" name="ac_menu_phase"/>
+           <widget class="QComboBox" name="ac_menu_profile">
+            <property name="minimumSize">
+             <size>
+              <width>188</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="placeholderText">
+             <string>Select Profile</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
