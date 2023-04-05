@@ -1,6 +1,7 @@
 from pathlib import Path
 from time import strftime, localtime, sleep
 from os.path import splitext, exists
+from os import getcwd
 from concurrent import futures
 from enphase_equipment.oscilloscope.agilent import AgilentDSO
 from threading import Thread
@@ -29,6 +30,9 @@ class Scope(AgilentDSO):
     # callback to take the scope capture
     def capture_display(self, sas_config):
         capture_folder = Path(sas_config["scope_line_cap_path"])
+
+        if capture_folder == Path(""):
+            capture_folder = getcwd() / Path("captures")
         
         if not Path(capture_folder).exists():
             Path(capture_folder).mkdir(parents=True)
