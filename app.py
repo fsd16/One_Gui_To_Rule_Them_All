@@ -282,9 +282,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         print("Restore defaults triggered")
         self.force_update_ui(self.d_config)
     
+    def closeEvent(self, event):
+        self._when_closers__clicked()
+
+        if True:
+            event.accept() # let the window close
+        else:
+            event.ignore()
+
     _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
     def _when_closers__clicked(self):
         print("Close clicked")
+        self.hide()
         try:
             self.ac_src.turn_off()
             self.ac_src.return_manual()
