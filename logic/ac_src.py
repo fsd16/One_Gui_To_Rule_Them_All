@@ -73,7 +73,7 @@ class AC_SRC():
         elif ac_config["ac_radio_three"]:
             phase_config = "three"
 
-        ac_voltage_tuple = self.calc_ac_volts(phase_config, ac_config["ac_entry_ac_volts"])
+        ac_voltage_tuple = self.calc_ac_volts(phase_config, float(ac_config["ac_entry_ac_volts"]))
 
         ac_freq = ac_config["ac_entry_freq"]
 

@@ -27,6 +27,7 @@ print(f"Import time: {import_time - start_time}")
 # TODO: Auto import station
 # TODO: Improve handling of pps and ametek
 # TODO: Improve logging
+# TODO: Add option to automatically set rlc params to sas power and ac voltage and frequency
 
 RUN_EQUIPMENT = True
 
@@ -165,6 +166,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         # Set up view box
         self.left_vb = ViewBox(lockAspect=False)
         self.right_vb = ViewBox(lockAspect=False)
+        
+        self.left_vb.disableAutoRange()
+        self.right_vb.disableAutoRange()
 
         plot.addItem(self.left_vb)
         plot.addItem(self.right_vb)
@@ -177,15 +181,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         voltage = data["v"]
         power = data["p"]
         left_curve = PlotCurveItem(voltage, power, pen='b')
+        self.left_vb.clear()
         self.left_vb.addItem(left_curve)
 
         right_curve = PlotCurveItem(voltage, current, pen='r')
+        self.right_vb.clear()
         self.right_vb.addItem(right_curve)
 
-        self.left_vb.disableAutoRange()
-        self.right_vb.disableAutoRange()
+        self.left_vb.autoRange()
+        self.right_vb.autoRange()
 
         self.pv_point = ScatterPlotItem()
+        self.pv_point.clear()
         self.left_vb.addItem(self.pv_point)
 
     def sas_update_plot_pv(self):
@@ -297,9 +304,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         try:
             self.ac_src.turn_off()
             self.ac_src.return_manual()
-            self.scope.turn_off()
-            self.rlc.turn_off()
             self.sas.turn_off()
+            self.rlc.turn_off()
+            self.scope.turn_off()
 
             print("Equipment turned off")
 
@@ -425,7 +432,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.error_msg.showMessage("Need to specify frequency with reactive power")
 
     _rlc_entries = 'rlc_entry_ac_volts, rlc_entry_freq, rlc_entry_reactive_pwr, rlc_entry_real_pwr'
-    def when_rlc_entries__valueChanged(self):
+    def _when_rlc_entries__valueChanged(self):
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.value()
@@ -469,7 +476,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     def _when_sas_entries__editingFinished(self):
         obj = self.sender()
         obj_name = obj.objectName()
-        state = obj.text()
+        state = obj.value()
 
         self.c_config["sas"][obj_name] = state
         

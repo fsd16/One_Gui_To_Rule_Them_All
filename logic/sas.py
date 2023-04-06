@@ -20,10 +20,10 @@ class SAS(AgilentE4360A):
         Vmp = sas_config["sas_entry_vmp"]
         ff = sas_config["sas_entry_ff"]
         irrad = sas_config["sas_entry_irrad"]
-        sas_curve = self.create_table(Pmp=Pmp,
-                                        Vmp=Vmp,
-                                        FillFactor=ff,
-                                        irradiance=irrad)
+        sas_curve = self.create_table(Pmp=float(Pmp),
+                                        Vmp=float(Vmp),
+                                        FillFactor=float(ff),
+                                        irradiance=float(irrad))
         
         vi_array = np.array(sas_curve[1]).astype(np.float)
         p_array =  vi_array[0]* vi_array[1]
