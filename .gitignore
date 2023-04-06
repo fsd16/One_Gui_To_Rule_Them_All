@@ -1,4 +1,4 @@
 __pycache__/
 .vscode/
 captures/
-*.json
+local_config.json
