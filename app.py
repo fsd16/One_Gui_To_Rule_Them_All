@@ -27,6 +27,8 @@ print(f"Import time: {import_time - start_time}")
 # TODO: Auto import station
 # TODO: Improve handling of pps and ametek
 # TODO: Improve logging
+# TODO: Add option to automatically set rlc params to sas power and ac voltage and frequency
+# TODO: Seperate config file into master and local, local should be generated automatically if it does not exist
 
 RUN_EQUIPMENT = True
 
@@ -106,7 +108,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
         self.load_config()
 
-        if self.c_config["setup_devices"]:
+        if self.l_config["setup_devices"]:
             self._on_main_action_devices__triggered()
 
         self._on_main_action_connect__triggered()
@@ -124,17 +126,17 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             QApplication.processEvents()
 
             try:
-                self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "Ametek")
+                self.ac_src = AC_SRC(self.l_config["ac"]["ac_entry_device"], "Ametek")
             except RuntimeError:
-                self.ac_src = AC_SRC(self.c_config["ac"]["ac_entry_device"], "PPS")
+                self.ac_src = AC_SRC(self.l_config["ac"]["ac_entry_device"], "PPS")
             loading_dlg.set_progress(25)
             QApplication.processEvents()
             
-            self.scope = Scope(self.c_config["scope"]["scope_entry_device"])
+            self.scope = Scope(self.l_config["scope"]["scope_entry_device"])
             loading_dlg.set_progress(50)
             QApplication.processEvents()
 
-            rcc, split, pcc = self.c_config["rlc"]["rlc_entry_device"].partition(',')
+            rcc, split, pcc = self.l_config["rlc"]["rlc_entry_device"].partition(',')
             try:
                 self.rlc = RLC(relay_controller_comport=rcc,
                             phase_controller_comport=pcc)
@@ -145,7 +147,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             loading_dlg.set_progress(75)
             QApplication.processEvents()
 
-            self.sas = SAS(self.c_config["sas"]["sas_entry_device"])
+            self.sas = SAS(self.l_config["sas"]["sas_entry_device"])
             loading_dlg.set_progress(100)
             QApplication.processEvents()
             loading_dlg.close()
@@ -165,6 +167,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         # Set up view box
         self.left_vb = ViewBox(lockAspect=False)
         self.right_vb = ViewBox(lockAspect=False)
+        
+        self.left_vb.disableAutoRange()
+        self.right_vb.disableAutoRange()
 
         plot.addItem(self.left_vb)
         plot.addItem(self.right_vb)
@@ -177,15 +182,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         voltage = data["v"]
         power = data["p"]
         left_curve = PlotCurveItem(voltage, power, pen='b')
+        self.left_vb.clear()
         self.left_vb.addItem(left_curve)
 
         right_curve = PlotCurveItem(voltage, current, pen='r')
+        self.right_vb.clear()
         self.right_vb.addItem(right_curve)
 
-        self.left_vb.disableAutoRange()
-        self.right_vb.disableAutoRange()
+        self.left_vb.autoRange()
+        self.right_vb.autoRange()
 
         self.pv_point = ScatterPlotItem()
+        self.pv_point.clear()
         self.left_vb.addItem(self.pv_point)
 
     def sas_update_plot_pv(self):
@@ -238,12 +246,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     
     def load_config(self):
 
-        with open("config.json", "r") as jsonfile:
-            self.config = json.load(jsonfile)
-        self.c_config = self.config["current"]
-        self.d_config = self.config["default"]
-        self.force_update_ui(self.c_config)
-        
+        with open("config/config.json", "r") as jsonfile:
+            self.d_config = json.load(jsonfile)
+
+        try:
+            with open("config/local_config.json", "r") as jsonfile:
+                self.l_config = json.load(jsonfile)
+        except IOError:
+            self.l_config = self.d_config
+        self.force_update_ui(self.l_config)
         print("Config loaded")
 
     #--------------------------------------------------------
@@ -263,20 +274,20 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     def _on_main_action_devices__triggered(self):
         print("Device setup triggered")
-        dlg = DevicesDialog(self.c_config)
+        dlg = DevicesDialog(self.l_config)
         dlg.exec()
 
         if QDialog.Accepted:
             if not dlg.ac_device == None:
-                self.c_config["ac"]["ac_entry_device"] = dlg.ac_device
+                self.l_config["ac"]["ac_entry_device"] = dlg.ac_device
             if not dlg.scope_device == None:
-                self.c_config["scope"]["scope_entry_device"] = dlg.scope_device
+                self.l_config["scope"]["scope_entry_device"] = dlg.scope_device
             if not dlg.rlc_device == None:
-                self.c_config["rlc"]["rlc_entry_device"] = dlg.rlc_device
+                self.l_config["rlc"]["rlc_entry_device"] = dlg.rlc_device
             if not dlg.sas_device == None:
-                self.c_config["sas"]["sas_entry_device"] = dlg.sas_device
+                self.l_config["sas"]["sas_entry_device"] = dlg.sas_device
             if not dlg.startup == None:
-                self.c_config["setup_devices"] = dlg.startup
+                self.l_config["setup_devices"] = dlg.startup
 
     def _on_main_action_restore__triggered(self):
         print("Restore defaults triggered")
@@ -297,16 +308,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         try:
             self.ac_src.turn_off()
             self.ac_src.return_manual()
-            self.scope.turn_off()
-            self.rlc.turn_off()
             self.sas.turn_off()
+            self.rlc.turn_off()
+            self.scope.turn_off()
 
             print("Equipment turned off")
 
             # save config
-            with open("config.json", "w") as jsonfile:
-                json.dump(self.config, jsonfile)
+            with open("config/local_config.json", "w") as jsonfile:
+                json.dump(self.l_config, jsonfile)
+
             print("Config saved")
+
         except AttributeError:
             pass
 
@@ -323,7 +336,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         if obj_name == "ac_butt_apply":
             print("Apply clicked")
             if RUN_EQUIPMENT:
-                self.ac_src.apply(self.c_config["ac"])
+                self.ac_src.apply(self.l_config["ac"])
         elif obj_name == "ac_butt_on":
             print("AC on clicked")
             if RUN_EQUIPMENT:
@@ -336,7 +349,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     def _on_ac_check_abnormal__stateChanged(self):
         state = self.sender().isChecked()
         print (f"Abnormal checked: {state}")
-        self.c_config["ac"]["ac_check_abnormal"] = state
+        self.l_config["ac"]["ac_check_abnormal"] = state
 
     _ac_entries = 'ac_entry_step_size, ac_entry_freq, ac_entry_ac_volts'
     def _when_ac_entries__valueChanged(self):
@@ -344,7 +357,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
         state = obj.value()
 
-        self.c_config["ac"][obj_name] = state
+        self.l_config["ac"][obj_name] = state
 
         if obj_name == "ac_entry_step_size":
             print(f"Step size entered: {state}")
@@ -359,7 +372,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
         state = obj.currentText()
 
-        self.c_config["ac"][obj_name] = state
+        self.l_config["ac"][obj_name] = state
 
         if obj_name == "ac_menu_abnormal":
             print(f"Abnormal waveform selected: {state}")
@@ -383,7 +396,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
         state = obj.isChecked()
 
-        self.c_config["ac"][obj_name] = state
+        self.l_config["ac"][obj_name] = state
 
         if obj_name == "ac_radio_single" and state:
             print("Single selected")
@@ -406,11 +419,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.rlc.turn_off()
         elif obj_name == "rlc_butt_on":
             print("RLC on clicked")
-            rlc_config = self.c_config["rlc"]
+            rlc_config = self.l_config["rlc"]
             try:
                 if RUN_EQUIPMENT:
                     rlc_config = self.rlc.turn_on(rlc_config)
-                self.c_config["rlc"].update(rlc_config)
+                self.l_config["rlc"].update(rlc_config)
             except self.rlc.NoInput:
                 self.error_msg.setWindowTitle("No Inputs")
                 self.error_msg.showMessage("Why do I even exist?")
@@ -425,12 +438,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.error_msg.showMessage("Need to specify frequency with reactive power")
 
     _rlc_entries = 'rlc_entry_ac_volts, rlc_entry_freq, rlc_entry_reactive_pwr, rlc_entry_real_pwr'
-    def when_rlc_entries__valueChanged(self):
+    def _when_rlc_entries__valueChanged(self):
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.value()
 
-        self.c_config["rlc"][obj_name] = state
+        self.l_config["rlc"][obj_name] = state
 
         if obj_name == "rlc_entry_ac_volts":
             print(f"Ac Volts entered: {state}")
@@ -461,7 +474,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         elif obj_name == "sas_butt_apply":
             print("Apply clicked")
             if RUN_EQUIPMENT:
-                sas_data =  self.sas.apply(self.c_config["sas"])
+                sas_data =  self.sas.apply(self.l_config["sas"])
                 self.sas_plot_pvi(sas_data)
                 self.sas_timer.start()
 
@@ -469,9 +482,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     def _when_sas_entries__editingFinished(self):
         obj = self.sender()
         obj_name = obj.objectName()
-        state = obj.text()
+        state = obj.value()
 
-        self.c_config["sas"][obj_name] = state
+        self.l_config["sas"][obj_name] = state
         
         if obj_name == "sas_entry_vmp":
             print(f"Vmp entered: {state}")
@@ -493,16 +506,16 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         if obj_name == "scope_butt_cap":
             print("Capture clicked")
             if RUN_EQUIPMENT:
-                self.scope.capture_display(self.c_config["scope"])
+                self.scope.capture_display(self.l_config["scope"])
         elif obj_name == "scope_butt_apply":
             print("Apply labels clicked")
             if RUN_EQUIPMENT:
-                self.scope.label(self.c_config["scope"])
+                self.scope.label(self.l_config["scope"])
         elif obj_name == "scope_butt_browse":
             path = str(QFileDialog.getExistingDirectory())
             self.scope_line_cap_path.setText(path)
             print(f"Capture path entered: {path}")
-            self.c_config["scope"][obj_name] = path
+            self.l_config["scope"][obj_name] = path
         
     _scope_checks = 'scope_check_auto, scope_check_date, scope_check_invert'
     def _when_scope_checks__stateChanged(self):
@@ -510,13 +523,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
         state = obj.isChecked()
 
-        self.c_config["scope"][obj_name] = state
+        self.l_config["scope"][obj_name] = state
 
         if obj_name == "scope_check_auto":
             print (f"Auto capture checked: {state}")
             if state:
                 if RUN_EQUIPMENT:    
-                    self.scope.auto_capture_on(self.c_config["scope"])
+                    self.scope.auto_capture_on(self.l_config["scope"])
             else:
                 if RUN_EQUIPMENT:
                     self.scope.auto_capture_off()
@@ -531,7 +544,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
         state = obj.text()
         
-        self.c_config["scope"][obj_name] = state
+        self.l_config["scope"][obj_name] = state
 
         if obj_name == "scope_line_cap_name":
             print(f"Capture name entered: {state}")
