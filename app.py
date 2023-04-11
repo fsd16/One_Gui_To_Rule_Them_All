@@ -19,16 +19,16 @@ from logic.sas import SAS
 from logic.signal import SmartSignal
 from serial.serialutil import SerialException
 from pyvisa.errors import VisaIOError
+from typing import Dict, Any, TypeVar
+KeyType = TypeVar('KeyType')
 
 import_time = time.time()
 print(f"Import time: {import_time - start_time}")
 
-# TODO: Tidy up GUI layout
 # TODO: Auto import station
 # TODO: Improve handling of pps and ametek
-# TODO: Improve logging
 # TODO: Add option to automatically set rlc params to sas power and ac voltage and frequency
-# TODO: Seperate config file into master and local, local should be generated automatically if it does not exist
+# TODO: Save and recall scope setups from gui
 
 RUN_EQUIPMENT = True
 
@@ -117,7 +117,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     #--------------------------------------------------------
     #                       Helpers                         #
-    #--------------------------------------------------------    
+    #--------------------------------------------------------
+    def deep_update(self, mapping: Dict[KeyType, Any], *updating_mappings: Dict[KeyType, Any]) -> Dict[KeyType, Any]:
+        updated_mapping = mapping.copy()
+        for updating_mapping in updating_mappings:
+            for k, v in updating_mapping.items():
+                if k in updated_mapping and isinstance(updated_mapping[k], dict) and isinstance(v, dict):
+                    updated_mapping[k] = self.deep_update(updated_mapping[k], v)
+                else:
+                    updated_mapping[k] = v
+
+        return updated_mapping
+
     def setup_equipment(self):
         if RUN_EQUIPMENT:
             loading_dlg = LoadingDialog()
@@ -202,6 +213,16 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.pv_point.clear()
         self.pv_point.addPoints(array([voltage]), array([power]), pen='g', symbol='o')
 
+    def rlc_auto_update_params(self):
+        if self.rlc_check_auto.isChecked():
+            self.rlc_entry_ac_volts.setValue(self.l_config["ac"]["ac_entry_ac_volts"])
+            self.rlc_entry_freq.setValue(self.l_config["ac"]["ac_entry_freq"])
+            self.rlc_entry_reactive_pwr.setValue(0)
+            self.rlc_entry_real_pwr.setValue(self.l_config["sas"]["sas_entry_pmp"])
+            if RUN_EQUIPMENT:
+                rlc_config = self.rlc.turn_on(self.l_config["rlc"])
+                self.l_config["rlc"].update(rlc_config)
+
     def force_update_ui(self, config):
         children = []
         children += self.findChildren(QSpinBox)
@@ -254,6 +275,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.l_config = json.load(jsonfile)
         except IOError:
             self.l_config = self.d_config
+        
+        self.l_config = self.deep_update(self.d_config, self.l_config)
+
         self.force_update_ui(self.l_config)
         print("Config loaded")
 
@@ -337,6 +361,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             print("Apply clicked")
             if RUN_EQUIPMENT:
                 self.ac_src.apply(self.l_config["ac"])
+            self.rlc_auto_update_params()
         elif obj_name == "ac_butt_on":
             print("AC on clicked")
             if RUN_EQUIPMENT:
@@ -423,7 +448,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             try:
                 if RUN_EQUIPMENT:
                     rlc_config = self.rlc.turn_on(rlc_config)
-                self.l_config["rlc"].update(rlc_config)
+                    self.l_config["rlc"].update(rlc_config)
             except self.rlc.NoInput:
                 self.error_msg.setWindowTitle("No Inputs")
                 self.error_msg.showMessage("Why do I even exist?")
@@ -454,6 +479,60 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         elif obj_name == "rlc_entry_real_pwr":
             print(f"Real power entered: {state}")
 
+    _rlc_checks = 'rlc_check_auto'
+    def _when_rlc_checks__stateChanged(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.isChecked()
+
+        self.l_config["rlc"][obj_name] = state
+
+        if obj_name == "rlc_check_auto":
+            print (f"Auto set RLC parameters checked: {state}")
+            if state:
+                self.rlc_entry_ac_volts.setValue(self.l_config["ac"]["ac_entry_ac_volts"])
+                self.rlc_entry_freq.setValue(self.l_config["ac"]["ac_entry_freq"])
+                self.rlc_entry_reactive_pwr.setValue(0)
+                self.rlc_entry_real_pwr.setValue(self.l_config["sas"]["sas_entry_pmp"])
+                self.rlc_entry_ac_volts.setDisabled(True)
+                self.rlc_entry_freq.setDisabled(True)
+                self.rlc_entry_reactive_pwr.setDisabled(True)
+                self.rlc_entry_real_pwr.setDisabled(True)
+                self.rlc_butt_on.setDisabled(True)
+                self.rlc_butt_off.setDisabled(True)
+            else:
+                self.rlc_entry_ac_volts.setDisabled(False)
+                self.rlc_entry_freq.setDisabled(False)
+                self.rlc_entry_reactive_pwr.setDisabled(False)
+                self.rlc_entry_real_pwr.setDisabled(False)
+                self.rlc_butt_on.setDisabled(False)
+                self.rlc_butt_off.setDisabled(False)
+    
+    _rlc_auto_check_entries = 'ac_entry_ac_volts, ac_entry_freq, sas_entry_pmp'
+    def _when_rlc_auto_check_entries__valueChanged(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.value()
+
+        if self.rlc_check_auto.isChecked():
+            if obj_name == "ac_entry_ac_volts":
+                self.rlc_entry_ac_volts.setValue(state)
+            elif obj_name == "ac_entry_freq":
+                self.rlc_entry_freq.setValue(state)
+            elif obj_name == "sas_entry_pmp":
+                self.rlc_entry_real_pwr.setValue(state)
+
+    _rlc_auto_check_applies = 'ac_butt_apply'
+    def _when_rlc_auto_checks__clicked(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+
+        if self.rlc_check_auto.isChecked():
+            if obj_name == "ac_butt_apply":
+                if RUN_EQUIPMENT:
+                        rlc_config = self.rlc.turn_on(rlc_config)
+                        self.l_config["rlc"].update(rlc_config)
+
     #--------------------------------------------------------
     #                       SAS Tab                         #
     #--------------------------------------------------------
@@ -477,6 +556,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 sas_data =  self.sas.apply(self.l_config["sas"])
                 self.sas_plot_pvi(sas_data)
                 self.sas_timer.start()
+            self.rlc_auto_update_params()
 
     _sas_entries = 'sas_entry_vmp, sas_entry_pmp, sas_entry_ff, sas_entry_irrad'
     def _when_sas_entries__editingFinished(self):
