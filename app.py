@@ -27,7 +27,6 @@ print(f"Import time: {import_time - start_time}")
 
 # TODO: Auto import station
 # TODO: Improve handling of pps and ametek
-# TODO: Add option to automatically set rlc params to sas power and ac voltage and frequency
 # TODO: Save and recall scope setups from gui
 
 RUN_EQUIPMENT = True
