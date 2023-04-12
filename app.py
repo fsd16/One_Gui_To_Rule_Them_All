@@ -332,7 +332,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.ac_src.turn_off()
             self.ac_src.return_manual()
             self.sas.turn_off()
-            self.rlc.turn_off()
+            self.rlc.close()
+            # self.rlc.turn_off()
             self.scope.turn_off()
 
             print("Equipment turned off")
@@ -446,8 +447,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             rlc_config = self.l_config["rlc"]
             try:
                 if RUN_EQUIPMENT:
-                    rlc_config = self.rlc.turn_on(rlc_config)
-                    self.l_config["rlc"].update(rlc_config)
+                    self.rlc.turn_on(rlc_config)
             except self.rlc.NoInput:
                 self.error_msg.setWindowTitle("No Inputs")
                 self.error_msg.showMessage("Why do I even exist?")
