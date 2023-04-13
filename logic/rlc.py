@@ -1,6 +1,7 @@
 
 from enphase_equipment.rlc_load.enphase_rlc_v2 import EnphaseRLCV2
 from enphase_equipment.rlc_load.common import calculate_rlc_from_real_and_reactive_power
+from time import sleep
 
 class RLC(EnphaseRLCV2):
     def __init__(self, *args, **kwargs):
@@ -38,8 +39,6 @@ class RLC(EnphaseRLCV2):
         
         actual = self.request_power_config(real_power=real_pwr, reactive_power=reactive_pwr, ac_voltage=ac_volts, ac_frequency=ac_freq)
 
-        rlc_config["rlc_entry_real_pwr"] = actual["actual_real_power"]
-        rlc_config["rlc_entry_reactive_pwr"] = actual["actual_reactive_power"]
         r, l, c = calculate_rlc_from_real_and_reactive_power(actual["actual_real_power"],
                                                                 actual["actual_reactive_power"],
                                                                 ac_volts,
@@ -47,7 +46,6 @@ class RLC(EnphaseRLCV2):
                                                                 
         print(f"RLC parameters applied: Resistance = {r}, Inductance = {l}, Capacitance = {c}")
         print(f'RLC configured Power: Real Power = {actual["actual_real_power"]}, Reactive Power = {actual["actual_reactive_power"]}')
-        return rlc_config
 
     def on_rlc(self):
         raise NotImplementedError
@@ -60,11 +58,11 @@ class RLC(EnphaseRLCV2):
         print("rlc configured using rlc values")
 
     def turn_on(self, rlc_config):
-        rlc_config = self.on_power(rlc_config)
+        self.on_power(rlc_config)
         print("RLC on")
-        return rlc_config
 
     # callback to turn off rlc output
     def turn_off(self):
-        self.close()
+        # open interlock and shutdown master relay power supply
+        self.enable_master_relay(False)
         print("RLC off")

@@ -59,8 +59,8 @@ class Scope(AgilentDSO):
 
     # Automatically scope capture if trigger occurs
     def auto_capture(self, sas_config):
-        self.write("*CLS;:SINGle")
-            
+        self.write(":TIMebase:MODE MAIN;*CLS;:SINGle")
+        
         while self.auto_cap_run:
             if bool(int(self.ask(":TER?"))): # True when a trigger has occured
                 print("Capture Scope Data")
@@ -70,6 +70,7 @@ class Scope(AgilentDSO):
 
     # Create thread for auto capture to run in
     def auto_capture_on(self, sas_config):
+        
         auto_capture_thread = Thread(target=self.auto_capture, args=[sas_config])
         auto_capture_thread.start()
         self.auto_cap_run = True

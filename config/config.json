@@ -25,6 +25,7 @@
     "scope_line_ch4_lab": "CH4"
   },
   "rlc": {
+    "rlc_check_auto": false,
     "rlc_entry_device": "COM3,COM4",
     "rlc_entry_ac_volts": 240,
     "rlc_entry_freq": 60,
