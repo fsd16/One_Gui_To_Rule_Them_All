@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>259</width>
-    <height>222</height>
+    <width>260</width>
+    <height>223</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,7 +63,7 @@
    <item row="2" column="0">
     <layout class="QFormLayout" name="formLayout">
      <property name="fieldGrowthPolicy">
-      <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
      </property>
      <property name="labelAlignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -124,6 +124,13 @@
       <widget class="QLineEdit" name="sas_entry_device">
        <property name="placeholderText">
         <string>GPIB0::&lt;address&gt;::INSTR</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QComboBox" name="sas_menu_config">
+       <property name="placeholderText">
+        <string>Cluster Config</string>
        </property>
       </widget>
      </item>

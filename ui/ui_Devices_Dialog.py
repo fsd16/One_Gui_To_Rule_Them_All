@@ -15,15 +15,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QDialog,
-    QDialogButtonBox, QFormLayout, QGridLayout, QLabel,
-    QLineEdit, QSizePolicy, QSpacerItem, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox,
+    QDialog, QDialogButtonBox, QFormLayout, QGridLayout,
+    QLabel, QLineEdit, QSizePolicy, QSpacerItem,
+    QWidget)
 
 class Ui_DevicesDialog(object):
     def setupUi(self, DevicesDialog):
         if not DevicesDialog.objectName():
             DevicesDialog.setObjectName(u"DevicesDialog")
-        DevicesDialog.resize(259, 222)
+        DevicesDialog.resize(260, 223)
         self.gridLayout = QGridLayout(DevicesDialog)
         self.gridLayout.setObjectName(u"gridLayout")
         self.device_entry_startup = QCheckBox(DevicesDialog)
@@ -49,7 +50,7 @@ class Ui_DevicesDialog(object):
 
         self.formLayout = QFormLayout()
         self.formLayout.setObjectName(u"formLayout")
-        self.formLayout.setFieldGrowthPolicy(QFormLayout.FieldsStayAtSizeHint)
+        self.formLayout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
         self.formLayout.setLabelAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
         self.formLayout.setFormAlignment(Qt.AlignHCenter|Qt.AlignTop)
         self.label = QLabel(DevicesDialog)
@@ -92,6 +93,11 @@ class Ui_DevicesDialog(object):
 
         self.formLayout.setWidget(4, QFormLayout.FieldRole, self.sas_entry_device)
 
+        self.sas_menu_config = QComboBox(DevicesDialog)
+        self.sas_menu_config.setObjectName(u"sas_menu_config")
+
+        self.formLayout.setWidget(5, QFormLayout.FieldRole, self.sas_menu_config)
+
 
         self.gridLayout.addLayout(self.formLayout, 2, 0, 1, 1)
 
@@ -114,5 +120,6 @@ class Ui_DevicesDialog(object):
         self.rlc_entry_device.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"COM<address>,COM<address>", None))
         self.label_4.setText(QCoreApplication.translate("DevicesDialog", u"SAS", None))
         self.sas_entry_device.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
+        self.sas_menu_config.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Cluster Config", None))
     # retranslateUi
 

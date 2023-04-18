@@ -58,13 +58,22 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         self.rlc_device = None
         self.sas_device = None
         self.startup = None
+        self.sas_config = None
 
+        self.sas_configs = {
+            "Series":   "series",
+            "Parallel": "parallel"
+        }
+        
         self.setupUi(self)
+        self.sas_menu_config.addItems(self.sas_configs)
 
         self.ac_entry_device.setText(config["ac"]["ac_entry_device"])
         self.scope_entry_device.setText(config["scope"]["scope_entry_device"])
         self.rlc_entry_device.setText(config["rlc"]["rlc_entry_device"])
         self.sas_entry_device.setText(config["sas"]["sas_entry_device"])
+        sas_config_index = list(self.sas_configs.values()).index(config["sas"]["sas_menu_config"])
+        self.sas_menu_config.setCurrentIndex(sas_config_index)
         self.device_entry_startup.setChecked(config["setup_devices"])
 
         self.auto_connect()
@@ -87,6 +96,16 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         elif obj_name == "sas_entry_device":
             print(f"SAS: {state}")
             self.sas_device = state
+    
+    _dialog_menus = 'sas_menu_config'
+    def _when_dialog_menus__activated(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.currentText()
+
+        if obj_name == "sas_menu_config":
+            print(f"SAS config selected: {state}")
+            self.sas_config = self.sas_configs[state]
 
     def _on_device_entry_startup__stateChanged(self):
         state = self.sender().isChecked()
@@ -143,6 +162,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.ac_src = AC_SRC(self.l_config["ac"]["ac_entry_device"], "Ametek")
             except RuntimeError:
                 self.ac_src = AC_SRC(self.l_config["ac"]["ac_entry_device"], "PPS")
+            self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
+            self.ac_menu_profile.addItems(self.ac_src.PROFILES)
             print("AC Source configured")
             loading_dlg.set_progress(25)
             QApplication.processEvents()
@@ -152,7 +173,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             loading_dlg.set_progress(50)
             QApplication.processEvents()
 
-            rcc, split, pcc = self.l_config["rlc"]["rlc_entry_device"].partition(',')
+            rcc, pcc, *trash = tuple([x.strip() for x in self.l_config["rlc"]["rlc_entry_device"].split(',')])
             try:
                 self.rlc = RLC(relay_controller_comport=rcc,
                             phase_controller_comport=pcc)
@@ -160,12 +181,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.rlc.close()
                 self.rlc = RLC(relay_controller_comport=rcc,
                             phase_controller_comport=pcc)
+                
             print("RLC configured")
             loading_dlg.set_progress(75)
             QApplication.processEvents()
 
-            sas_addresses = self.l_config["sas"]["sas_entry_device"].split(",")
-            self.sas = SAS(sas_addresses)
+            sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_device"].split(',')]
+            self.sas = SAS(sas_addresses, self.l_config["sas"]["sas_menu_config"])
+            print(self.l_config["sas"]["sas_menu_config"])
             print("SAS configured")
             loading_dlg.set_progress(100)
             QApplication.processEvents()
@@ -297,8 +320,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         try:
             if RUN_EQUIPMENT:
                 self.setup_equipment()
-                self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
-                self.ac_menu_profile.addItems(self.ac_src.PROFILES)
         except VisaIOError:
             self.error_msg.setWindowTitle("Connection failed")
             self.error_msg.showMessage("Ensure equipment is on and address is correct<br/>Retry connection:<br/>(Options->Reconnect Equipment)")
@@ -318,6 +339,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.l_config["rlc"]["rlc_entry_device"] = dlg.rlc_device
             if not dlg.sas_device == None:
                 self.l_config["sas"]["sas_entry_device"] = dlg.sas_device
+            if not dlg.sas_config == None:
+                self.l_config["sas"]["sas_menu_config"] = dlg.sas_config
             if not dlg.startup == None:
                 self.l_config["setup_devices"] = dlg.startup
 
