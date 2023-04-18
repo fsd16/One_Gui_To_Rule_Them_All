@@ -34,6 +34,7 @@
   },
   "sas": {
     "sas_entry_device": "GPIB0::15::INSTR",
+    "sas_menu_config": "series",
     "sas_entry_vmp": 32,
     "sas_entry_pmp": 100,
     "sas_entry_ff": 0.78,
