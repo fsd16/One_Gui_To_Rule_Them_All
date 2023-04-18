@@ -28,6 +28,10 @@ print(f"Import time: {import_time - start_time}")
 # TODO: Auto import station
 # TODO: Improve handling of pps and ametek
 # TODO: Save and recall scope setups from gui
+# TODO: After autocapture stops, return the scope to the mode it was in before autocapture was started (or just to run mode)
+# TODO: Issue where abnormal waveforms location is hardcoded to a bench
+# TODO: Allow startup with only selected equipment
+# TODO: Add sas cluster support
 
 RUN_EQUIPMENT = True
 
@@ -139,10 +143,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.ac_src = AC_SRC(self.l_config["ac"]["ac_entry_device"], "Ametek")
             except RuntimeError:
                 self.ac_src = AC_SRC(self.l_config["ac"]["ac_entry_device"], "PPS")
+            print("AC Source configured")
             loading_dlg.set_progress(25)
             QApplication.processEvents()
             
             self.scope = Scope(self.l_config["scope"]["scope_entry_device"])
+            print("Scope configured")
             loading_dlg.set_progress(50)
             QApplication.processEvents()
 
@@ -154,14 +160,17 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.rlc.close()
                 self.rlc = RLC(relay_controller_comport=rcc,
                             phase_controller_comport=pcc)
+            print("RLC configured")
             loading_dlg.set_progress(75)
             QApplication.processEvents()
 
-            self.sas = SAS(self.l_config["sas"]["sas_entry_device"])
+            sas_addresses = self.l_config["sas"]["sas_entry_device"].split(",")
+            self.sas = SAS(sas_addresses)
+            print("SAS configured")
             loading_dlg.set_progress(100)
             QApplication.processEvents()
             loading_dlg.close()
-            print("Equipment setup")
+            print("Equipment setup complete")
 
     def setup_sas_plot(self):
         self.sas_plot.setBackground('w')

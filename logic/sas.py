@@ -1,10 +1,14 @@
 import numpy as np
-from enphase_equipment.solar_array_simulator.agilent import AgilentE4360A
+from enphase_equipment.solar_array_simulator.agilent import AgilentE4360A, AgilentE43XXCluster
 
-class SAS(AgilentE4360A):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class SAS(AgilentE43XXCluster):
 
+    def __init__(self, addresses, *args, **kwargs):
+        sass = []
+        for address in addresses:
+            sass.append(AgilentE4360A(address))
+        super().__init__(sass, *args, **kwargs)
+        
     def get_sas_pv(self):
 
         sas_measurement = self.measurement()
