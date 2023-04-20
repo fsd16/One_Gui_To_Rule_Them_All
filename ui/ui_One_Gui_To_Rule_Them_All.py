@@ -22,13 +22,14 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
     QRadioButton, QSizePolicy, QSpacerItem, QSpinBox,
     QStatusBar, QTabWidget, QWidget)
 
+from .log import QPlainTextEditLogger
 from pyqtgraph import PlotWidget
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(600, 400)
+        MainWindow.resize(600, 477)
         self.main_action_restore = QAction(MainWindow)
         self.main_action_restore.setObjectName(u"main_action_restore")
         self.main_action_devices = QAction(MainWindow)
@@ -41,6 +42,7 @@ class Ui_MainWindow(object):
         self.gridLayout_7.setObjectName(u"gridLayout_7")
         self.tabWidget = QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName(u"tabWidget")
+        self.tabWidget.setMinimumSize(QSize(582, 339))
         self.sas_tab = QWidget()
         self.sas_tab.setObjectName(u"sas_tab")
         self.gridLayout_9 = QGridLayout(self.sas_tab)
@@ -523,6 +525,11 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.rlc_tab, "")
 
         self.gridLayout_7.addWidget(self.tabWidget, 0, 1, 1, 1)
+
+        self.central_textEdit_log = QPlainTextEditLogger(self.centralwidget)
+        self.central_textEdit_log.setObjectName(u"central_textEdit_log")
+
+        self.gridLayout_7.addWidget(self.central_textEdit_log, 1, 1, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
