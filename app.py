@@ -31,7 +31,6 @@ print(f"Import time: {import_time - start_time}")
 # TODO: Improve handling of pps and ametek
 # TODO: Save and recall scope setups from gui
 # TODO: After autocapture stops, return the scope to the mode it was in before autocapture was started (or just to run mode)
-# TODO: Issue where abnormal waveforms location is hardcoded to a bench
 # TODO: Allow startup with only selected equipment
 # TODO: Add sas cluster support
 

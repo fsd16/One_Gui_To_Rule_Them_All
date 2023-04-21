@@ -27,7 +27,7 @@ class AC_SRC():
             "230v, 50hz, Single Phase (INT)": (230, 50, "single"),  # Rest of world (INT)
             "208V, 60hz, Three Phase ":       (208, 60, "three"), # North American Comercial (NA)
         }
-        self.base_path = 'C:/Users/fdrabsch/Envs/enphase_env/workspace/hw_testcases/src/hw_testcases/abnormal_waveform_test/waveforms'
+        self.base_path = 'C:/Python37/workspace/hw_testcases/src/hw_testcases/abnormal_waveform_test/waveforms'
 
         self.AB_WAVEFORMS = {
             "IEC 77A Class 1":                             ('IEC_77A_Class_1.wfd'),
