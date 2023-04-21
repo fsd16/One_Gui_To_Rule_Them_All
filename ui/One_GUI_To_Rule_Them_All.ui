@@ -1080,7 +1080,14 @@
      </widget>
     </item>
     <item row="1" column="1">
-     <widget class="QPlainTextEditLogger" name="central_textEdit_log"/>
+     <widget class="QPlainTextEditLogger" name="central_textEdit_log">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -1097,26 +1104,49 @@
     <property name="title">
      <string>Options</string>
     </property>
-    <addaction name="main_action_restore"/>
-    <addaction name="main_action_devices"/>
-    <addaction name="main_action_connect"/>
+    <addaction name="options_action_restore"/>
+    <addaction name="options_action_devices"/>
+    <addaction name="options_action_connect"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="view_action_log"/>
    </widget>
    <addaction name="menuOptions"/>
+   <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="main_action_restore">
+  <action name="options_action_restore">
    <property name="text">
     <string>Restore Defaults</string>
    </property>
   </action>
-  <action name="main_action_devices">
+  <action name="options_action_devices">
    <property name="text">
     <string>Configure Equipment</string>
    </property>
   </action>
-  <action name="main_action_connect">
+  <action name="options_action_connect">
    <property name="text">
     <string>Reconnect Equipment</string>
+   </property>
+  </action>
+  <action name="main_action_log_view">
+   <property name="text">
+    <string>Toggle View</string>
+   </property>
+  </action>
+  <action name="view_action_log">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Log</string>
    </property>
   </action>
  </widget>
@@ -1130,7 +1160,7 @@
   <customwidget>
    <class>QPlainTextEditLogger</class>
    <extends>QPlainTextEdit</extends>
-   <header>log</header>
+   <header>.log</header>
   </customwidget>
  </customwidgets>
  <resources/>

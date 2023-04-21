@@ -30,12 +30,18 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(600, 477)
-        self.main_action_restore = QAction(MainWindow)
-        self.main_action_restore.setObjectName(u"main_action_restore")
-        self.main_action_devices = QAction(MainWindow)
-        self.main_action_devices.setObjectName(u"main_action_devices")
-        self.main_action_connect = QAction(MainWindow)
-        self.main_action_connect.setObjectName(u"main_action_connect")
+        self.options_action_restore = QAction(MainWindow)
+        self.options_action_restore.setObjectName(u"options_action_restore")
+        self.options_action_devices = QAction(MainWindow)
+        self.options_action_devices.setObjectName(u"options_action_devices")
+        self.options_action_connect = QAction(MainWindow)
+        self.options_action_connect.setObjectName(u"options_action_connect")
+        self.main_action_log_view = QAction(MainWindow)
+        self.main_action_log_view.setObjectName(u"main_action_log_view")
+        self.view_action_log = QAction(MainWindow)
+        self.view_action_log.setObjectName(u"view_action_log")
+        self.view_action_log.setCheckable(True)
+        self.view_action_log.setEnabled(True)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_7 = QGridLayout(self.centralwidget)
@@ -528,6 +534,11 @@ class Ui_MainWindow(object):
 
         self.central_textEdit_log = QPlainTextEditLogger(self.centralwidget)
         self.central_textEdit_log.setObjectName(u"central_textEdit_log")
+        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.central_textEdit_log.sizePolicy().hasHeightForWidth())
+        self.central_textEdit_log.setSizePolicy(sizePolicy)
 
         self.gridLayout_7.addWidget(self.central_textEdit_log, 1, 1, 1, 1)
 
@@ -537,15 +548,19 @@ class Ui_MainWindow(object):
         self.menubar.setGeometry(QRect(0, 0, 600, 22))
         self.menuOptions = QMenu(self.menubar)
         self.menuOptions.setObjectName(u"menuOptions")
+        self.menuView = QMenu(self.menubar)
+        self.menuView.setObjectName(u"menuView")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
         self.menubar.addAction(self.menuOptions.menuAction())
-        self.menuOptions.addAction(self.main_action_restore)
-        self.menuOptions.addAction(self.main_action_devices)
-        self.menuOptions.addAction(self.main_action_connect)
+        self.menubar.addAction(self.menuView.menuAction())
+        self.menuOptions.addAction(self.options_action_restore)
+        self.menuOptions.addAction(self.options_action_devices)
+        self.menuOptions.addAction(self.options_action_connect)
+        self.menuView.addAction(self.view_action_log)
 
         self.retranslateUi(MainWindow)
 
@@ -558,9 +573,11 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"One Gui To Rule Them All", None))
-        self.main_action_restore.setText(QCoreApplication.translate("MainWindow", u"Restore Defaults", None))
-        self.main_action_devices.setText(QCoreApplication.translate("MainWindow", u"Configure Equipment", None))
-        self.main_action_connect.setText(QCoreApplication.translate("MainWindow", u"Reconnect Equipment", None))
+        self.options_action_restore.setText(QCoreApplication.translate("MainWindow", u"Restore Defaults", None))
+        self.options_action_devices.setText(QCoreApplication.translate("MainWindow", u"Configure Equipment", None))
+        self.options_action_connect.setText(QCoreApplication.translate("MainWindow", u"Reconnect Equipment", None))
+        self.main_action_log_view.setText(QCoreApplication.translate("MainWindow", u"Toggle View", None))
+        self.view_action_log.setText(QCoreApplication.translate("MainWindow", u"Log", None))
         self.sas_butt_off.setText(QCoreApplication.translate("MainWindow", u"SAS Off", None))
         self.sas_butt_on.setText(QCoreApplication.translate("MainWindow", u"SAS On", None))
         self.sas_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))
@@ -613,5 +630,6 @@ class Ui_MainWindow(object):
         self.rlc_check_auto.setText(QCoreApplication.translate("MainWindow", u"Auto set RLC parameters", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.rlc_tab), QCoreApplication.translate("MainWindow", u"RLC", None))
         self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))
+        self.menuView.setTitle(QCoreApplication.translate("MainWindow", u"View", None))
     # retranslateUi
 

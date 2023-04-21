@@ -39,5 +39,8 @@
     "sas_entry_pmp": 100,
     "sas_entry_ff": 0.78,
     "sas_entry_irrad": 1
+  },
+  "view": {
+    "view_action_log": false
   }
 }

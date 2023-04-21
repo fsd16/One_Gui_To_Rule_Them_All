@@ -123,22 +123,17 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
         self.setup_logging()
-
+        self.setup_config()
         self.setup_sas_plot()
-
-        self.sas_timer = QTimer()
-        self.sas_timer.setInterval(100)
-        self.sas_timer.timeout.connect(self.sas_update_plot_pv)
+        self.setup_view()
 
         self.error_msg = QErrorMessage()
         self.error_msg.setWindowModality(Qt.ApplicationModal)
 
-        self.load_config()
-
         if self.l_config["setup_devices"]:
-            self._on_main_action_devices__triggered()
+            self._on_options_action_devices__triggered()
 
-        self._on_main_action_connect__triggered()
+        self._on_options_action_connect__triggered()
             
         self.auto_connect()
         
@@ -164,6 +159,30 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.LOG.addHandler(self.central_textEdit_log)
         # You can control the logging level
         self.LOG.setLevel(logging.INFO)
+
+    def setup_config(self):
+
+        with open("config/config.json", "r") as jsonfile:
+            self.d_config = json.load(jsonfile)
+
+        try:
+            with open("config/local_config.json", "r") as jsonfile:
+                self.l_config = json.load(jsonfile)
+        except IOError:
+            self.l_config = self.d_config
+        
+        self.l_config = self.deep_update(self.d_config, self.l_config)
+
+        self.force_update_ui(self.l_config)
+        self.LOG.info("Config loaded")
+
+    def setup_view(self):
+        self.view_action_log.setChecked(self.l_config["view"]["view_action_log"])
+        
+        if not self.l_config["view"]["view_action_log"]:
+            self.central_textEdit_log.hide()
+            self.resize(self.minimumSizeHint())
+            
 
     def setup_equipment(self):
         if RUN_EQUIPMENT:
@@ -232,6 +251,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
         plot.getAxis('left').linkToView(self.left_vb)
         plot.getAxis('right').linkToView(self.right_vb)
+
+        self.sas_timer = QTimer()
+        self.sas_timer.setInterval(100)
+        self.sas_timer.timeout.connect(self.sas_update_plot_pv)
 
     def sas_plot_pvi(self, data):
         current = data["i"]
@@ -309,27 +332,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 wgtobj = getattr(self, name)
                 if hasattr(wgtobj, "setChecked"):
                     wgtobj.setChecked(config[prefix][name])
-    
-    def load_config(self):
-
-        with open("config/config.json", "r") as jsonfile:
-            self.d_config = json.load(jsonfile)
-
-        try:
-            with open("config/local_config.json", "r") as jsonfile:
-                self.l_config = json.load(jsonfile)
-        except IOError:
-            self.l_config = self.d_config
-        
-        self.l_config = self.deep_update(self.d_config, self.l_config)
-
-        self.force_update_ui(self.l_config)
-        self.LOG.info("Config loaded")
 
     #--------------------------------------------------------
     #                       Main Items                      #
     #--------------------------------------------------------
-    def _on_main_action_connect__triggered(self):
+    def _on_options_action_connect__triggered(self):
         self.LOG.info("Equipment connect triggered")
         try:
             if RUN_EQUIPMENT:
@@ -339,7 +346,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.error_msg.showMessage("Ensure equipment is on and address is correct<br/>Retry connection:<br/>(Options->Reconnect Equipment)")
             self.error_msg.exec()
 
-    def _on_main_action_devices__triggered(self):
+    def _on_options_action_devices__triggered(self):
         self.LOG.info("Device setup triggered")
         dlg = DevicesDialog(self.l_config)
         dlg.exec()
@@ -358,9 +365,22 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             if not dlg.startup == None:
                 self.l_config["setup_devices"] = dlg.startup
 
-    def _on_main_action_restore__triggered(self):
+    def _on_options_action_restore__triggered(self):
         self.LOG.info("Restore defaults triggered")
         self.force_update_ui(self.d_config)
+
+    def _on_view_action_log__triggered(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.isChecked()
+
+        self.l_config["view"][obj_name] = state
+
+        if state:
+            self.central_textEdit_log.show()
+        else:
+            self.central_textEdit_log.hide()
+            self.resize(self.minimumSizeHint())
     
     def closeEvent(self, event):
         self._when_closers__clicked()
