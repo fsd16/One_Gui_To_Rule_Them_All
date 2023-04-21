@@ -19,6 +19,7 @@ from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
 from logic.signal import SmartSignal
+from logic.equipment_library import EquipmentDrivers
 from serial.serialutil import SerialException
 from pyvisa.errors import VisaIOError
 from typing import Dict, Any, TypeVar
@@ -55,21 +56,34 @@ class LoadingDialog(QDialog, Ui_LoadingDialog):
 #--------------------------------------------------------
 class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
     def __init__(self, config, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__()
+        self.drivers = EquipmentDrivers()
+        
         self.ac_device = None
         self.scope_device = None
         self.rlc_device = None
         self.sas_device = None
         self.startup = None
+        self.ac_driver = None
+        self.scope_driver = None
+        self.rlc_driver = None
+        self.sas_driver = None
         self.sas_config = None
 
         self.sas_configs = {
             "Series":   "series",
             "Parallel": "parallel"
         }
-        
+
         self.setupUi(self)
+        
+        self.ac_menu_driver.addItems(self.drivers.AC_SOURCE_DRIVERS)
+        self.scope_menu_driver.addItems(self.drivers.SCOPE_DRIVERS)
+        self.rlc_menu_driver.addItems(self.drivers.RLC_DRIVERS)
+        self.sas_menu_driver.addItems(self.drivers.SAS_DRIVERS)
+        
         self.sas_menu_config.addItems(self.sas_configs)
+
 
         self.ac_entry_device.setText(config["ac"]["ac_entry_device"])
         self.scope_entry_device.setText(config["scope"]["scope_entry_device"])
@@ -100,7 +114,7 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
             print(f"SAS: {state}")
             self.sas_device = state
     
-    _dialog_menus = 'sas_menu_config'
+    _dialog_menus = 'sas_menu_config, ac_menu_driver, scope_menu_driver, rlc_menu_driver, sas_menu_driver'
     def _when_dialog_menus__activated(self):
         obj = self.sender()
         obj_name = obj.objectName()
@@ -109,6 +123,18 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         if obj_name == "sas_menu_config":
             print(f"SAS config selected: {state}")
             self.sas_config = self.sas_configs[state]
+        if obj_name == "ac_menu_driver":
+            print(f"AC source driver selected: {state}")
+            self.ac_driver = self.drivers.AC_SOURCE_DRIVERS[state]
+        if obj_name == "scope_menu_driver":
+            print(f"Scope driver selected: {state}")
+            self.scope_driver = self.drivers.SCOPE_DRIVERS[state]
+        if obj_name == "rlc_menu_driver":
+            print(f"RLC source driver selected: {state}")
+            self.rlc_driver = self.drivers.RLC_DRIVERS[state]
+        if obj_name == "sas_menu_driver":
+            print(f"SAS source driver selected: {state}")
+            self.sas_driver = self.drivers.SAS_DRIVERS[state]
 
     def _on_device_entry_startup__stateChanged(self):
         state = self.sender().isChecked()
