@@ -20,6 +20,7 @@ from logic.rlc import RLC
 from logic.sas import SAS
 from logic.signal import SmartSignal
 from logic.equipment_library import EquipmentDrivers
+from logic.utils import dict_value_to_index
 from serial.serialutil import SerialException
 from pyvisa.errors import VisaIOError
 from typing import Dict, Any, TypeVar
@@ -93,16 +94,16 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         self.sas_menu_config.setCurrentIndex(sas_config_index)
 
         if config["ac"]["ac_menu_driver"] != None:
-            ac_driver_index = list(self.drivers.AC_SOURCE_DRIVERS.values()).index(config["ac"]["ac_menu_driver"])
+            ac_driver_index = dict_value_to_index(self.drivers.AC_SOURCE_DRIVERS, config["ac"]["ac_menu_driver"])
             self.ac_menu_driver.setCurrentIndex(ac_driver_index)
         if config["scope"]["scope_menu_driver"] != None:
-            scope_driver_index = list(self.drivers.SCOPE_DRIVERS.values()).index(config["scope"]["scope_menu_driver"])
+            scope_driver_index = dict_value_to_index(self.drivers.SCOPE_DRIVERS, config["scope"]["scope_menu_driver"])
             self.scope_menu_driver.setCurrentIndex(scope_driver_index)
         if config["rlc"]["rlc_menu_driver"] != None:
-            rlc_driver_index = list(self.drivers.RLC_DRIVERS.values()).index(config["rlc"]["rlc_menu_driver"])
+            rlc_driver_index = dict_value_to_index(self.drivers.RLC_DRIVERS, config["rlc"]["rlc_menu_driver"])
             self.rlc_menu_driver.setCurrentIndex(rlc_driver_index)
         if config["sas"]["sas_menu_driver"] != None:
-            sas_driver_index = list(self.drivers.SAS_DRIVERS.values()).index(config["sas"]["sas_menu_driver"])
+            sas_driver_index = dict_value_to_index(self.drivers.SAS_DRIVERS, config["sas"]["sas_menu_driver"])
             self.sas_menu_driver.setCurrentIndex(sas_driver_index)
 
         self.device_entry_startup.setChecked(config["setup_devices"])
