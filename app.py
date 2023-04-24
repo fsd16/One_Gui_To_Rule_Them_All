@@ -20,11 +20,9 @@ from logic.rlc import RLC
 from logic.sas import SAS
 from logic.signal import SmartSignal
 from logic.equipment_library import EquipmentDrivers
-from logic.utils import dict_value_to_index
+from logic.utils import dict_value_to_index, deep_update
 from serial.serialutil import SerialException
 from pyvisa.errors import VisaIOError
-from typing import Dict, Any, TypeVar
-KeyType = TypeVar('KeyType')
 
 import_time = time.time()
 print(f"Import time: {import_time - start_time}")
@@ -81,21 +79,11 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         self.rlc_entry_address.setText(config["rlc"]["rlc_entry_address"])
         self.sas_entry_address.setText(config["sas"]["sas_entry_address"])
 
-        sas_config_index = list(self.sas_configs.values()).index(config["sas"]["sas_menu_config"])
-        self.sas_menu_config.setCurrentIndex(sas_config_index)
-
-        if config["ac"]["ac_menu_driver"] != None:
-            ac_driver_index = dict_value_to_index(self.drivers.AC_SOURCE_DRIVERS, config["ac"]["ac_menu_driver"])
-            self.ac_menu_driver.setCurrentIndex(ac_driver_index)
-        if config["scope"]["scope_menu_driver"] != None:
-            scope_driver_index = dict_value_to_index(self.drivers.SCOPE_DRIVERS, config["scope"]["scope_menu_driver"])
-            self.scope_menu_driver.setCurrentIndex(scope_driver_index)
-        if config["rlc"]["rlc_menu_driver"] != None:
-            rlc_driver_index = dict_value_to_index(self.drivers.RLC_DRIVERS, config["rlc"]["rlc_menu_driver"])
-            self.rlc_menu_driver.setCurrentIndex(rlc_driver_index)
-        if config["sas"]["sas_menu_driver"] != None:
-            sas_driver_index = dict_value_to_index(self.drivers.SAS_DRIVERS, config["sas"]["sas_menu_driver"])
-            self.sas_menu_driver.setCurrentIndex(sas_driver_index)
+        self.sas_menu_config.setCurrentIndex(config["sas"]["sas_menu_config"]["index"])
+        self.ac_menu_driver.setCurrentIndex(config["ac"]["ac_menu_driver"]["index"])
+        self.scope_menu_driver.setCurrentIndex(config["scope"]["scope_menu_driver"]["index"])
+        self.rlc_menu_driver.setCurrentIndex(config["rlc"]["rlc_menu_driver"]["index"])
+        self.sas_menu_driver.setCurrentIndex(config["sas"]["sas_menu_driver"]["index"])
 
         self.device_entry_startup.setChecked(config["setup_devices"])
 
@@ -106,41 +94,43 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.text()
-        
+
+        prefix = obj_name.split('_')[0]
+        self.config[prefix][obj_name] = state
+
         if obj_name == "ac_entry_address":
             print(f"AC Source: {state}")
-            self.config["ac"][obj_name] = state
         elif obj_name == "scope_entry_address":
             print(f"Scope: {state}")
-            self.config["scope"][obj_name] = state
         elif obj_name == "rlc_entry_address":
             print(f"RLC: {state}")
-            self.config["rlc"][obj_name] = state
         elif obj_name == "sas_entry_address":
             print(f"SAS: {state}")
-            self.config["sas"][obj_name] = state
     
     _dialog_menus = 'sas_menu_config, ac_menu_driver, scope_menu_driver, rlc_menu_driver, sas_menu_driver'
     def _when_dialog_menus__activated(self):
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.currentText()
+        
+        prefix = obj_name.split('_')[0]
+        self.config[prefix][obj_name]["index"] = obj.currentIndex()
 
         if obj_name == "sas_menu_config":
             print(f"SAS config selected: {state}")
-            self.config["sas"][obj_name] = self.sas_configs[state]
+            self.config["sas"][obj_name]["item"] = self.sas_configs[state]
         if obj_name == "ac_menu_driver":
             print(f"AC source driver selected: {state}")
-            self.config["ac"][obj_name] = self.drivers.AC_SOURCE_DRIVERS[state]
+            self.config["ac"][obj_name]["item"] = self.drivers.AC_SOURCE_DRIVERS[state]
         if obj_name == "scope_menu_driver":
             print(f"Scope driver selected: {state}")
-            self.config["scope"][obj_name] = self.drivers.SCOPE_DRIVERS[state]
+            self.config["scope"][obj_name]["item"] = self.drivers.SCOPE_DRIVERS[state]
         if obj_name == "rlc_menu_driver":
             print(f"RLC source driver selected: {state}")
-            self.config["rlc"][obj_name] = self.drivers.RLC_DRIVERS[state]
+            self.config["rlc"][obj_name]["item"] = self.drivers.RLC_DRIVERS[state]
         if obj_name == "sas_menu_driver":
             print(f"SAS source driver selected: {state}")
-            self.config["sas"][obj_name] = self.drivers.SAS_DRIVERS[state]
+            self.config["sas"][obj_name]["item"] = self.drivers.SAS_DRIVERS[state]
 
     def _on_device_entry_startup__stateChanged(self):
         state = self.sender().isChecked()
@@ -172,17 +162,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     #--------------------------------------------------------
     #                       Helpers                         #
     #--------------------------------------------------------
-    def deep_update(self, mapping: Dict[KeyType, Any], *updating_mappings: Dict[KeyType, Any]) -> Dict[KeyType, Any]:
-        updated_mapping = mapping.copy()
-        for updating_mapping in updating_mappings:
-            for k, v in updating_mapping.items():
-                if k in updated_mapping and isinstance(updated_mapping[k], dict) and isinstance(v, dict):
-                    updated_mapping[k] = self.deep_update(updated_mapping[k], v)
-                else:
-                    updated_mapping[k] = v
-
-        return updated_mapping
-
     def setup_logging(self):
         # You can format what is printed to text box
         self.central_textEdit_log.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
@@ -203,7 +182,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         except IOError:
             self.l_config = self.d_config
         
-        self.l_config = self.deep_update(self.d_config, self.l_config)
+        self.l_config = deep_update(self.d_config, self.l_config)
 
         self.force_update_ui(self.l_config)
         self.LOG.info("Config loaded")
@@ -222,32 +201,31 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         loading_dlg.show()
         QApplication.processEvents()
 
-
-        self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"], self.l_config["ac"]["ac_entry_address"])
+        self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"]["item"], self.l_config["ac"]["ac_entry_address"])
         self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
         self.ac_menu_profile.addItems(self.ac_src.PROFILES)
         self.LOG.info("AC Source configured")
         loading_dlg.set_progress(25)
         QApplication.processEvents()
         
-        self.scope = Scope(self.l_config["scope"]["scope_menu_driver"], self.l_config["scope"]["scope_entry_address"])
+        self.scope = Scope(self.l_config["scope"]["scope_menu_driver"]["item"], self.l_config["scope"]["scope_entry_address"])
         self.LOG.info("Scope configured")
         loading_dlg.set_progress(50)
         QApplication.processEvents()
 
         rcc, pcc, *trash = tuple([x.strip() for x in self.l_config["rlc"]["rlc_entry_address"].split(',')])
         try:
-            self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"], relay_controller_comport=rcc, phase_controller_comport=pcc)
+            self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
         except SerialException:
             self.rlc.close()
-            self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"], relay_controller_comport=rcc, phase_controller_comport=pcc)
+            self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
             
         self.LOG.info("RLC configured")
         loading_dlg.set_progress(75)
         QApplication.processEvents()
 
         sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_address"].split(',')]
-        self.sas = SAS(self.l_config["sas"]["sas_menu_driver"], sas_addresses, self.l_config["sas"]["sas_menu_config"])
+        self.sas = SAS(self.l_config["sas"]["sas_menu_driver"]["item"], sas_addresses, self.l_config["sas"]["sas_menu_config"]["item"])
         self.LOG.info(self.l_config["sas"]["sas_menu_config"])
         self.LOG.info("SAS configured")
         loading_dlg.set_progress(100)

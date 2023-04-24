@@ -2,7 +2,6 @@ import importlib
 
 class EquipmentDrivers:
     def __init__(self):
-        print("init")
         self.AC_SOURCE_DRIVERS = {
             "PPS_308": 'enphase_equipment.ac_source.pacific_power_source.PPS_308',
             "AmetekAsterion": 'enphase_equipment.ac_source.ametek.AmetekAsterion'
