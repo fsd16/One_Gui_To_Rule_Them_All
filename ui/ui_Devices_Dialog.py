@@ -28,10 +28,10 @@ class Ui_DevicesDialog(object):
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
-        self.sas_entry_device = QLineEdit(DevicesDialog)
-        self.sas_entry_device.setObjectName(u"sas_entry_device")
+        self.sas_entry_address = QLineEdit(DevicesDialog)
+        self.sas_entry_address.setObjectName(u"sas_entry_address")
 
-        self.gridLayout.addWidget(self.sas_entry_device, 3, 2, 1, 1)
+        self.gridLayout.addWidget(self.sas_entry_address, 3, 2, 1, 1)
 
         self.label = QLabel(DevicesDialog)
         self.label.setObjectName(u"label")
@@ -58,20 +58,20 @@ class Ui_DevicesDialog(object):
 
         self.gridLayout.addWidget(self.sas_menu_config, 4, 2, 1, 1)
 
-        self.scope_entry_device = QLineEdit(DevicesDialog)
-        self.scope_entry_device.setObjectName(u"scope_entry_device")
+        self.scope_entry_address = QLineEdit(DevicesDialog)
+        self.scope_entry_address.setObjectName(u"scope_entry_address")
 
-        self.gridLayout.addWidget(self.scope_entry_device, 1, 2, 1, 1)
+        self.gridLayout.addWidget(self.scope_entry_address, 1, 2, 1, 1)
 
-        self.ac_entry_device = QLineEdit(DevicesDialog)
-        self.ac_entry_device.setObjectName(u"ac_entry_device")
+        self.ac_entry_address = QLineEdit(DevicesDialog)
+        self.ac_entry_address.setObjectName(u"ac_entry_address")
 
-        self.gridLayout.addWidget(self.ac_entry_device, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.ac_entry_address, 0, 2, 1, 1)
 
-        self.rlc_entry_device = QLineEdit(DevicesDialog)
-        self.rlc_entry_device.setObjectName(u"rlc_entry_device")
+        self.rlc_entry_address = QLineEdit(DevicesDialog)
+        self.rlc_entry_address.setObjectName(u"rlc_entry_address")
 
-        self.gridLayout.addWidget(self.rlc_entry_device, 2, 2, 1, 1)
+        self.gridLayout.addWidget(self.rlc_entry_address, 2, 2, 1, 1)
 
         self.ac_menu_driver = QComboBox(DevicesDialog)
         self.ac_menu_driver.setObjectName(u"ac_menu_driver")
@@ -127,15 +127,15 @@ class Ui_DevicesDialog(object):
 
     def retranslateUi(self, DevicesDialog):
         DevicesDialog.setWindowTitle(QCoreApplication.translate("DevicesDialog", u"Device Connection", None))
-        self.sas_entry_device.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
+        self.sas_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
         self.label.setText(QCoreApplication.translate("DevicesDialog", u"AC Source", None))
         self.label_3.setText(QCoreApplication.translate("DevicesDialog", u"RLC Load", None))
         self.label_2.setText(QCoreApplication.translate("DevicesDialog", u"Scope", None))
         self.label_4.setText(QCoreApplication.translate("DevicesDialog", u"SAS", None))
         self.sas_menu_config.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Cluster Config", None))
-        self.scope_entry_device.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
-        self.ac_entry_device.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
-        self.rlc_entry_device.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"COM<address>,COM<address>", None))
+        self.scope_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
+        self.ac_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
+        self.rlc_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"COM<address>,COM<address>", None))
         self.ac_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
         self.scope_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
         self.rlc_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))

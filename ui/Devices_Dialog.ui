@@ -17,7 +17,7 @@
    <item row="1" column="1">
     <layout class="QGridLayout" name="gridLayout">
      <item row="3" column="2">
-      <widget class="QLineEdit" name="sas_entry_device">
+      <widget class="QLineEdit" name="sas_entry_address">
        <property name="placeholderText">
         <string>GPIB0::&lt;address&gt;::INSTR</string>
        </property>
@@ -59,21 +59,21 @@
       </widget>
      </item>
      <item row="1" column="2">
-      <widget class="QLineEdit" name="scope_entry_device">
+      <widget class="QLineEdit" name="scope_entry_address">
        <property name="placeholderText">
         <string>GPIB0::&lt;address&gt;::INSTR</string>
        </property>
       </widget>
      </item>
      <item row="0" column="2">
-      <widget class="QLineEdit" name="ac_entry_device">
+      <widget class="QLineEdit" name="ac_entry_address">
        <property name="placeholderText">
         <string>GPIB0::&lt;address&gt;::INSTR</string>
        </property>
       </widget>
      </item>
      <item row="2" column="2">
-      <widget class="QLineEdit" name="rlc_entry_device">
+      <widget class="QLineEdit" name="rlc_entry_address">
        <property name="placeholderText">
         <string>COM&lt;address&gt;,COM&lt;address&gt;</string>
        </property>
