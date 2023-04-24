@@ -1,3 +1,5 @@
+import importlib
+
 class EquipmentDrivers:
     def __init__(self):
         print("init")
@@ -20,3 +22,10 @@ class EquipmentDrivers:
         self.SAS_DRIVERS = {
             "E4360A": 'enphase_equipment.solar_array_simulator.agilent.AgilentE4360A'
         }
+
+def import_class_from_string(path):
+    '''Takes `path`, a string, and returns a class.'''
+    module = '.'.join(path.split('.')[:-1])
+    class_ = path.split('.')[-1]
+    imported_module = importlib.import_module(name=module)
+    return getattr(imported_module, class_)

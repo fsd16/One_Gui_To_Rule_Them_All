@@ -2,6 +2,7 @@
   "setup_devices": true,
   "ac": {
     "ac_entry_device": "GPIB0::1::INSTR",
+    "ac_menu_driver": null,
     "ac_entry_ac_volts": 240,
     "ac_entry_freq": 60,
     "ac_radio_single": false,
@@ -14,6 +15,7 @@
   },
   "scope": {
     "scope_entry_device": "GPIB0::28::INSTR",
+    "scope_menu_driver": null,
     "scope_line_cap_path": "",
     "scope_line_cap_name": "foo",
     "scope_check_date": false,
@@ -25,8 +27,9 @@
     "scope_line_ch4_lab": "CH4"
   },
   "rlc": {
-    "rlc_check_auto": false,
     "rlc_entry_device": "COM3,COM4",
+    "rlc_menu_driver": null,
+    "rlc_check_auto": false,
     "rlc_entry_ac_volts": 240,
     "rlc_entry_freq": 60,
     "rlc_entry_real_pwr": 0,
@@ -34,6 +37,7 @@
   },
   "sas": {
     "sas_entry_device": "GPIB0::15::INSTR",
+    "sas_menu_driver": null,
     "sas_menu_config": "series",
     "sas_entry_vmp": 32,
     "sas_entry_pmp": 100,

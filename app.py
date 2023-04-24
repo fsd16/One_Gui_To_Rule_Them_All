@@ -84,13 +84,27 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         
         self.sas_menu_config.addItems(self.sas_configs)
 
-
         self.ac_entry_device.setText(config["ac"]["ac_entry_device"])
         self.scope_entry_device.setText(config["scope"]["scope_entry_device"])
         self.rlc_entry_device.setText(config["rlc"]["rlc_entry_device"])
         self.sas_entry_device.setText(config["sas"]["sas_entry_device"])
+
         sas_config_index = list(self.sas_configs.values()).index(config["sas"]["sas_menu_config"])
         self.sas_menu_config.setCurrentIndex(sas_config_index)
+
+        if config["ac"]["ac_menu_driver"] != None:
+            ac_driver_index = list(self.drivers.AC_SOURCE_DRIVERS.values()).index(config["ac"]["ac_menu_driver"])
+            self.ac_menu_driver.setCurrentIndex(ac_driver_index)
+        if config["scope"]["scope_menu_driver"] != None:
+            scope_driver_index = list(self.drivers.SCOPE_DRIVERS.values()).index(config["scope"]["scope_menu_driver"])
+            self.scope_menu_driver.setCurrentIndex(scope_driver_index)
+        if config["rlc"]["rlc_menu_driver"] != None:
+            rlc_driver_index = list(self.drivers.RLC_DRIVERS.values()).index(config["rlc"]["rlc_menu_driver"])
+            self.rlc_menu_driver.setCurrentIndex(rlc_driver_index)
+        if config["sas"]["sas_menu_driver"] != None:
+            sas_driver_index = list(self.drivers.SAS_DRIVERS.values()).index(config["sas"]["sas_menu_driver"])
+            self.sas_menu_driver.setCurrentIndex(sas_driver_index)
+
         self.device_entry_startup.setChecked(config["setup_devices"])
 
         self.auto_connect()
@@ -159,7 +173,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         if self.l_config["setup_devices"]:
             self._on_options_action_devices__triggered()
 
-        self._on_options_action_connect__triggered()
+        self.setup_equipment_connection()
             
         self.auto_connect()
         
@@ -211,48 +225,53 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             
 
     def setup_equipment(self):
-        if RUN_EQUIPMENT:
-            loading_dlg = LoadingDialog()
-            loading_dlg.set_progress(0)
-            loading_dlg.show()
-            QApplication.processEvents()
+        loading_dlg = LoadingDialog()
+        loading_dlg.set_progress(0)
+        loading_dlg.show()
+        QApplication.processEvents()
 
-            try:
-                self.ac_src = AC_SRC(self.l_config["ac"]["ac_entry_device"], "Ametek")
-            except RuntimeError:
-                self.ac_src = AC_SRC(self.l_config["ac"]["ac_entry_device"], "PPS")
-            self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
-            self.ac_menu_profile.addItems(self.ac_src.PROFILES)
-            self.LOG.info("AC Source configured")
-            loading_dlg.set_progress(25)
-            QApplication.processEvents()
+
+        self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"], self.l_config["ac"]["ac_entry_device"])
+        self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
+        self.ac_menu_profile.addItems(self.ac_src.PROFILES)
+        self.LOG.info("AC Source configured")
+        loading_dlg.set_progress(25)
+        QApplication.processEvents()
+        
+        self.scope = Scope(self.l_config["scope"]["scope_menu_driver"], self.l_config["scope"]["scope_entry_device"])
+        self.LOG.info("Scope configured")
+        loading_dlg.set_progress(50)
+        QApplication.processEvents()
+
+        rcc, pcc, *trash = tuple([x.strip() for x in self.l_config["rlc"]["rlc_entry_device"].split(',')])
+        try:
+            self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"], relay_controller_comport=rcc, phase_controller_comport=pcc)
+        except SerialException:
+            self.rlc.close()
+            self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"], relay_controller_comport=rcc, phase_controller_comport=pcc)
             
-            self.scope = Scope(self.l_config["scope"]["scope_entry_device"])
-            self.LOG.info("Scope configured")
-            loading_dlg.set_progress(50)
-            QApplication.processEvents()
+        self.LOG.info("RLC configured")
+        loading_dlg.set_progress(75)
+        QApplication.processEvents()
 
-            rcc, pcc, *trash = tuple([x.strip() for x in self.l_config["rlc"]["rlc_entry_device"].split(',')])
-            try:
-                self.rlc = RLC(relay_controller_comport=rcc,
-                            phase_controller_comport=pcc)
-            except SerialException:
-                self.rlc.close()
-                self.rlc = RLC(relay_controller_comport=rcc,
-                            phase_controller_comport=pcc)
-                
-            self.LOG.info("RLC configured")
-            loading_dlg.set_progress(75)
-            QApplication.processEvents()
+        sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_device"].split(',')]
+        self.sas = SAS(self.l_config["sas"]["sas_menu_driver"], sas_addresses, self.l_config["sas"]["sas_menu_config"])
+        self.LOG.info(self.l_config["sas"]["sas_menu_config"])
+        self.LOG.info("SAS configured")
+        loading_dlg.set_progress(100)
+        QApplication.processEvents()
+        loading_dlg.close()
+        self.LOG.info("Equipment setup complete")
 
-            sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_device"].split(',')]
-            self.sas = SAS(sas_addresses, self.l_config["sas"]["sas_menu_config"])
-            self.LOG.info(self.l_config["sas"]["sas_menu_config"])
-            self.LOG.info("SAS configured")
-            loading_dlg.set_progress(100)
-            QApplication.processEvents()
-            loading_dlg.close()
-            self.LOG.info("Equipment setup complete")
+    def setup_equipment_connection(self):
+        self.LOG.info("Equipment connect triggered")
+        try:
+            if RUN_EQUIPMENT:
+                self.setup_equipment()
+        except VisaIOError:
+            self.error_msg.setWindowTitle("Connection failed")
+            self.error_msg.showMessage("Ensure equipment is on and address is correct<br/>Retry connection:<br/>(Options->Reconnect Equipment)")
+            self.error_msg.exec()
 
     def setup_sas_plot(self):
         self.sas_plot.setBackground('w')
@@ -363,21 +382,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     #                       Main Items                      #
     #--------------------------------------------------------
     def _on_options_action_connect__triggered(self):
-        self.LOG.info("Equipment connect triggered")
-        try:
-            if RUN_EQUIPMENT:
-                self.setup_equipment()
-        except VisaIOError:
-            self.error_msg.setWindowTitle("Connection failed")
-            self.error_msg.showMessage("Ensure equipment is on and address is correct<br/>Retry connection:<br/>(Options->Reconnect Equipment)")
-            self.error_msg.exec()
+        self.setup_equipment_connection()
 
     def _on_options_action_devices__triggered(self):
         self.LOG.info("Device setup triggered")
         dlg = DevicesDialog(self.l_config)
-        dlg.exec()
+        result = dlg.exec()
 
-        if QDialog.Accepted:
+        if result:
             if not dlg.ac_device == None:
                 self.l_config["ac"]["ac_entry_device"] = dlg.ac_device
             if not dlg.scope_device == None:
@@ -390,6 +402,16 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.l_config["sas"]["sas_menu_config"] = dlg.sas_config
             if not dlg.startup == None:
                 self.l_config["setup_devices"] = dlg.startup
+            if not dlg.ac_driver == None:
+                self.l_config["ac"]["ac_menu_driver"] = dlg.ac_driver
+            if not dlg.scope_driver == None:
+                self.l_config["scope"]["scope_menu_driver"] = dlg.scope_driver
+            if not dlg.sas_driver == None:
+                self.l_config["sas"]["sas_menu_driver"] = dlg.sas_driver
+            if not dlg.rlc_driver == None:
+                self.l_config["rlc"]["rlc_menu_driver"] = dlg.rlc_driver
+        else:
+            sys.exit()
 
     def _on_options_action_restore__triggered(self):
         self.LOG.info("Restore defaults triggered")

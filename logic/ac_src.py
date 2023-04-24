@@ -1,23 +1,18 @@
 from math import sqrt
 from os.path import join
 from enphase_equipment.ac_source.interface import Waveform 
-from enphase_equipment.ac_source.pacific_power_source import PPS_308
-from enphase_equipment.ac_source.ametek import AmetekAsterion
+from logic.equipment_library import import_class_from_string
 import pyvisa as visa
 
 class AC_SRC():
         
-    def __init__(self, resource_name, ac_source="PPS", *args, **kwargs):
-        if ac_source == "PPS":
-            self.__class__ = type(self.__class__.__name__,
-                              (PPS_308, object),
-                              dict(self.__class__.__dict__))
-        elif ac_source == "Ametek":
-            self.__class__ = type(self.__class__.__name__,
-                              (AmetekAsterion, object),
-                              dict(self.__class__.__dict__))
+    def __init__(self, driver_path, address, *args, **kwargs):
+        parent_class = import_class_from_string(driver_path)
+        self.__class__ = type(self.__class__.__name__,
+                            (parent_class, object),
+                            dict(self.__class__.__dict__))
             
-        super(self.__class__, self).__init__(resource_name, *args, **kwargs)
+        super(self.__class__, self).__init__(address, *args, **kwargs)
 
         # pre defined profiles
         self.PROFILES = {

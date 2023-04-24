@@ -136,6 +136,10 @@ class Ui_DevicesDialog(object):
         self.scope_entry_device.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
         self.ac_entry_device.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
         self.rlc_entry_device.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"COM<address>,COM<address>", None))
+        self.ac_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
+        self.scope_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
+        self.rlc_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
+        self.sas_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
         self.device_entry_startup.setText(QCoreApplication.translate("DevicesDialog", u"Show on Startup", None))
     # retranslateUi
 

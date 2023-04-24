@@ -80,16 +80,32 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="ac_menu_driver"/>
+      <widget class="QComboBox" name="ac_menu_driver">
+       <property name="placeholderText">
+        <string>Select Driver</string>
+       </property>
+      </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QComboBox" name="scope_menu_driver"/>
+      <widget class="QComboBox" name="scope_menu_driver">
+       <property name="placeholderText">
+        <string>Select Driver</string>
+       </property>
+      </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QComboBox" name="rlc_menu_driver"/>
+      <widget class="QComboBox" name="rlc_menu_driver">
+       <property name="placeholderText">
+        <string>Select Driver</string>
+       </property>
+      </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QComboBox" name="sas_menu_driver"/>
+      <widget class="QComboBox" name="sas_menu_driver">
+       <property name="placeholderText">
+        <string>Select Driver</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

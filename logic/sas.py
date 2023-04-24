@@ -1,12 +1,14 @@
 import numpy as np
 from enphase_equipment.solar_array_simulator.agilent import AgilentE4360A, AgilentE43XXCluster
+from logic.equipment_library import import_class_from_string
 
 class SAS(AgilentE43XXCluster):
 
-    def __init__(self, addresses, *args, **kwargs):
+    def __init__(self, driver_path, addresses, *args, **kwargs):
         sass = []
         for address in addresses:
-            sass.append(AgilentE4360A(address))
+            parent_class = import_class_from_string(driver_path)
+            sass.append(parent_class(address))
         super().__init__(sass, *args, **kwargs)
         
     def get_sas_pv(self):
