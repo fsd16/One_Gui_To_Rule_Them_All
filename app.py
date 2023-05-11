@@ -431,14 +431,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
             self.LOG.info("Equipment turned off")
 
-            # save config
-            with open("config/local_config.json", "w") as jsonfile:
-                json.dump(self.l_config, jsonfile)
-
-            self.LOG.info("Config saved")
-
         except AttributeError:
             pass
+
+        # save config
+        with open("config/local_config.json", "w") as jsonfile:
+            json.dump(self.l_config, jsonfile)
+
+        self.LOG.info("Config saved")
 
         sys.exit()
 
