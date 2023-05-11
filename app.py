@@ -31,7 +31,6 @@ print(f"Import time: {import_time - start_time}")
 # TODO: Improve handling of pps and ametek
 # TODO: Save and recall scope setups from gui
 # TODO: After autocapture stops, return the scope to the mode it was in before autocapture was started (or just to run mode)
-# TODO: Issue where abnormal waveforms location is hardcoded to a bench
 # TODO: Allow startup with only selected equipment
 # TODO: Add sas cluster support
 
@@ -331,8 +330,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.rlc_entry_reactive_pwr.setValue(0)
             self.rlc_entry_real_pwr.setValue(self.l_config["sas"]["sas_entry_pmp"])
             if RUN_EQUIPMENT:
-                rlc_config = self.rlc.turn_on(self.l_config["rlc"])
-                self.l_config["rlc"].update(rlc_config)
+                self.rlc.turn_on(self.l_config["rlc"])
 
     def force_update_ui(self, config):
         children = []
