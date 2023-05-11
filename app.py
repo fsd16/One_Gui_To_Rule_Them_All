@@ -38,6 +38,18 @@ print(f"Import time: {import_time - start_time}")
 RUN_EQUIPMENT = True
 
 # logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+class Dummy:
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return self
+
+    def __getattr__(self, *args, **kwargs):
+        return self
+
 #--------------------------------------------------------
 #                   Loading Dialog                      #
 #--------------------------------------------------------
@@ -201,33 +213,49 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         loading_dlg.show()
         QApplication.processEvents()
 
-        self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"]["item"], self.l_config["ac"]["ac_entry_address"])
-        self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
-        self.ac_menu_profile.addItems(self.ac_src.PROFILES)
-        self.LOG.info("AC Source configured")
+        if self.l_config["ac"]["ac_menu_driver"]["item"] != None:
+            self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"]["item"], self.l_config["ac"]["ac_entry_address"])
+            self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
+            self.ac_menu_profile.addItems(self.ac_src.PROFILES)
+            self.LOG.info("AC Source configured")
+        else:
+            self.ac_src = Dummy
+            self.LOG.info("AC Source not configured")
         loading_dlg.set_progress(25)
         QApplication.processEvents()
         
-        self.scope = Scope(self.l_config["scope"]["scope_menu_driver"]["item"], self.l_config["scope"]["scope_entry_address"])
-        self.LOG.info("Scope configured")
+        if self.l_config["scope"]["scope_menu_driver"]["item"] != None:
+            self.scope = Scope(self.l_config["scope"]["scope_menu_driver"]["item"], self.l_config["scope"]["scope_entry_address"])
+            self.LOG.info("Scope configured")
+        else:
+            self.scope = Dummy
+            self.LOG.info("Scope not configured")
         loading_dlg.set_progress(50)
         QApplication.processEvents()
 
-        rcc, pcc, *trash = tuple([x.strip() for x in self.l_config["rlc"]["rlc_entry_address"].split(',')])
-        try:
-            self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
-        except SerialException:
-            self.rlc.close()
-            self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
-            
-        self.LOG.info("RLC configured")
+        if self.l_config["rlc"]["rlc_menu_driver"]["item"] != None:
+            rcc, pcc, *trash = tuple([x.strip() for x in self.l_config["rlc"]["rlc_entry_address"].split(',')])
+            try:
+                self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
+            except SerialException:
+                self.rlc.close()
+                self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
+            self.LOG.info("RLC configured")
+        else:
+            self.rlc = Dummy
+            self.LOG.info("RLC not configured") 
+        
         loading_dlg.set_progress(75)
         QApplication.processEvents()
 
-        sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_address"].split(',')]
-        self.sas = SAS(self.l_config["sas"]["sas_menu_driver"]["item"], sas_addresses, self.l_config["sas"]["sas_menu_config"]["item"])
-        self.LOG.info(self.l_config["sas"]["sas_menu_config"])
-        self.LOG.info("SAS configured")
+        if self.l_config["sas"]["sas_menu_driver"]["item"] != None:
+            sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_address"].split(',')]
+            self.sas = SAS(self.l_config["sas"]["sas_menu_driver"]["item"], sas_addresses, self.l_config["sas"]["sas_menu_config"]["item"])
+            self.LOG.info(self.l_config["sas"]["sas_menu_config"])
+            self.LOG.info("SAS configured")
+        else:
+            self.sas = Dummy
+            self.LOG.info("SAS not configured")
         loading_dlg.set_progress(100)
         QApplication.processEvents()
         loading_dlg.close()

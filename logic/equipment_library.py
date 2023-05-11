@@ -3,11 +3,13 @@ import importlib
 class EquipmentDrivers:
     def __init__(self):
         self.AC_SOURCE_DRIVERS = {
+            "None": None,
             "PPS_308": 'enphase_equipment.ac_source.pacific_power_source.PPS_308',
             "AmetekAsterion": 'enphase_equipment.ac_source.ametek.AmetekAsterion'
         }
 
         self.SCOPE_DRIVERS = {
+            "None": None,
             "DSO-X 3034A": 'enphase_equipment.oscilloscope.agilent.AgilentDSOX3034A',
             "DSO-X 3034T": 'enphase_equipment.oscilloscope.agilent.AgilentDSOX3034A',
             "MSO-X 3034A": 'enphase_equipment.oscilloscope.agilent.AgilentMSOX3034A',
@@ -15,10 +17,12 @@ class EquipmentDrivers:
         }
 
         self.RLC_DRIVERS = {
+            "None": None,
             "RLC-700": 'enphase_equipment.rlc_load.enphase_rlc_v2.EnphaseRLCV2'
         }
 
         self.SAS_DRIVERS = {
+            "None": None,
             "E4360A": 'enphase_equipment.solar_array_simulator.agilent.AgilentE4360A'
         }
 
