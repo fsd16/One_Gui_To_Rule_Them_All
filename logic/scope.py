@@ -3,16 +3,21 @@ from time import strftime, localtime, sleep
 from os.path import splitext, exists
 from os import getcwd
 from concurrent import futures
-from enphase_equipment.oscilloscope.agilent import AgilentDSO
+from logic.equipment_library import import_class_from_string
 from threading import Thread
 
 
 thread_pool_executor = futures.ThreadPoolExecutor(max_workers=1)
 
-class Scope(AgilentDSO):
+class Scope():
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, driver_path, *args, **kwargs):
+        parent_class = import_class_from_string(driver_path)
+        self.__class__ = type(self.__class__.__name__,
+                            (parent_class, object),
+                            dict(self.__class__.__dict__))
+            
+        super(self.__class__, self).__init__(*args, **kwargs)
 
         self.auto_cap_run = False
     

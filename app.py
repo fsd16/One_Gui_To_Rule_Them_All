@@ -3,6 +3,8 @@ start_time = time.time()
 
 import sys
 import json
+import logging
+
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QFileDialog, QProgressDialog 
 from PySide6.QtCore import QTimer, Qt
@@ -17,10 +19,10 @@ from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
 from logic.signal import SmartSignal
+from logic.equipment_library import EquipmentDrivers
+from logic.utils import dict_value_to_index, deep_update
 from serial.serialutil import SerialException
 from pyvisa.errors import VisaIOError
-from typing import Dict, Any, TypeVar
-KeyType = TypeVar('KeyType')
 
 import_time = time.time()
 print(f"Import time: {import_time - start_time}")
@@ -34,6 +36,19 @@ print(f"Import time: {import_time - start_time}")
 # TODO: Add sas cluster support
 
 RUN_EQUIPMENT = True
+
+# logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+class Dummy:
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return self
+
+    def __getattr__(self, *args, **kwargs):
+        return self
 
 #--------------------------------------------------------
 #                   Loading Dialog                      #
@@ -52,65 +67,87 @@ class LoadingDialog(QDialog, Ui_LoadingDialog):
 #--------------------------------------------------------
 class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
     def __init__(self, config, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.ac_device = None
-        self.scope_device = None
-        self.rlc_device = None
-        self.sas_device = None
-        self.startup = None
-        self.sas_config = None
+        super().__init__()
+        self.drivers = EquipmentDrivers()
+
+        self.config = config
 
         self.sas_configs = {
             "Series":   "series",
             "Parallel": "parallel"
         }
-        
+
         self.setupUi(self)
+        
+        self.ac_menu_driver.addItems(self.drivers.AC_SOURCE_DRIVERS)
+        self.scope_menu_driver.addItems(self.drivers.SCOPE_DRIVERS)
+        self.rlc_menu_driver.addItems(self.drivers.RLC_DRIVERS)
+        self.sas_menu_driver.addItems(self.drivers.SAS_DRIVERS)
+        
         self.sas_menu_config.addItems(self.sas_configs)
 
-        self.ac_entry_device.setText(config["ac"]["ac_entry_device"])
-        self.scope_entry_device.setText(config["scope"]["scope_entry_device"])
-        self.rlc_entry_device.setText(config["rlc"]["rlc_entry_device"])
-        self.sas_entry_device.setText(config["sas"]["sas_entry_device"])
-        sas_config_index = list(self.sas_configs.values()).index(config["sas"]["sas_menu_config"])
-        self.sas_menu_config.setCurrentIndex(sas_config_index)
+        self.ac_entry_address.setText(config["ac"]["ac_entry_address"])
+        self.scope_entry_address.setText(config["scope"]["scope_entry_address"])
+        self.rlc_entry_address.setText(config["rlc"]["rlc_entry_address"])
+        self.sas_entry_address.setText(config["sas"]["sas_entry_address"])
+
+        self.sas_menu_config.setCurrentIndex(config["sas"]["sas_menu_config"]["index"])
+        self.ac_menu_driver.setCurrentIndex(config["ac"]["ac_menu_driver"]["index"])
+        self.scope_menu_driver.setCurrentIndex(config["scope"]["scope_menu_driver"]["index"])
+        self.rlc_menu_driver.setCurrentIndex(config["rlc"]["rlc_menu_driver"]["index"])
+        self.sas_menu_driver.setCurrentIndex(config["sas"]["sas_menu_driver"]["index"])
+
         self.device_entry_startup.setChecked(config["setup_devices"])
 
         self.auto_connect()
 
-    _dialog_entries = 'ac_entry_device, scope_entry_device, rlc_entry_device, sas_entry_device'
+    _dialog_entries = 'ac_entry_address, scope_entry_address, rlc_entry_address, sas_entry_address'
     def _when_dialog_entries__editingFinished(self):
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.text()
-        
-        if obj_name == "ac_entry_device":
+
+        prefix = obj_name.split('_')[0]
+        self.config[prefix][obj_name] = state
+
+        if obj_name == "ac_entry_address":
             print(f"AC Source: {state}")
-            self.ac_device = state
-        elif obj_name == "scope_entry_device":
+        elif obj_name == "scope_entry_address":
             print(f"Scope: {state}")
-            self.scope_device = state
-        elif obj_name == "rlc_entry_device":
-            print(f"RLCe: {state}")
-            self.rlc_device = state
-        elif obj_name == "sas_entry_device":
+        elif obj_name == "rlc_entry_address":
+            print(f"RLC: {state}")
+        elif obj_name == "sas_entry_address":
             print(f"SAS: {state}")
-            self.sas_device = state
     
-    _dialog_menus = 'sas_menu_config'
+    _dialog_menus = 'sas_menu_config, ac_menu_driver, scope_menu_driver, rlc_menu_driver, sas_menu_driver'
     def _when_dialog_menus__activated(self):
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.currentText()
+        
+        prefix = obj_name.split('_')[0]
+        self.config[prefix][obj_name]["index"] = obj.currentIndex()
 
         if obj_name == "sas_menu_config":
             print(f"SAS config selected: {state}")
-            self.sas_config = self.sas_configs[state]
+            self.config["sas"][obj_name]["item"] = self.sas_configs[state]
+        if obj_name == "ac_menu_driver":
+            print(f"AC source driver selected: {state}")
+            self.config["ac"][obj_name]["item"] = self.drivers.AC_SOURCE_DRIVERS[state]
+        if obj_name == "scope_menu_driver":
+            print(f"Scope driver selected: {state}")
+            self.config["scope"][obj_name]["item"] = self.drivers.SCOPE_DRIVERS[state]
+        if obj_name == "rlc_menu_driver":
+            print(f"RLC source driver selected: {state}")
+            self.config["rlc"][obj_name]["item"] = self.drivers.RLC_DRIVERS[state]
+        if obj_name == "sas_menu_driver":
+            print(f"SAS source driver selected: {state}")
+            self.config["sas"][obj_name]["item"] = self.drivers.SAS_DRIVERS[state]
 
     def _on_device_entry_startup__stateChanged(self):
         state = self.sender().isChecked()
         print (f"Startup behaviour checked: {state}")
-        self.startup = state
+        self.config["setup_devices"] = state
 
 #--------------------------------------------------------
 #                   Main Window                         #
@@ -119,81 +156,120 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
+        self.setup_logging()
+        self.setup_config()
         self.setup_sas_plot()
-
-        self.sas_timer = QTimer()
-        self.sas_timer.setInterval(100)
-        self.sas_timer.timeout.connect(self.sas_update_plot_pv)
+        self.setup_view()
 
         self.error_msg = QErrorMessage()
         self.error_msg.setWindowModality(Qt.ApplicationModal)
 
-        self.load_config()
-
         if self.l_config["setup_devices"]:
-            self._on_main_action_devices__triggered()
+            self._on_options_action_devices__triggered()
 
-        self._on_main_action_connect__triggered()
+        self.setup_equipment_connection()
             
         self.auto_connect()
-
+        
     #--------------------------------------------------------
     #                       Helpers                         #
     #--------------------------------------------------------
-    def deep_update(self, mapping: Dict[KeyType, Any], *updating_mappings: Dict[KeyType, Any]) -> Dict[KeyType, Any]:
-        updated_mapping = mapping.copy()
-        for updating_mapping in updating_mappings:
-            for k, v in updating_mapping.items():
-                if k in updated_mapping and isinstance(updated_mapping[k], dict) and isinstance(v, dict):
-                    updated_mapping[k] = self.deep_update(updated_mapping[k], v)
-                else:
-                    updated_mapping[k] = v
+    def setup_logging(self):
+        # You can format what is printed to text box
+        self.central_textEdit_log.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
+        # self.central_textEdit_log.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        self.LOG = logging.getLogger(__name__)
+        self.LOG.addHandler(self.central_textEdit_log)
+        # You can control the logging level
+        self.LOG.setLevel(logging.INFO)
 
-        return updated_mapping
+    def setup_config(self):
+
+        with open("config/config.json", "r") as jsonfile:
+            self.d_config = json.load(jsonfile)
+
+        try:
+            with open("config/local_config.json", "r") as jsonfile:
+                self.l_config = json.load(jsonfile)
+        except IOError:
+            self.l_config = self.d_config
+        
+        self.l_config = deep_update(self.d_config, self.l_config)
+
+        self.force_update_ui(self.l_config)
+        self.LOG.info("Config loaded")
+
+    def setup_view(self):
+        self.view_action_log.setChecked(self.l_config["view"]["view_action_log"])
+        
+        if not self.l_config["view"]["view_action_log"]:
+            self.central_textEdit_log.hide()
+            self.resize(self.minimumSizeHint())
+            
 
     def setup_equipment(self):
-        if RUN_EQUIPMENT:
-            loading_dlg = LoadingDialog()
-            loading_dlg.set_progress(0)
-            loading_dlg.show()
-            QApplication.processEvents()
+        loading_dlg = LoadingDialog()
+        loading_dlg.set_progress(0)
+        loading_dlg.show()
+        QApplication.processEvents()
 
-            try:
-                self.ac_src = AC_SRC(self.l_config["ac"]["ac_entry_device"], "Ametek")
-            except RuntimeError:
-                self.ac_src = AC_SRC(self.l_config["ac"]["ac_entry_device"], "PPS")
+        if self.l_config["ac"]["ac_menu_driver"]["item"] != None:
+            self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"]["item"], self.l_config["ac"]["ac_entry_address"])
             self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
             self.ac_menu_profile.addItems(self.ac_src.PROFILES)
-            print("AC Source configured")
-            loading_dlg.set_progress(25)
-            QApplication.processEvents()
-            
-            self.scope = Scope(self.l_config["scope"]["scope_entry_device"])
-            print("Scope configured")
-            loading_dlg.set_progress(50)
-            QApplication.processEvents()
+            self.LOG.info("AC Source configured")
+        else:
+            self.ac_src = Dummy
+            self.LOG.info("AC Source not configured")
+        loading_dlg.set_progress(25)
+        QApplication.processEvents()
+        
+        if self.l_config["scope"]["scope_menu_driver"]["item"] != None:
+            self.scope = Scope(self.l_config["scope"]["scope_menu_driver"]["item"], self.l_config["scope"]["scope_entry_address"])
+            self.LOG.info("Scope configured")
+        else:
+            self.scope = Dummy
+            self.LOG.info("Scope not configured")
+        loading_dlg.set_progress(50)
+        QApplication.processEvents()
 
-            rcc, pcc, *trash = tuple([x.strip() for x in self.l_config["rlc"]["rlc_entry_device"].split(',')])
+        if self.l_config["rlc"]["rlc_menu_driver"]["item"] != None:
+            rcc, pcc, *trash = tuple([x.strip() for x in self.l_config["rlc"]["rlc_entry_address"].split(',')])
             try:
-                self.rlc = RLC(relay_controller_comport=rcc,
-                            phase_controller_comport=pcc)
+                self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
             except SerialException:
                 self.rlc.close()
-                self.rlc = RLC(relay_controller_comport=rcc,
-                            phase_controller_comport=pcc)
-                
-            print("RLC configured")
-            loading_dlg.set_progress(75)
-            QApplication.processEvents()
+                self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
+            self.LOG.info("RLC configured")
+        else:
+            self.rlc = Dummy
+            self.LOG.info("RLC not configured") 
+        
+        loading_dlg.set_progress(75)
+        QApplication.processEvents()
 
-            sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_device"].split(',')]
-            self.sas = SAS(sas_addresses, self.l_config["sas"]["sas_menu_config"])
-            print(self.l_config["sas"]["sas_menu_config"])
-            print("SAS configured")
-            loading_dlg.set_progress(100)
-            QApplication.processEvents()
-            loading_dlg.close()
-            print("Equipment setup complete")
+        if self.l_config["sas"]["sas_menu_driver"]["item"] != None:
+            sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_address"].split(',')]
+            self.sas = SAS(self.l_config["sas"]["sas_menu_driver"]["item"], sas_addresses, self.l_config["sas"]["sas_menu_config"]["item"])
+            self.LOG.info(self.l_config["sas"]["sas_menu_config"])
+            self.LOG.info("SAS configured")
+        else:
+            self.sas = Dummy
+            self.LOG.info("SAS not configured")
+        loading_dlg.set_progress(100)
+        QApplication.processEvents()
+        loading_dlg.close()
+        self.LOG.info("Equipment setup complete")
+
+    def setup_equipment_connection(self):
+        self.LOG.info("Equipment connect triggered")
+        try:
+            if RUN_EQUIPMENT:
+                self.setup_equipment()
+        except VisaIOError:
+            self.error_msg.setWindowTitle("Connection failed")
+            self.error_msg.showMessage("Ensure equipment is on and address is correct<br/>Retry connection:<br/>(Options->Reconnect Equipment)")
+            self.error_msg.exec()
 
     def setup_sas_plot(self):
         self.sas_plot.setBackground('w')
@@ -219,6 +295,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         plot.getAxis('left').linkToView(self.left_vb)
         plot.getAxis('right').linkToView(self.right_vb)
 
+        self.sas_timer = QTimer()
+        self.sas_timer.setInterval(100)
+        self.sas_timer.timeout.connect(self.sas_update_plot_pv)
+
     def sas_plot_pvi(self, data):
         current = data["i"]
         voltage = data["v"]
@@ -240,7 +320,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     def sas_update_plot_pv(self):
         power, voltage = self.sas.get_sas_pv()
-        # print(f"Power: {power}, Voltage: {voltage}")
+        # self.LOG.info(f"Power: {power}, Voltage: {voltage}")
         self.pv_point.clear()
         self.pv_point.addPoints(array([voltage]), array([power]), pen='g', symbol='o')
 
@@ -295,58 +375,39 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 wgtobj = getattr(self, name)
                 if hasattr(wgtobj, "setChecked"):
                     wgtobj.setChecked(config[prefix][name])
-    
-    def load_config(self):
-
-        with open("config/config.json", "r") as jsonfile:
-            self.d_config = json.load(jsonfile)
-
-        try:
-            with open("config/local_config.json", "r") as jsonfile:
-                self.l_config = json.load(jsonfile)
-        except IOError:
-            self.l_config = self.d_config
-        
-        self.l_config = self.deep_update(self.d_config, self.l_config)
-
-        self.force_update_ui(self.l_config)
-        print("Config loaded")
 
     #--------------------------------------------------------
     #                       Main Items                      #
     #--------------------------------------------------------
-    def _on_main_action_connect__triggered(self):
-        print("Equipment connect triggered")
-        try:
-            if RUN_EQUIPMENT:
-                self.setup_equipment()
-        except VisaIOError:
-            self.error_msg.setWindowTitle("Connection failed")
-            self.error_msg.showMessage("Ensure equipment is on and address is correct<br/>Retry connection:<br/>(Options->Reconnect Equipment)")
-            self.error_msg.exec()
+    def _on_options_action_connect__triggered(self):
+        self.setup_equipment_connection()
 
-    def _on_main_action_devices__triggered(self):
-        print("Device setup triggered")
+    def _on_options_action_devices__triggered(self):
+        self.LOG.info("Device setup triggered")
         dlg = DevicesDialog(self.l_config)
-        dlg.exec()
+        result = dlg.exec()
 
-        if QDialog.Accepted:
-            if not dlg.ac_device == None:
-                self.l_config["ac"]["ac_entry_device"] = dlg.ac_device
-            if not dlg.scope_device == None:
-                self.l_config["scope"]["scope_entry_device"] = dlg.scope_device
-            if not dlg.rlc_device == None:
-                self.l_config["rlc"]["rlc_entry_device"] = dlg.rlc_device
-            if not dlg.sas_device == None:
-                self.l_config["sas"]["sas_entry_device"] = dlg.sas_device
-            if not dlg.sas_config == None:
-                self.l_config["sas"]["sas_menu_config"] = dlg.sas_config
-            if not dlg.startup == None:
-                self.l_config["setup_devices"] = dlg.startup
+        if result:
+            self.l_config = dlg.config
+        else:
+            sys.exit()
 
-    def _on_main_action_restore__triggered(self):
-        print("Restore defaults triggered")
+    def _on_options_action_restore__triggered(self):
+        self.LOG.info("Restore defaults triggered")
         self.force_update_ui(self.d_config)
+
+    def _on_view_action_log__triggered(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.isChecked()
+
+        self.l_config["view"][obj_name] = state
+
+        if state:
+            self.central_textEdit_log.show()
+        else:
+            self.central_textEdit_log.hide()
+            self.resize(self.minimumSizeHint())
     
     def closeEvent(self, event):
         self._when_closers__clicked()
@@ -358,7 +419,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
     def _when_closers__clicked(self):
-        print("Close clicked")
+        self.LOG.info("Close clicked")
         self.hide()
         try:
             self.ac_src.turn_off()
@@ -368,13 +429,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             # self.rlc.turn_off()
             self.scope.turn_off()
 
-            print("Equipment turned off")
+            self.LOG.info("Equipment turned off")
 
             # save config
             with open("config/local_config.json", "w") as jsonfile:
                 json.dump(self.l_config, jsonfile)
 
-            print("Config saved")
+            self.LOG.info("Config saved")
 
         except AttributeError:
             pass
@@ -390,22 +451,22 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
 
         if obj_name == "ac_butt_apply":
-            print("Apply clicked")
+            self.LOG.info("Apply clicked")
             if RUN_EQUIPMENT:
                 self.ac_src.apply(self.l_config["ac"])
             self.rlc_auto_update_params()
         elif obj_name == "ac_butt_on":
-            print("AC on clicked")
+            self.LOG.info("AC on clicked")
             if RUN_EQUIPMENT:
                 self.ac_src.turn_on()
         elif obj_name == "ac_butt_off":
-            print("AC off clicked")
+            self.LOG.info("AC off clicked")
             if RUN_EQUIPMENT:
                 self.ac_src.turn_off()
         
     def _on_ac_check_abnormal__stateChanged(self):
         state = self.sender().isChecked()
-        print (f"Abnormal checked: {state}")
+        self.LOG.info (f"Abnormal checked: {state}")
         self.l_config["ac"]["ac_check_abnormal"] = state
 
     _ac_entries = 'ac_entry_step_size, ac_entry_freq, ac_entry_ac_volts'
@@ -417,11 +478,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["ac"][obj_name] = state
 
         if obj_name == "ac_entry_step_size":
-            print(f"Step size entered: {state}")
+            self.LOG.info(f"Step size entered: {state}")
         elif obj_name == "ac_entry_freq":
-            print(f"Frequency entered: {state}")
+            self.LOG.info(f"Frequency entered: {state}")
         elif obj_name == "ac_entry_ac_volts":
-            print(f"Ac Volts entered: {state}")
+            self.LOG.info(f"Ac Volts entered: {state}")
 
     _ac_menus = 'ac_menu_abnormal, ac_menu_profile'
     def _when_ac_menus__activated(self):
@@ -432,9 +493,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["ac"][obj_name] = state
 
         if obj_name == "ac_menu_abnormal":
-            print(f"Abnormal waveform selected: {state}")
+            self.LOG.info(f"Abnormal waveform selected: {state}")
         elif obj_name == "ac_menu_profile":
-            print(f"Profile selected: {state}")
+            self.LOG.info(f"Profile selected: {state}")
             if RUN_EQUIPMENT:
                 profile = self.ac_src.PROFILES[state]
             self.ac_entry_ac_volts.setValue(profile[0])
@@ -456,11 +517,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["ac"][obj_name] = state
 
         if obj_name == "ac_radio_single" and state:
-            print("Single selected")
+            self.LOG.info("Single selected")
         elif obj_name == "ac_radio_split" and state:
-            print("Split selected")
+            self.LOG.info("Split selected")
         elif obj_name == "ac_radio_three" and state:
-            print("Three selected")
+            self.LOG.info("Three selected")
 
     #--------------------------------------------------------
     #                       RLC Tab                         #
@@ -471,11 +532,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
 
         if obj_name == "rlc_butt_off":
-            print("RLC off clicked")
+            self.LOG.info("RLC off clicked")
             if RUN_EQUIPMENT:
                 self.rlc.turn_off()
         elif obj_name == "rlc_butt_on":
-            print("RLC on clicked")
+            self.LOG.info("RLC on clicked")
             rlc_config = self.l_config["rlc"]
             try:
                 if RUN_EQUIPMENT:
@@ -502,13 +563,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["rlc"][obj_name] = state
 
         if obj_name == "rlc_entry_ac_volts":
-            print(f"Ac Volts entered: {state}")
+            self.LOG.info(f"Ac Volts entered: {state}")
         elif obj_name == "rlc_entry_freq":
-            print(f"Frequency entered: {state}")
+            self.LOG.info(f"Frequency entered: {state}")
         elif obj_name == "rlc_entry_reactive_pwr":
-            print(f"Reactive power entered: {state}")
+            self.LOG.info(f"Reactive power entered: {state}")
         elif obj_name == "rlc_entry_real_pwr":
-            print(f"Real power entered: {state}")
+            self.LOG.info(f"Real power entered: {state}")
 
     _rlc_checks = 'rlc_check_auto'
     def _when_rlc_checks__stateChanged(self):
@@ -519,7 +580,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["rlc"][obj_name] = state
 
         if obj_name == "rlc_check_auto":
-            print (f"Auto set RLC parameters checked: {state}")
+            self.LOG.info (f"Auto set RLC parameters checked: {state}")
             if state:
                 self.rlc_entry_ac_volts.setValue(self.l_config["ac"]["ac_entry_ac_volts"])
                 self.rlc_entry_freq.setValue(self.l_config["ac"]["ac_entry_freq"])
@@ -574,15 +635,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         state = obj.text()
 
         if obj_name == "sas_butt_off":
-            print("SAS off clicked")
+            self.LOG.info("SAS off clicked")
             if RUN_EQUIPMENT:
                 self.sas.turn_off()
         elif obj_name == "sas_butt_on":
-            print("SAS on clicked")
+            self.LOG.info("SAS on clicked")
             if RUN_EQUIPMENT:
                 self.sas.turn_on()
         elif obj_name == "sas_butt_apply":
-            print("Apply clicked")
+            self.LOG.info("Apply clicked")
             if RUN_EQUIPMENT:
                 sas_data =  self.sas.apply(self.l_config["sas"])
                 self.sas_plot_pvi(sas_data)
@@ -598,13 +659,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["sas"][obj_name] = state
         
         if obj_name == "sas_entry_vmp":
-            print(f"Vmp entered: {state}")
+            self.LOG.info(f"Vmp entered: {state}")
         elif obj_name == "sas_entry_pmp":
-            print(f"Pmp entered: {state}")
+            self.LOG.info(f"Pmp entered: {state}")
         elif obj_name == "sas_entry_ff":
-            print(f"Fill Factor entered: {state}")
+            self.LOG.info(f"Fill Factor entered: {state}")
         elif obj_name == "sas_entry_irrad":
-            print(f"Irradiance entered: {state}")
+            self.LOG.info(f"Irradiance entered: {state}")
 
     #--------------------------------------------------------
     #                       Scope Tab                       #
@@ -615,17 +676,17 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
 
         if obj_name == "scope_butt_cap":
-            print("Capture clicked")
+            self.LOG.info("Capture clicked")
             if RUN_EQUIPMENT:
                 self.scope.capture_display(self.l_config["scope"])
         elif obj_name == "scope_butt_apply":
-            print("Apply labels clicked")
+            self.LOG.info("Apply labels clicked")
             if RUN_EQUIPMENT:
                 self.scope.label(self.l_config["scope"])
         elif obj_name == "scope_butt_browse":
             path = str(QFileDialog.getExistingDirectory())
             self.scope_line_cap_path.setText(path)
-            print(f"Capture path entered: {path}")
+            self.LOG.info(f"Capture path entered: {path}")
             self.l_config["scope"][obj_name] = path
         
     _scope_checks = 'scope_check_auto, scope_check_date, scope_check_invert'
@@ -637,7 +698,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["scope"][obj_name] = state
 
         if obj_name == "scope_check_auto":
-            print (f"Auto capture checked: {state}")
+            self.LOG.info (f"Auto capture checked: {state}")
             if state:
                 if RUN_EQUIPMENT:    
                     self.scope.auto_capture_on(self.l_config["scope"])
@@ -645,9 +706,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 if RUN_EQUIPMENT:
                     self.scope.auto_capture_off()
         elif obj_name == "scope_check_date":
-            print (f"Date checked: {state}")
+            self.LOG.info (f"Date checked: {state}")
         elif obj_name == "scope_check_invert":
-            print (f"Invert checked: {state}")
+            self.LOG.info (f"Invert checked: {state}")
     
     _scope_entries = 'scope_line_cap_name, scope_line_cap_path, scope_line_ch1_lab, scope_line_ch2_lab, scope_line_ch3_lab, scope_line_ch4_lab'
     def _when_scope_entries__editingFinished(self):
@@ -658,17 +719,17 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["scope"][obj_name] = state
 
         if obj_name == "scope_line_cap_name":
-            print(f"Capture name entered: {state}")
+            self.LOG.info(f"Capture name entered: {state}")
         elif obj_name == "scope_line_cap_path":
-            print(f"Capture path entered: {state}")
+            self.LOG.info(f"Capture path entered: {state}")
         elif obj_name == "scope_line_ch1_lab":
-            print(f"CH1 label entered: {state}")
+            self.LOG.info(f"CH1 label entered: {state}")
         elif obj_name == "scope_line_ch2_lab":
-            print(f"CH2 label entered: {state}")
+            self.LOG.info(f"CH2 label entered: {state}")
         elif obj_name == "scope_line_ch3_lab":
-            print(f"CH3 label entered: {state}")
+            self.LOG.info(f"CH3 label entered: {state}")
         elif obj_name == "scope_line_ch4_lab":
-            print(f"CH4 label entered: {state}")
+            self.LOG.info(f"CH4 label entered: {state}")
 
 def main():
     app = QApplication(sys.argv)
