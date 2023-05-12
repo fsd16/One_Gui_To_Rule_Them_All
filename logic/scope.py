@@ -20,6 +20,7 @@ class Scope():
         super(self.__class__, self).__init__(*args, **kwargs)
 
         self.auto_cap_run = False
+        # self.scope_run_state = "Run"
     
     # Ensure file name is unique
     def uniquify(self, filepath):
@@ -79,10 +80,14 @@ class Scope():
         auto_capture_thread = Thread(target=self.auto_capture, args=[sas_config])
         auto_capture_thread.start()
         self.auto_cap_run = True
+        # self.scope_run_state = self.ask(":RSTate?")
+        # print(self.scope_run_state)
         print("Auto capture started")
 
     def auto_capture_off(self):
         self.auto_cap_run = False
+        # print(f":{self.scope_run_state}")
+        # self.write(f":{self.scope_run_state}")
         print("Auto capture stopped")
         
     # callback to clean up and exit, used by the Close button
