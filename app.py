@@ -329,8 +329,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.rlc_entry_reactive_pwr.setValue(0)
             self.rlc_entry_real_pwr.setValue(self.l_config["sas"]["sas_entry_pmp"])
             if RUN_EQUIPMENT:
-                rlc_config = self.rlc.turn_on(self.l_config["rlc"])
-                self.l_config["rlc"].update(rlc_config)
+                self.rlc.turn_on(self.l_config["rlc"])
 
     def force_update_ui(self, config):
         children = []

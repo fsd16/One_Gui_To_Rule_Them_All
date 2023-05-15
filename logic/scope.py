@@ -1,10 +1,10 @@
 from pathlib import Path
 from time import strftime, localtime, sleep
-from os.path import splitext, exists
 from os import getcwd
 from concurrent import futures
 from logic.equipment_library import import_class_from_string
 from threading import Thread
+from logic.utils import uniquify
 
 
 thread_pool_executor = futures.ThreadPoolExecutor(max_workers=1)
@@ -27,11 +27,8 @@ class Scope():
         filename, extension = splitext(filepath)
         counter = 1
 
-        while exists(filepath):
-            filepath = filename + " (" + str(counter) + ")" + extension
-            counter += 1
-
-        return filepath
+    def interface_type(self):
+        return self.resource_name.partition(':')[0][:-1]
         
     # callback to take the scope capture
     def capture_display(self, sas_config):
@@ -52,10 +49,15 @@ class Scope():
         if Path(capture_name_str).suffix != '.png':
             capture_name_str = capture_name_str + '.png'
 
-        capture_path = self.uniquify(capture_folder / (date_prefix + capture_name_str))
-        self.capture(capture_path, invert_graticule=sas_config["scope_check_invert"])
+        filename = uniquify(capture_folder / (date_prefix + capture_name_str))
+
+        if self.interface_type() == 'USB':
+            fileformat = 'BMP8bit'
+        else:
+            fileformat = 'PNG'
+        self.capture(filename, invert_graticule=sas_config["scope_check_invert"], fileformat=fileformat)
         
-        print(f"Scope display captured to: {capture_path}")
+        print(f"Scope display captured to: {filename}")
 
     # callback to apply the labels
     def label(self, sas_config):
