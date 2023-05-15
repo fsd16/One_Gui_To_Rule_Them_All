@@ -28,11 +28,9 @@ import_time = time.time()
 print(f"Import time: {import_time - start_time}")
 
 # TODO: Auto import station
-# TODO: Improve handling of pps and ametek
 # TODO: Save and recall scope setups from gui
 # TODO: After autocapture stops, return the scope to the mode it was in before autocapture was started (or just to run mode)
-# TODO: Allow startup with only selected equipment
-# TODO: Add sas cluster support
+# TODO: Some serious commenting is needed
 
 RUN_EQUIPMENT = True
 
@@ -218,7 +216,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.ac_menu_profile.addItems(self.ac_src.PROFILES)
             self.LOG.info("AC Source configured")
         else:
-            self.ac_src = Dummy
+            self.ac_tab.setDisabled(True)
             self.LOG.info("AC Source not configured")
         loading_dlg.set_progress(25)
         QApplication.processEvents()
@@ -227,7 +225,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.scope = Scope(self.l_config["scope"]["scope_menu_driver"]["item"], self.l_config["scope"]["scope_entry_address"])
             self.LOG.info("Scope configured")
         else:
-            self.scope = Dummy
+            self.scope_tab.setDisabled(True)
             self.LOG.info("Scope not configured")
         loading_dlg.set_progress(50)
         QApplication.processEvents()
@@ -241,7 +239,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
             self.LOG.info("RLC configured")
         else:
-            self.rlc = Dummy
+            self.rlc_tab.setDisabled(True)
             self.LOG.info("RLC not configured") 
         
         loading_dlg.set_progress(75)
@@ -253,8 +251,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.LOG.info(self.l_config["sas"]["sas_menu_config"])
             self.LOG.info("SAS configured")
         else:
-            self.sas = Dummy
+            self.sas_tab.setDisabled(True)
             self.LOG.info("SAS not configured")
+
         loading_dlg.set_progress(100)
         QApplication.processEvents()
         loading_dlg.close()
@@ -422,21 +421,31 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         try:
             self.ac_src.turn_off()
             self.ac_src.return_manual()
+        except AttributeError:
+            pass
+        try:  
             self.sas.turn_off()
+        except AttributeError:
+            pass
+        try:
             self.rlc.close()
             # self.rlc.turn_off()
+        except AttributeError:
+            pass
+        try:
             self.scope.turn_off()
+        except AttributeError:
+            pass
 
             self.LOG.info("Equipment turned off")
 
-            # save config
-            with open("config/local_config.json", "w") as jsonfile:
-                json.dump(self.l_config, jsonfile)
+       
 
-            self.LOG.info("Config saved")
+        # save config
+        with open("config/local_config.json", "w") as jsonfile:
+            json.dump(self.l_config, jsonfile)
 
-        except AttributeError:
-            pass
+        self.LOG.info("Config saved")
 
         sys.exit()
 

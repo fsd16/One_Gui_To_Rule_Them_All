@@ -1,4 +1,6 @@
 from typing import Dict, Any, TypeVar
+from os.path import splitext, exists
+
 KeyType = TypeVar('KeyType')
 
 def dict_value_to_index(dict, value):
@@ -15,3 +17,14 @@ def deep_update(mapping: Dict[KeyType, Any], *updating_mappings: Dict[KeyType, A
                     updated_mapping[k] = v
 
         return updated_mapping
+
+# Ensure file name is unique
+def uniquify(filepath):
+    filename, extension = splitext(filepath)
+    counter = 1
+
+    while exists(filepath):
+        filepath = filename + " (" + str(counter) + ")" + extension
+        counter += 1
+
+    return filepath
