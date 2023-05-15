@@ -21,11 +21,6 @@ class Scope():
 
         self.auto_cap_run = False
         # self.scope_run_state = "Run"
-    
-    # Ensure file name is unique
-    def uniquify(self, filepath):
-        filename, extension = splitext(filepath)
-        counter = 1
 
     def interface_type(self):
         return self.resource_name.partition(':')[0][:-1]
