@@ -1,6 +1,4 @@
 # One-Gui-To-Rule-Them-All
-Package Requirements:
+To install dependecies:
 
--PySide6==6.4.3
-
--pyqtgraph
+    pip install -r requirements.txt
