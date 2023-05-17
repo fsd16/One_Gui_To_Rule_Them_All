@@ -11,9 +11,9 @@ from PySide6.QtCore import QTimer, Qt
 from pyqtgraph import ViewBox, PlotCurveItem, ScatterPlotItem
 from numpy import array
 
-from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
-from ui.ui_Devices_Dialog import Ui_DevicesDialog
-from ui.ui_Loading_Dialog import Ui_LoadingDialog
+from ui.One_GUI_To_Rule_Them_All_ui import Ui_MainWindow
+from ui.Devices_Dialog_ui import Ui_DevicesDialog
+from ui.Loading_Dialog_ui import Ui_LoadingDialog
 from logic.ac_src import AC_SRC
 from logic.scope import Scope
 from logic.rlc import RLC
