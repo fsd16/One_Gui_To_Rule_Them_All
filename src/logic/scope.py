@@ -6,7 +6,6 @@ from logic.equipment_library import import_class_from_string
 from threading import Thread
 from logic.utils import uniquify
 
-
 thread_pool_executor = futures.ThreadPoolExecutor(max_workers=1)
 
 class Scope():

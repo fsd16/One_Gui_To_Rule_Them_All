@@ -23,6 +23,7 @@ from logic.equipment_library import EquipmentDrivers
 from logic.utils import dict_value_to_index, deep_update
 from serial.serialutil import SerialException
 from pyvisa.errors import VisaIOError
+from os.path import dirname, abspath
 
 import_time = time.time()
 print(f"Import time: {import_time - start_time}")
@@ -181,12 +182,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.LOG.setLevel(logging.INFO)
 
     def setup_config(self):
-
-        with open("config/config.json", "r") as jsonfile:
+        dir_path = dirname(abspath(__file__))
+        with open(f"{dir_path}/config/config.json", "r") as jsonfile:
             self.d_config = json.load(jsonfile)
 
         try:
-            with open("config/local_config.json", "r") as jsonfile:
+            with open(f"{dir_path}/config/local_config.json", "r") as jsonfile:
                 self.l_config = json.load(jsonfile)
         except IOError:
             self.l_config = self.d_config
@@ -439,10 +440,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
             self.LOG.info("Equipment turned off")
 
-       
-
         # save config
-        with open("config/local_config.json", "w") as jsonfile:
+        dir_path = dirname(abspath(__file__))
+        with open(f"{dir_path}/config/local_config.json", "w") as jsonfile:
             json.dump(self.l_config, jsonfile)
 
         self.LOG.info("Config saved")
