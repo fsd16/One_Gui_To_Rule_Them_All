@@ -27,10 +27,7 @@ class AC_SRC():
 
         files = sorted(list(self.base_path.glob('*.wfd')) + list(self.base_path.glob('*.csv')))
         
-        self.AB_WAVEFORMS = dict()
-        
-        for item in files:
-            self.AB_WAVEFORMS.update({item.stem: str(item)})
+        self.AB_WAVEFORMS = {wf.stem: Waveform.create_waveform_from_file(wf) for wf in files}
 
         self.rm = visa.ResourceManager()
         self.vl = self.rm.visalib
@@ -63,9 +60,7 @@ class AC_SRC():
 
         if ac_config["ac_check_abnormal"]:
             choice = ac_config["ac_menu_abnormal"]
-            filepath = self.base_path.joinpath(self.AB_WAVEFORMS[choice])
-            continuous_waveform = Waveform.create_waveform_from_file(str(filepath))
-            self.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq, waveform=continuous_waveform)
+            self.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq, waveform=self.AB_WAVEFORMS[choice])
             print(f"AC parameters applied: Voltages = {ac_voltage_tuple}, Frequency = {ac_freq}, Waveform = {choice}")
         else:
             self.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq)
