@@ -1,5 +1,6 @@
 from math import sqrt
 from os.path import join
+from pathlib import Path
 from enphase_equipment.ac_source.interface import Waveform 
 from logic.equipment_library import import_class_from_string
 import pyvisa as visa
@@ -22,26 +23,14 @@ class AC_SRC():
             "230v, 50hz, Single Phase (INT)": (230, 50, "single"),  # Rest of world (INT)
             "208V, 60hz, Three Phase ":       (208, 60, "three"), # North American Comercial (NA)
         }
-        self.base_path = 'C:/Python37/workspace/hw_testcases/src/hw_testcases/abnormal_waveform_test/waveforms'
+        self.base_path = Path('C:/Python37/workspace/hw_testcases/src/hw_testcases/abnormal_waveform_test/waveforms')
 
-        self.AB_WAVEFORMS = {
-            "IEC 77A Class 1":                             ('IEC_77A_Class_1.wfd'),
-            "IEC 77A Class 2":                             ('IEC_77A_Class_2.wfd'),
-            "_208_120 NastyCurrentSpiker":                 ('_208_120_NastyCurrentSpiker.wfd'),
-            "Clip 12% THD":                                ('Clip_12%_THD.wfd'),
-            "MINV17":                                      ('MINV17.wfd'),
-            "MINV18":                                      ('MINV18.wfd'),
-            "Giles 5 19 17":                               ('Giles_5_19_17.wfd'),
-            "InductiveCurrent":                            ('InductiveCurrent.wfd'),
-            "InductiveCurrent WaHoC":   ('InductiveCurrent_With_A_HintOfCapacitance.wfd'),
-            "LangLake Zero Cross Distortion":              ('LangLake_Zero_Cross_Distortion.wfd'),
-            "NastyCurrentSpiker":                          ('NastyCurrentSpiker.wfd'),
-            "Poleshek":                                    ('Poleshek.wfd'),
-            "TWACS VL1Na":                                 ('TWACS_VL1Na.wfd'),
-            "Triangle":                                    ('Triangle.wfd'),
-            "ross vL1n":                                   ('ross_vL1n.wfd'),
-            "Amanda Welz Florida":                         ('Amanda_Welz_Florida.wfd'),
-        }
+        files = sorted(list(self.base_path.glob('*.wfd')) + list(self.base_path.glob('*.csv')))
+        
+        self.AB_WAVEFORMS = dict()
+        
+        for item in files:
+            self.AB_WAVEFORMS.update({item.stem: str(item)})
 
         self.rm = visa.ResourceManager()
         self.vl = self.rm.visalib
@@ -74,8 +63,8 @@ class AC_SRC():
 
         if ac_config["ac_check_abnormal"]:
             choice = ac_config["ac_menu_abnormal"]
-            filepath = join(self.base_path, (self.AB_WAVEFORMS[choice]))
-            continuous_waveform = Waveform.create_waveform_from_file(filepath)
+            filepath = self.base_path.joinpath(self.AB_WAVEFORMS[choice])
+            continuous_waveform = Waveform.create_waveform_from_file(str(filepath))
             self.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq, waveform=continuous_waveform)
             print(f"AC parameters applied: Voltages = {ac_voltage_tuple}, Frequency = {ac_freq}, Waveform = {choice}")
         else:

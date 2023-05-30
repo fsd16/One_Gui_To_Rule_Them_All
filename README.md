@@ -1,4 +1,8 @@
 # One-Gui-To-Rule-Them-All
-To install dependecies:
+Install dependecies:
 
     pip install -r requirements.txt
+
+Run app.py
+
+    python src/app.py
