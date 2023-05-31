@@ -26,6 +26,13 @@ class EquipmentDrivers:
             "E4360A": 'enphase_equipment.solar_array_simulator.agilent.AgilentE4360A'
         }
 
+        self.CHAMBER_DRIVERS = {
+            "None": None,
+            "WatlowF4": 'enphase_equipment.thermal_chamber.watlow.WatlowF4',
+            "Espec": 'enphase_equipment.thermal_chamber.espec.Espec',
+            "Thermotron": 'enphase_equipment.thermal_chamber.thermotron_v2.Thermotron',
+        }
+
 def import_class_from_string(path):
     '''Takes `path`, a string, and returns a class.'''
     module = '.'.join(path.split('.')[:-1])
