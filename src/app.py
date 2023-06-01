@@ -90,7 +90,7 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         self.rlc_entry_address_r.setText(config["rlc"]["rlc_entry_address_r"])
         self.rlc_entry_address_p.setText(config["rlc"]["rlc_entry_address_p"])
         self.sas_entry_address.setText(config["sas"]["sas_entry_address"])
-        self.sas_entry_address.setText(config["chamber"]["chamber_entry_address"])
+        self.chamber_entry_address.setText(config["chamber"]["chamber_entry_address"])
 
         self.sas_menu_config.setCurrentIndex(config["sas"]["sas_menu_config"]["index"])
         self.ac_menu_driver.setCurrentIndex(config["ac"]["ac_menu_driver"]["index"])
