@@ -24,7 +24,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="sas_tab">
        <attribute name="title">
@@ -883,37 +883,29 @@
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="1" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
-           <widget class="QLabel" name="label_11">
+          <item row="3" column="0" colspan="2" alignment="Qt::AlignHCenter">
+           <widget class="QPushButton" name="rlc_butt_on">
             <property name="minimumSize">
              <size>
-              <width>100</width>
+              <width>80</width>
               <height>0</height>
              </size>
             </property>
-            <property name="text">
-             <string>AC Voltage
-(Vrms)</string>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
+            <property name="text">
+             <string>RLC on</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="3" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
-           <widget class="QLabel" name="label_12">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
+          <item row="0" column="4" colspan="2" alignment="Qt::AlignRight">
+           <widget class="QCheckBox" name="rlc_check_auto">
             <property name="text">
-             <string>Real Power
-(W)</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <string>Auto set RLC parameters</string>
             </property>
            </widget>
           </item>
@@ -949,16 +941,56 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="5" alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QSpinBox" name="rlc_entry_reactive_pwr">
+          <item row="3" column="4" colspan="2" alignment="Qt::AlignHCenter">
+           <widget class="QPushButton" name="rlc_butt_close">
             <property name="minimumSize">
              <size>
-              <width>50</width>
+              <width>80</width>
               <height>0</height>
              </size>
             </property>
-            <property name="maximum">
-             <number>999</number>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Close</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QLabel" name="label_11">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>AC Voltage
+(Vrms)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignBottom">
+           <widget class="QLabel" name="label_12">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Real Power
+(W)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -979,22 +1011,48 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="4" colspan="2" alignment="Qt::AlignHCenter">
-           <widget class="QPushButton" name="rlc_butt_close">
+          <item row="2" column="1" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QSpinBox" name="rlc_entry_ac_volts">
             <property name="minimumSize">
              <size>
-              <width>80</width>
+              <width>50</width>
               <height>0</height>
              </size>
             </property>
-            <property name="maximumSize">
+            <property name="maximum">
+             <number>999</number>
+            </property>
+            <property name="value">
+             <number>240</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QSpinBox" name="rlc_entry_freq">
+            <property name="minimumSize">
              <size>
-              <width>80</width>
-              <height>16777215</height>
+              <width>50</width>
+              <height>0</height>
              </size>
             </property>
-            <property name="text">
-             <string>Close</string>
+            <property name="maximum">
+             <number>999</number>
+            </property>
+            <property name="value">
+             <number>60</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="5" alignment="Qt::AlignHCenter|Qt::AlignTop">
+           <widget class="QSpinBox" name="rlc_entry_reactive_pwr">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximum">
+             <number>999</number>
             </property>
            </widget>
           </item>
@@ -1015,40 +1073,19 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0" alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QSpinBox" name="rlc_entry_freq">
-            <property name="minimumSize">
-             <size>
-              <width>50</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximum">
-             <number>999</number>
-            </property>
-            <property name="value">
-             <number>60</number>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignTop">
-           <widget class="QSpinBox" name="rlc_entry_ac_volts">
-            <property name="minimumSize">
-             <size>
-              <width>50</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximum">
-             <number>999</number>
-            </property>
-            <property name="value">
-             <number>240</number>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="2" alignment="Qt::AlignHCenter">
-           <widget class="QPushButton" name="rlc_butt_on">
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="chamber_tab">
+       <attribute name="title">
+        <string>Chamber</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_11">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout_10">
+          <item row="2" column="3" colspan="2" alignment="Qt::AlignHCenter">
+           <widget class="QPushButton" name="chamber_butt_close">
             <property name="minimumSize">
              <size>
               <width>80</width>
@@ -1062,14 +1099,65 @@
              </size>
             </property>
             <property name="text">
-             <string>RLC on</string>
+             <string>Close</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="4" colspan="2" alignment="Qt::AlignRight">
-           <widget class="QCheckBox" name="rlc_check_auto">
+          <item row="0" column="2" alignment="Qt::AlignBottom">
+           <widget class="QLabel" name="label_19">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Auto set RLC parameters</string>
+             <string>Temperature
+(degC)</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+           <widget class="QPushButton" name="chamber_butt_apply">
+            <property name="minimumSize">
+             <size>
+              <width>80</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>80</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Apply</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" alignment="Qt::AlignTop">
+           <widget class="QDoubleSpinBox" name="chamber_entry_temp">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>-100.000000000000000</double>
             </property>
            </widget>
           </item>

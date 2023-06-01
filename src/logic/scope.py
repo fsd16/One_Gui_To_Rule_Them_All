@@ -1,6 +1,5 @@
 from pathlib import Path
 from time import strftime, localtime, sleep
-from os import getcwd
 from concurrent import futures
 from logic.equipment_library import import_class_from_string
 from threading import Thread
@@ -29,7 +28,7 @@ class Scope():
         capture_folder = Path(sas_config["scope_line_cap_path"])
 
         if capture_folder == Path(""):
-            capture_folder = getcwd() / Path("captures")
+            capture_folder = Path.cwd().joinpath('captures')
         
         if not Path(capture_folder).exists():
             Path(capture_folder).mkdir(parents=True)

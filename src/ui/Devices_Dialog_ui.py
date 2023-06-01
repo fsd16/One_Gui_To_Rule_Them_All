@@ -28,70 +28,90 @@ class Ui_DevicesDialog(object):
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
-        self.sas_entry_address = QLineEdit(DevicesDialog)
-        self.sas_entry_address.setObjectName(u"sas_entry_address")
-
-        self.gridLayout.addWidget(self.sas_entry_address, 3, 2, 1, 1)
-
-        self.label = QLabel(DevicesDialog)
-        self.label.setObjectName(u"label")
-
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-
-        self.label_3 = QLabel(DevicesDialog)
-        self.label_3.setObjectName(u"label_3")
-
-        self.gridLayout.addWidget(self.label_3, 2, 0, 1, 1)
-
         self.label_2 = QLabel(DevicesDialog)
         self.label_2.setObjectName(u"label_2")
 
         self.gridLayout.addWidget(self.label_2, 1, 0, 1, 1)
-
-        self.label_4 = QLabel(DevicesDialog)
-        self.label_4.setObjectName(u"label_4")
-
-        self.gridLayout.addWidget(self.label_4, 3, 0, 1, 1)
-
-        self.sas_menu_config = QComboBox(DevicesDialog)
-        self.sas_menu_config.setObjectName(u"sas_menu_config")
-
-        self.gridLayout.addWidget(self.sas_menu_config, 4, 2, 1, 1)
-
-        self.scope_entry_address = QLineEdit(DevicesDialog)
-        self.scope_entry_address.setObjectName(u"scope_entry_address")
-
-        self.gridLayout.addWidget(self.scope_entry_address, 1, 2, 1, 1)
 
         self.ac_entry_address = QLineEdit(DevicesDialog)
         self.ac_entry_address.setObjectName(u"ac_entry_address")
 
         self.gridLayout.addWidget(self.ac_entry_address, 0, 2, 1, 1)
 
-        self.rlc_entry_address = QLineEdit(DevicesDialog)
-        self.rlc_entry_address.setObjectName(u"rlc_entry_address")
+        self.label = QLabel(DevicesDialog)
+        self.label.setObjectName(u"label")
 
-        self.gridLayout.addWidget(self.rlc_entry_address, 2, 2, 1, 1)
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+
+        self.chamber_menu_driver = QComboBox(DevicesDialog)
+        self.chamber_menu_driver.setObjectName(u"chamber_menu_driver")
+
+        self.gridLayout.addWidget(self.chamber_menu_driver, 7, 1, 1, 1)
+
+        self.rlc_entry_address_r = QLineEdit(DevicesDialog)
+        self.rlc_entry_address_r.setObjectName(u"rlc_entry_address_r")
+
+        self.gridLayout.addWidget(self.rlc_entry_address_r, 2, 2, 1, 1)
+
+        self.scope_entry_address = QLineEdit(DevicesDialog)
+        self.scope_entry_address.setObjectName(u"scope_entry_address")
+
+        self.gridLayout.addWidget(self.scope_entry_address, 1, 2, 1, 1)
+
+        self.chamber_entry_address = QLineEdit(DevicesDialog)
+        self.chamber_entry_address.setObjectName(u"chamber_entry_address")
+
+        self.gridLayout.addWidget(self.chamber_entry_address, 7, 2, 1, 1)
+
+        self.sas_entry_address = QLineEdit(DevicesDialog)
+        self.sas_entry_address.setObjectName(u"sas_entry_address")
+
+        self.gridLayout.addWidget(self.sas_entry_address, 4, 2, 1, 1)
 
         self.ac_menu_driver = QComboBox(DevicesDialog)
         self.ac_menu_driver.setObjectName(u"ac_menu_driver")
 
         self.gridLayout.addWidget(self.ac_menu_driver, 0, 1, 1, 1)
 
+        self.sas_menu_config = QComboBox(DevicesDialog)
+        self.sas_menu_config.setObjectName(u"sas_menu_config")
+
+        self.gridLayout.addWidget(self.sas_menu_config, 5, 2, 1, 1)
+
+        self.label_5 = QLabel(DevicesDialog)
+        self.label_5.setObjectName(u"label_5")
+
+        self.gridLayout.addWidget(self.label_5, 7, 0, 1, 1)
+
         self.scope_menu_driver = QComboBox(DevicesDialog)
         self.scope_menu_driver.setObjectName(u"scope_menu_driver")
 
         self.gridLayout.addWidget(self.scope_menu_driver, 1, 1, 1, 1)
+
+        self.rlc_entry_address_p = QLineEdit(DevicesDialog)
+        self.rlc_entry_address_p.setObjectName(u"rlc_entry_address_p")
+
+        self.gridLayout.addWidget(self.rlc_entry_address_p, 3, 2, 1, 1)
 
         self.rlc_menu_driver = QComboBox(DevicesDialog)
         self.rlc_menu_driver.setObjectName(u"rlc_menu_driver")
 
         self.gridLayout.addWidget(self.rlc_menu_driver, 2, 1, 1, 1)
 
+        self.label_3 = QLabel(DevicesDialog)
+        self.label_3.setObjectName(u"label_3")
+
+        self.gridLayout.addWidget(self.label_3, 2, 0, 1, 1)
+
         self.sas_menu_driver = QComboBox(DevicesDialog)
         self.sas_menu_driver.setObjectName(u"sas_menu_driver")
 
-        self.gridLayout.addWidget(self.sas_menu_driver, 3, 1, 1, 1)
+        self.gridLayout.addWidget(self.sas_menu_driver, 4, 1, 1, 1)
+
+        self.label_4 = QLabel(DevicesDialog)
+        self.label_4.setObjectName(u"label_4")
+
+        self.gridLayout.addWidget(self.label_4, 4, 0, 1, 1)
 
 
         self.gridLayout_2.addLayout(self.gridLayout, 1, 1, 1, 1)
@@ -127,19 +147,23 @@ class Ui_DevicesDialog(object):
 
     def retranslateUi(self, DevicesDialog):
         DevicesDialog.setWindowTitle(QCoreApplication.translate("DevicesDialog", u"Device Connection", None))
-        self.sas_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
-        self.label.setText(QCoreApplication.translate("DevicesDialog", u"AC Source", None))
-        self.label_3.setText(QCoreApplication.translate("DevicesDialog", u"RLC Load", None))
         self.label_2.setText(QCoreApplication.translate("DevicesDialog", u"Scope", None))
-        self.label_4.setText(QCoreApplication.translate("DevicesDialog", u"SAS", None))
-        self.sas_menu_config.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Cluster Config", None))
-        self.scope_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
         self.ac_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
-        self.rlc_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"COM<address>,COM<address>", None))
+        self.label.setText(QCoreApplication.translate("DevicesDialog", u"AC Source", None))
+        self.chamber_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
+        self.rlc_entry_address_r.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"COM<address> (rcc)", None))
+        self.scope_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
+        self.chamber_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"COM<address>", None))
+        self.sas_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
         self.ac_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
+        self.sas_menu_config.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Cluster Config", None))
+        self.label_5.setText(QCoreApplication.translate("DevicesDialog", u"Chamber", None))
         self.scope_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
+        self.rlc_entry_address_p.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"COM<address> (pcc)", None))
         self.rlc_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
+        self.label_3.setText(QCoreApplication.translate("DevicesDialog", u"RLC Load", None))
         self.sas_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
+        self.label_4.setText(QCoreApplication.translate("DevicesDialog", u"SAS", None))
         self.device_entry_startup.setText(QCoreApplication.translate("DevicesDialog", u"Show on Startup", None))
     # retranslateUi
 

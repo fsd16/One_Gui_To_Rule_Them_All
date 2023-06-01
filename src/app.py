@@ -4,6 +4,7 @@ start_time = time.time()
 import sys
 import json
 import logging
+import re
 
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QFileDialog, QProgressDialog 
@@ -11,19 +12,20 @@ from PySide6.QtCore import QTimer, Qt
 from pyqtgraph import ViewBox, PlotCurveItem, ScatterPlotItem
 from numpy import array
 
-from ui.ui_One_Gui_To_Rule_Them_All import Ui_MainWindow
-from ui.ui_Devices_Dialog import Ui_DevicesDialog
-from ui.ui_Loading_Dialog import Ui_LoadingDialog
+from ui.One_GUI_To_Rule_Them_All_ui import Ui_MainWindow
+from ui.Devices_Dialog_ui import Ui_DevicesDialog
+from ui.Loading_Dialog_ui import Ui_LoadingDialog
 from logic.ac_src import AC_SRC
 from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
+from logic.chamber import Chamber
 from logic.signal import SmartSignal
 from logic.equipment_library import EquipmentDrivers
 from logic.utils import dict_value_to_index, deep_update
 from serial.serialutil import SerialException
 from pyvisa.errors import VisaIOError
-from os.path import dirname, abspath
+from pathlib import Path
 
 import_time = time.time()
 print(f"Import time: {import_time - start_time}")
@@ -81,25 +83,29 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         self.scope_menu_driver.addItems(self.drivers.SCOPE_DRIVERS)
         self.rlc_menu_driver.addItems(self.drivers.RLC_DRIVERS)
         self.sas_menu_driver.addItems(self.drivers.SAS_DRIVERS)
+        self.chamber_menu_driver.addItems(self.drivers.CHAMBER_DRIVERS)
         
         self.sas_menu_config.addItems(self.sas_configs)
 
         self.ac_entry_address.setText(config["ac"]["ac_entry_address"])
         self.scope_entry_address.setText(config["scope"]["scope_entry_address"])
-        self.rlc_entry_address.setText(config["rlc"]["rlc_entry_address"])
+        self.rlc_entry_address_r.setText(config["rlc"]["rlc_entry_address_r"])
+        self.rlc_entry_address_p.setText(config["rlc"]["rlc_entry_address_p"])
         self.sas_entry_address.setText(config["sas"]["sas_entry_address"])
+        self.chamber_entry_address.setText(config["chamber"]["chamber_entry_address"])
 
         self.sas_menu_config.setCurrentIndex(config["sas"]["sas_menu_config"]["index"])
         self.ac_menu_driver.setCurrentIndex(config["ac"]["ac_menu_driver"]["index"])
         self.scope_menu_driver.setCurrentIndex(config["scope"]["scope_menu_driver"]["index"])
         self.rlc_menu_driver.setCurrentIndex(config["rlc"]["rlc_menu_driver"]["index"])
         self.sas_menu_driver.setCurrentIndex(config["sas"]["sas_menu_driver"]["index"])
+        self.chamber_menu_driver.setCurrentIndex(config["chamber"]["chamber_menu_driver"]["index"])
 
         self.device_entry_startup.setChecked(config["setup_devices"])
 
         self.auto_connect()
 
-    _dialog_entries = 'ac_entry_address, scope_entry_address, rlc_entry_address, sas_entry_address'
+    _dialog_entries = 'ac_entry_address, scope_entry_address, rlc_entry_address_r, rlc_entry_address_p sas_entry_address, chamber_entry_address'
     def _when_dialog_entries__editingFinished(self):
         obj = self.sender()
         obj_name = obj.objectName()
@@ -112,12 +118,16 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
             print(f"AC Source: {state}")
         elif obj_name == "scope_entry_address":
             print(f"Scope: {state}")
-        elif obj_name == "rlc_entry_address":
-            print(f"RLC: {state}")
+        elif obj_name == "rlc_entry_address_r":
+            print(f"RLC rcc: {state}")
+        elif obj_name == "rlc_entry_address_p":
+            print(f"RLC pcc: {state}")
         elif obj_name == "sas_entry_address":
             print(f"SAS: {state}")
+        elif obj_name == "chamber_entry_address":
+            print(f"Chamber: {state}")
     
-    _dialog_menus = 'sas_menu_config, ac_menu_driver, scope_menu_driver, rlc_menu_driver, sas_menu_driver'
+    _dialog_menus = 'sas_menu_config, ac_menu_driver, scope_menu_driver, rlc_menu_driver, sas_menu_driver, chamber_menu_driver'
     def _when_dialog_menus__activated(self):
         obj = self.sender()
         obj_name = obj.objectName()
@@ -129,18 +139,21 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         if obj_name == "sas_menu_config":
             print(f"SAS config selected: {state}")
             self.config["sas"][obj_name]["item"] = self.sas_configs[state]
-        if obj_name == "ac_menu_driver":
+        elif obj_name == "ac_menu_driver":
             print(f"AC source driver selected: {state}")
             self.config["ac"][obj_name]["item"] = self.drivers.AC_SOURCE_DRIVERS[state]
-        if obj_name == "scope_menu_driver":
+        elif obj_name == "scope_menu_driver":
             print(f"Scope driver selected: {state}")
             self.config["scope"][obj_name]["item"] = self.drivers.SCOPE_DRIVERS[state]
-        if obj_name == "rlc_menu_driver":
+        elif obj_name == "rlc_menu_driver":
             print(f"RLC source driver selected: {state}")
             self.config["rlc"][obj_name]["item"] = self.drivers.RLC_DRIVERS[state]
-        if obj_name == "sas_menu_driver":
+        elif obj_name == "sas_menu_driver":
             print(f"SAS source driver selected: {state}")
             self.config["sas"][obj_name]["item"] = self.drivers.SAS_DRIVERS[state]
+        elif obj_name == "chamber_menu_driver":
+            print(f"Chamber source driver selected: {state}")
+            self.config["chamber"][obj_name]["item"] = self.drivers.CHAMBER_DRIVERS[state]
 
     def _on_device_entry_startup__stateChanged(self):
         state = self.sender().isChecked()
@@ -182,7 +195,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.LOG.setLevel(logging.INFO)
 
     def setup_config(self):
-        dir_path = dirname(abspath(__file__))
+        dir_path = Path(__file__).resolve().parent
         with open(f"{dir_path}/config/config.json", "r") as jsonfile:
             self.d_config = json.load(jsonfile)
 
@@ -219,7 +232,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         else:
             self.ac_tab.setDisabled(True)
             self.LOG.info("AC Source not configured")
-        loading_dlg.set_progress(25)
+        loading_dlg.set_progress(20)
         QApplication.processEvents()
         
         if self.l_config["scope"]["scope_menu_driver"]["item"] != None:
@@ -228,22 +241,21 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         else:
             self.scope_tab.setDisabled(True)
             self.LOG.info("Scope not configured")
-        loading_dlg.set_progress(50)
+        loading_dlg.set_progress(40)
         QApplication.processEvents()
 
         if self.l_config["rlc"]["rlc_menu_driver"]["item"] != None:
-            rcc, pcc, *trash = tuple([x.strip() for x in self.l_config["rlc"]["rlc_entry_address"].split(',')])
             try:
-                self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
+                self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
             except SerialException:
                 self.rlc.close()
-                self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], relay_controller_comport=rcc, phase_controller_comport=pcc)
+                self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
             self.LOG.info("RLC configured")
         else:
             self.rlc_tab.setDisabled(True)
-            self.LOG.info("RLC not configured") 
+            self.LOG.info("RLC not configured")
         
-        loading_dlg.set_progress(75)
+        loading_dlg.set_progress(60)
         QApplication.processEvents()
 
         if self.l_config["sas"]["sas_menu_driver"]["item"] != None:
@@ -255,8 +267,24 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.sas_tab.setDisabled(True)
             self.LOG.info("SAS not configured")
 
+        loading_dlg.set_progress(80)
+        QApplication.processEvents()
+
+        if self.l_config["chamber"]["chamber_menu_driver"]["item"] != None:
+            address = int(re.sub('\\D', '', self.l_config["chamber"]["chamber_entry_address"]))
+            try:
+                self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
+            except SerialException:
+                self.chamber.close()
+                self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], self.l_config["chamber"]["chamber_entry_address"])
+            self.LOG.info("Chamber configured")
+        else:
+            # self.Chamber_tab.setDisabled(True)
+            self.LOG.info("Chamber not configured")
+
         loading_dlg.set_progress(100)
         QApplication.processEvents()
+
         loading_dlg.close()
         self.LOG.info("Equipment setup complete")
 
@@ -415,7 +443,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         else:
             event.ignore()
 
-    _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
+    _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close, chamber_butt_close'
     def _when_closers__clicked(self):
         self.LOG.info("Close clicked")
         self.hide()
@@ -437,11 +465,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.scope.turn_off()
         except AttributeError:
             pass
+        try:
+            self.chamber.close()
+        except AttributeError:
+            pass
 
-            self.LOG.info("Equipment turned off")
+        self.LOG.info("Equipment turned off")
 
         # save config
-        dir_path = dirname(abspath(__file__))
+        dir_path = Path(__file__).resolve().parent
         with open(f"{dir_path}/config/local_config.json", "w") as jsonfile:
             json.dump(self.l_config, jsonfile)
 
@@ -737,6 +769,31 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.LOG.info(f"CH3 label entered: {state}")
         elif obj_name == "scope_line_ch4_lab":
             self.LOG.info(f"CH4 label entered: {state}")
+
+    #--------------------------------------------------------
+    #                     Chamber Tab                       #
+    #--------------------------------------------------------
+    _chamber_buttons = 'chamber_butt_apply'
+    def _when_chamber_buttons__clicked(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+
+        if obj_name == "chamber_butt_apply":
+            self.LOG.info("Apply clicked")
+            if RUN_EQUIPMENT:
+                self.chamber.set_temperature(self.l_config["chamber"]["chamber_entry_temp"])
+
+    _chamber_entries = 'chamber_entry_temp'
+    def _when_chamber_entries__editingFinished(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.value()
+        
+        self.l_config["chamber"][obj_name] = state
+
+        if obj_name == "chamber_entry_temp":
+            self.LOG.info(f"Temperature entered: {state}")
+
 
 def main():
     app = QApplication(sys.argv)

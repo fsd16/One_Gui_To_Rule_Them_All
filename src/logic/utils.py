@@ -1,5 +1,5 @@
 from typing import Dict, Any, TypeVar
-from os.path import splitext, exists
+from pathlib import Path
 
 KeyType = TypeVar('KeyType')
 
@@ -20,11 +20,11 @@ def deep_update(mapping: Dict[KeyType, Any], *updating_mappings: Dict[KeyType, A
 
 # Ensure file name is unique
 def uniquify(filepath):
-    filename, extension = splitext(filepath)
+    filepath_P = Path(filepath)
     counter = 1
 
-    while exists(filepath):
-        filepath = filename + " (" + str(counter) + ")" + extension
+    while filepath_P.exists():
+        filepath_P = f"{filepath_P.stem} ({counter}){filepath_P.suffix}"
         counter += 1
 
-    return filepath
+    return filepath_P
