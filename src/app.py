@@ -18,6 +18,7 @@ from logic.ac_src import AC_SRC
 from logic.scope import Scope
 from logic.rlc import RLC
 from logic.sas import SAS
+from logic.chamber import Chamber
 from logic.signal import SmartSignal
 from logic.equipment_library import EquipmentDrivers
 from logic.utils import dict_value_to_index, deep_update
@@ -230,7 +231,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         else:
             self.ac_tab.setDisabled(True)
             self.LOG.info("AC Source not configured")
-        loading_dlg.set_progress(25)
+        loading_dlg.set_progress(20)
         QApplication.processEvents()
         
         if self.l_config["scope"]["scope_menu_driver"]["item"] != None:
@@ -239,7 +240,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         else:
             self.scope_tab.setDisabled(True)
             self.LOG.info("Scope not configured")
-        loading_dlg.set_progress(50)
+        loading_dlg.set_progress(40)
         QApplication.processEvents()
 
         if self.l_config["rlc"]["rlc_menu_driver"]["item"] != None:
@@ -251,9 +252,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.LOG.info("RLC configured")
         else:
             self.rlc_tab.setDisabled(True)
-            self.LOG.info("RLC not configured") 
+            self.LOG.info("RLC not configured")
         
-        loading_dlg.set_progress(75)
+        loading_dlg.set_progress(60)
         QApplication.processEvents()
 
         if self.l_config["sas"]["sas_menu_driver"]["item"] != None:
@@ -265,8 +266,23 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.sas_tab.setDisabled(True)
             self.LOG.info("SAS not configured")
 
+        loading_dlg.set_progress(80)
+        QApplication.processEvents()
+
+        if self.l_config["chamber"]["chamber_menu_driver"]["item"] != None:
+            try:
+                self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], self.l_config["chamber"]["chamber_entry_address"])
+            except SerialException:
+                self.chamber.close()
+                self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], self.l_config["chamber"]["chamber_entry_address"])
+            self.LOG.info("Chamber configured")
+        else:
+            # self.Chamber_tab.setDisabled(True)
+            self.LOG.info("Chamber not configured")
+
         loading_dlg.set_progress(100)
         QApplication.processEvents()
+
         loading_dlg.close()
         self.LOG.info("Equipment setup complete")
 
@@ -447,8 +463,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.scope.turn_off()
         except AttributeError:
             pass
+        try:
+            self.chamber.close()
+        except AttributeError:
+            pass
 
-            self.LOG.info("Equipment turned off")
+        self.LOG.info("Equipment turned off")
 
         # save config
         dir_path = Path(__file__).resolve().parent
