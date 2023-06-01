@@ -16,8 +16,15 @@
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="1" column="1">
     <layout class="QGridLayout" name="gridLayout">
-     <item row="3" column="2">
-      <widget class="QLineEdit" name="sas_entry_address">
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Scope</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLineEdit" name="ac_entry_address">
        <property name="placeholderText">
         <string>GPIB0::&lt;address&gt;::INSTR</string>
        </property>
@@ -30,31 +37,17 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>RLC Load</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Scope</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>SAS</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2">
-      <widget class="QComboBox" name="sas_menu_config">
+     <item row="7" column="1">
+      <widget class="QComboBox" name="chamber_menu_driver">
        <property name="placeholderText">
-        <string>Cluster Config</string>
+        <string>Select Driver</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QLineEdit" name="rlc_entry_address_r">
+       <property name="placeholderText">
+        <string>COM&lt;address&gt; (rcc)</string>
        </property>
       </widget>
      </item>
@@ -65,17 +58,17 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
-      <widget class="QLineEdit" name="ac_entry_address">
+     <item row="7" column="2">
+      <widget class="QLineEdit" name="chamber_entry_address">
        <property name="placeholderText">
-        <string>GPIB0::&lt;address&gt;::INSTR</string>
+        <string>COM&lt;address&gt;</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="2">
-      <widget class="QLineEdit" name="rlc_entry_address">
+     <item row="4" column="2">
+      <widget class="QLineEdit" name="sas_entry_address">
        <property name="placeholderText">
-        <string>COM&lt;address&gt;,COM&lt;address&gt;</string>
+        <string>GPIB0::&lt;address&gt;::INSTR</string>
        </property>
       </widget>
      </item>
@@ -86,10 +79,31 @@
        </property>
       </widget>
      </item>
+     <item row="5" column="2">
+      <widget class="QComboBox" name="sas_menu_config">
+       <property name="placeholderText">
+        <string>Cluster Config</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Chamber</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="1">
       <widget class="QComboBox" name="scope_menu_driver">
        <property name="placeholderText">
         <string>Select Driver</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QLineEdit" name="rlc_entry_address_p">
+       <property name="placeholderText">
+        <string>COM&lt;address&gt; (pcc)</string>
        </property>
       </widget>
      </item>
@@ -100,10 +114,24 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>RLC Load</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
       <widget class="QComboBox" name="sas_menu_driver">
        <property name="placeholderText">
         <string>Select Driver</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>SAS</string>
        </property>
       </widget>
      </item>
