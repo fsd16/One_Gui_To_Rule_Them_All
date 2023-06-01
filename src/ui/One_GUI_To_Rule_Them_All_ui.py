@@ -441,19 +441,17 @@ class Ui_MainWindow(object):
         self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.gridLayout_4 = QGridLayout()
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.label_11 = QLabel(self.rlc_tab)
-        self.label_11.setObjectName(u"label_11")
-        self.label_11.setMinimumSize(QSize(100, 0))
-        self.label_11.setAlignment(Qt.AlignCenter)
+        self.rlc_butt_on = QPushButton(self.rlc_tab)
+        self.rlc_butt_on.setObjectName(u"rlc_butt_on")
+        self.rlc_butt_on.setMinimumSize(QSize(80, 0))
+        self.rlc_butt_on.setMaximumSize(QSize(80, 16777215))
 
-        self.gridLayout_4.addWidget(self.label_11, 1, 1, 1, 2, Qt.AlignHCenter|Qt.AlignBottom)
+        self.gridLayout_4.addWidget(self.rlc_butt_on, 3, 0, 1, 2, Qt.AlignHCenter)
 
-        self.label_12 = QLabel(self.rlc_tab)
-        self.label_12.setObjectName(u"label_12")
-        self.label_12.setMinimumSize(QSize(100, 0))
-        self.label_12.setAlignment(Qt.AlignCenter)
+        self.rlc_check_auto = QCheckBox(self.rlc_tab)
+        self.rlc_check_auto.setObjectName(u"rlc_check_auto")
 
-        self.gridLayout_4.addWidget(self.label_12, 1, 3, 1, 2, Qt.AlignHCenter|Qt.AlignBottom)
+        self.gridLayout_4.addWidget(self.rlc_check_auto, 0, 4, 1, 2, Qt.AlignRight)
 
         self.rlc_butt_off = QPushButton(self.rlc_tab)
         self.rlc_butt_off.setObjectName(u"rlc_butt_off")
@@ -469,20 +467,6 @@ class Ui_MainWindow(object):
 
         self.gridLayout_4.addWidget(self.rlc_entry_real_pwr, 2, 3, 1, 2, Qt.AlignHCenter|Qt.AlignTop)
 
-        self.rlc_entry_reactive_pwr = QSpinBox(self.rlc_tab)
-        self.rlc_entry_reactive_pwr.setObjectName(u"rlc_entry_reactive_pwr")
-        self.rlc_entry_reactive_pwr.setMinimumSize(QSize(50, 0))
-        self.rlc_entry_reactive_pwr.setMaximum(999)
-
-        self.gridLayout_4.addWidget(self.rlc_entry_reactive_pwr, 2, 5, 1, 1, Qt.AlignHCenter|Qt.AlignTop)
-
-        self.label_13 = QLabel(self.rlc_tab)
-        self.label_13.setObjectName(u"label_13")
-        self.label_13.setMinimumSize(QSize(100, 0))
-        self.label_13.setAlignment(Qt.AlignCenter)
-
-        self.gridLayout_4.addWidget(self.label_13, 1, 5, 1, 1, Qt.AlignHCenter|Qt.AlignBottom)
-
         self.rlc_butt_close = QPushButton(self.rlc_tab)
         self.rlc_butt_close.setObjectName(u"rlc_butt_close")
         self.rlc_butt_close.setMinimumSize(QSize(80, 0))
@@ -490,20 +474,26 @@ class Ui_MainWindow(object):
 
         self.gridLayout_4.addWidget(self.rlc_butt_close, 3, 4, 1, 2, Qt.AlignHCenter)
 
-        self.label_10 = QLabel(self.rlc_tab)
-        self.label_10.setObjectName(u"label_10")
-        self.label_10.setMinimumSize(QSize(100, 0))
-        self.label_10.setAlignment(Qt.AlignCenter)
+        self.label_11 = QLabel(self.rlc_tab)
+        self.label_11.setObjectName(u"label_11")
+        self.label_11.setMinimumSize(QSize(100, 0))
+        self.label_11.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_4.addWidget(self.label_10, 1, 0, 1, 1, Qt.AlignHCenter|Qt.AlignBottom)
+        self.gridLayout_4.addWidget(self.label_11, 1, 1, 1, 2, Qt.AlignHCenter|Qt.AlignBottom)
 
-        self.rlc_entry_freq = QSpinBox(self.rlc_tab)
-        self.rlc_entry_freq.setObjectName(u"rlc_entry_freq")
-        self.rlc_entry_freq.setMinimumSize(QSize(50, 0))
-        self.rlc_entry_freq.setMaximum(999)
-        self.rlc_entry_freq.setValue(60)
+        self.label_12 = QLabel(self.rlc_tab)
+        self.label_12.setObjectName(u"label_12")
+        self.label_12.setMinimumSize(QSize(100, 0))
+        self.label_12.setAlignment(Qt.AlignCenter)
 
-        self.gridLayout_4.addWidget(self.rlc_entry_freq, 2, 0, 1, 1, Qt.AlignHCenter|Qt.AlignTop)
+        self.gridLayout_4.addWidget(self.label_12, 1, 3, 1, 2, Qt.AlignHCenter|Qt.AlignBottom)
+
+        self.label_13 = QLabel(self.rlc_tab)
+        self.label_13.setObjectName(u"label_13")
+        self.label_13.setMinimumSize(QSize(100, 0))
+        self.label_13.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_4.addWidget(self.label_13, 1, 5, 1, 1, Qt.AlignHCenter|Qt.AlignBottom)
 
         self.rlc_entry_ac_volts = QSpinBox(self.rlc_tab)
         self.rlc_entry_ac_volts.setObjectName(u"rlc_entry_ac_volts")
@@ -513,32 +503,86 @@ class Ui_MainWindow(object):
 
         self.gridLayout_4.addWidget(self.rlc_entry_ac_volts, 2, 1, 1, 2, Qt.AlignHCenter|Qt.AlignTop)
 
-        self.rlc_butt_on = QPushButton(self.rlc_tab)
-        self.rlc_butt_on.setObjectName(u"rlc_butt_on")
-        self.rlc_butt_on.setMinimumSize(QSize(80, 0))
-        self.rlc_butt_on.setMaximumSize(QSize(80, 16777215))
+        self.rlc_entry_freq = QSpinBox(self.rlc_tab)
+        self.rlc_entry_freq.setObjectName(u"rlc_entry_freq")
+        self.rlc_entry_freq.setMinimumSize(QSize(50, 0))
+        self.rlc_entry_freq.setMaximum(999)
+        self.rlc_entry_freq.setValue(60)
 
-        self.gridLayout_4.addWidget(self.rlc_butt_on, 3, 0, 1, 2, Qt.AlignHCenter)
+        self.gridLayout_4.addWidget(self.rlc_entry_freq, 2, 0, 1, 1, Qt.AlignHCenter|Qt.AlignTop)
 
-        self.rlc_check_auto = QCheckBox(self.rlc_tab)
-        self.rlc_check_auto.setObjectName(u"rlc_check_auto")
+        self.rlc_entry_reactive_pwr = QSpinBox(self.rlc_tab)
+        self.rlc_entry_reactive_pwr.setObjectName(u"rlc_entry_reactive_pwr")
+        self.rlc_entry_reactive_pwr.setMinimumSize(QSize(50, 0))
+        self.rlc_entry_reactive_pwr.setMaximum(999)
 
-        self.gridLayout_4.addWidget(self.rlc_check_auto, 0, 4, 1, 2, Qt.AlignRight)
+        self.gridLayout_4.addWidget(self.rlc_entry_reactive_pwr, 2, 5, 1, 1, Qt.AlignHCenter|Qt.AlignTop)
+
+        self.label_10 = QLabel(self.rlc_tab)
+        self.label_10.setObjectName(u"label_10")
+        self.label_10.setMinimumSize(QSize(100, 0))
+        self.label_10.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_4.addWidget(self.label_10, 1, 0, 1, 1, Qt.AlignHCenter|Qt.AlignBottom)
 
 
         self.gridLayout_5.addLayout(self.gridLayout_4, 0, 0, 1, 1)
 
         self.tabWidget.addTab(self.rlc_tab, "")
+        self.chamber_tab = QWidget()
+        self.chamber_tab.setObjectName(u"chamber_tab")
+        self.gridLayout_11 = QGridLayout(self.chamber_tab)
+        self.gridLayout_11.setObjectName(u"gridLayout_11")
+        self.gridLayout_10 = QGridLayout()
+        self.gridLayout_10.setObjectName(u"gridLayout_10")
+        self.chamber_butt_close = QPushButton(self.chamber_tab)
+        self.chamber_butt_close.setObjectName(u"chamber_butt_close")
+        self.chamber_butt_close.setMinimumSize(QSize(80, 0))
+        self.chamber_butt_close.setMaximumSize(QSize(80, 16777215))
+
+        self.gridLayout_10.addWidget(self.chamber_butt_close, 2, 3, 1, 2, Qt.AlignHCenter)
+
+        self.label_19 = QLabel(self.chamber_tab)
+        self.label_19.setObjectName(u"label_19")
+        self.label_19.setMinimumSize(QSize(100, 0))
+        self.label_19.setAlignment(Qt.AlignCenter)
+
+        self.gridLayout_10.addWidget(self.label_19, 0, 2, 1, 1, Qt.AlignBottom)
+
+        self.chamber_butt_apply = QPushButton(self.chamber_tab)
+        self.chamber_butt_apply.setObjectName(u"chamber_butt_apply")
+        self.chamber_butt_apply.setMinimumSize(QSize(80, 0))
+        self.chamber_butt_apply.setMaximumSize(QSize(80, 16777215))
+
+        self.gridLayout_10.addWidget(self.chamber_butt_apply, 2, 0, 1, 2, Qt.AlignHCenter|Qt.AlignVCenter)
+
+        self.chamber_entry_temp = QDoubleSpinBox(self.chamber_tab)
+        self.chamber_entry_temp.setObjectName(u"chamber_entry_temp")
+        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.chamber_entry_temp.sizePolicy().hasHeightForWidth())
+        self.chamber_entry_temp.setSizePolicy(sizePolicy)
+        self.chamber_entry_temp.setMinimumSize(QSize(50, 0))
+        self.chamber_entry_temp.setDecimals(1)
+        self.chamber_entry_temp.setMinimum(-100.000000000000000)
+
+        self.gridLayout_10.addWidget(self.chamber_entry_temp, 1, 2, 1, 1, Qt.AlignTop)
+
+
+        self.gridLayout_11.addLayout(self.gridLayout_10, 0, 0, 1, 1)
+
+        self.tabWidget.addTab(self.chamber_tab, "")
 
         self.gridLayout_7.addWidget(self.tabWidget, 0, 1, 1, 1)
 
         self.central_textEdit_log = QPlainTextEditLogger(self.centralwidget)
         self.central_textEdit_log.setObjectName(u"central_textEdit_log")
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.central_textEdit_log.sizePolicy().hasHeightForWidth())
-        self.central_textEdit_log.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.central_textEdit_log.sizePolicy().hasHeightForWidth())
+        self.central_textEdit_log.setSizePolicy(sizePolicy1)
 
         self.gridLayout_7.addWidget(self.central_textEdit_log, 1, 1, 1, 1)
 
@@ -564,7 +608,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(4)
         self.ac_menu_abnormal.setCurrentIndex(-1)
 
 
@@ -616,19 +660,24 @@ class Ui_MainWindow(object):
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"CH2 Label", None))
         self.scope_butt_browse.setText(QCoreApplication.translate("MainWindow", u"Browse", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.scope_tab), QCoreApplication.translate("MainWindow", u"Scope", None))
+        self.rlc_butt_on.setText(QCoreApplication.translate("MainWindow", u"RLC on", None))
+        self.rlc_check_auto.setText(QCoreApplication.translate("MainWindow", u"Auto set RLC parameters", None))
+        self.rlc_butt_off.setText(QCoreApplication.translate("MainWindow", u"RLC off", None))
+        self.rlc_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))
         self.label_11.setText(QCoreApplication.translate("MainWindow", u"AC Voltage\n"
 "(Vrms)", None))
         self.label_12.setText(QCoreApplication.translate("MainWindow", u"Real Power\n"
 "(W)", None))
-        self.rlc_butt_off.setText(QCoreApplication.translate("MainWindow", u"RLC off", None))
         self.label_13.setText(QCoreApplication.translate("MainWindow", u"Reactive Pwr\n"
 "(Vars)", None))
-        self.rlc_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))
         self.label_10.setText(QCoreApplication.translate("MainWindow", u"Frequency\n"
 "(Hz)", None))
-        self.rlc_butt_on.setText(QCoreApplication.translate("MainWindow", u"RLC on", None))
-        self.rlc_check_auto.setText(QCoreApplication.translate("MainWindow", u"Auto set RLC parameters", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.rlc_tab), QCoreApplication.translate("MainWindow", u"RLC", None))
+        self.chamber_butt_close.setText(QCoreApplication.translate("MainWindow", u"Close", None))
+        self.label_19.setText(QCoreApplication.translate("MainWindow", u"Temperature\n"
+"(degC)", None))
+        self.chamber_butt_apply.setText(QCoreApplication.translate("MainWindow", u"Apply", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.chamber_tab), QCoreApplication.translate("MainWindow", u"Chamber", None))
         self.menuOptions.setTitle(QCoreApplication.translate("MainWindow", u"Options", None))
         self.menuView.setTitle(QCoreApplication.translate("MainWindow", u"View", None))
     # retranslateUi

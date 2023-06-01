@@ -4,6 +4,7 @@ start_time = time.time()
 import sys
 import json
 import logging
+import re
 
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QFileDialog, QProgressDialog 
@@ -270,8 +271,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         QApplication.processEvents()
 
         if self.l_config["chamber"]["chamber_menu_driver"]["item"] != None:
+            address = int(re.sub('\\D', '', self.l_config["chamber"]["chamber_entry_address"]))
             try:
-                self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], self.l_config["chamber"]["chamber_entry_address"])
+                self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
             except SerialException:
                 self.chamber.close()
                 self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], self.l_config["chamber"]["chamber_entry_address"])
@@ -441,7 +443,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         else:
             event.ignore()
 
-    _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close'
+    _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close, chamber_butt_close'
     def _when_closers__clicked(self):
         self.LOG.info("Close clicked")
         self.hide()
@@ -767,6 +769,31 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.LOG.info(f"CH3 label entered: {state}")
         elif obj_name == "scope_line_ch4_lab":
             self.LOG.info(f"CH4 label entered: {state}")
+
+    #--------------------------------------------------------
+    #                     Chamber Tab                       #
+    #--------------------------------------------------------
+    _chamber_buttons = 'chamber_butt_apply'
+    def _when_chamber_buttons__clicked(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+
+        if obj_name == "chamber_butt_apply":
+            self.LOG.info("Apply clicked")
+            if RUN_EQUIPMENT:
+                self.chamber.set_temperature(self.l_config["chamber"]["chamber_entry_temp"])
+
+    _chamber_entries = 'chamber_entry_temp'
+    def _when_chamber_entries__editingFinished(self):
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.value()
+        
+        self.l_config["chamber"][obj_name] = state
+
+        if obj_name == "chamber_entry_temp":
+            self.LOG.info(f"Temperature entered: {state}")
+
 
 def main():
     app = QApplication(sys.argv)
