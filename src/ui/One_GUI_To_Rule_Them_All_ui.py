@@ -608,7 +608,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(4)
+        self.tabWidget.setCurrentIndex(0)
         self.ac_menu_abnormal.setCurrentIndex(-1)
 
 
