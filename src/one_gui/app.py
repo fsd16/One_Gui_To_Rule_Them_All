@@ -196,11 +196,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     def setup_config(self):
         dir_path = Path(__file__).resolve().parent
-        with open(f"{dir_path}/config/config.json", "r") as jsonfile:
+        with open(dir_path.joinpath("config", "config.json"), "r") as jsonfile:
             self.d_config = json.load(jsonfile)
 
         try:
-            with open(f"{dir_path}/config/local_config.json", "r") as jsonfile:
+            with open(dir_path.joinpath("config", "local_config.json"), "r") as jsonfile:
                 self.l_config = json.load(jsonfile)
         except IOError:
             self.l_config = self.d_config
@@ -474,7 +474,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
         # save config
         dir_path = Path(__file__).resolve().parent
-        with open(f"{dir_path}/config/local_config.json", "w") as jsonfile:
+        with open(dir_path.joinpath("config", "local_config.json"), "w") as jsonfile:
             json.dump(self.l_config, jsonfile)
 
         self.LOG.info("Config saved")
