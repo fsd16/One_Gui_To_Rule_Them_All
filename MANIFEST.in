@@ -1,2 +1,3 @@
 # Include config files (json)
-include src/onegui/config/config.json
+#graft src/config
+#include src/onegui/config/config.json
