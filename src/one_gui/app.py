@@ -23,10 +23,11 @@ from one_gui.logic.sas import SAS
 from one_gui.logic.chamber import Chamber
 from one_gui.logic.signal import SmartSignal
 from one_gui.logic.equipment_library import EquipmentDrivers
-from one_gui.logic.utils import dict_value_to_index, deep_update
+from one_gui.logic.utils import dict_value_to_index, deep_update, discover_addresses
 from serial.serialutil import SerialException
 from pyvisa.errors import VisaIOError
 from pathlib import Path
+
 
 import_time = time.time()
 print(f"Import time: {import_time - start_time}")
@@ -77,7 +78,9 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
             "Series":   "series",
             "Parallel": "parallel"
         }
-
+        
+        auto_discovered_connection_addresses = discover_addresses()
+        
         self.setupUi(self)
         
         self.ac_menu_driver.addItems(self.drivers.AC_SOURCE_DRIVERS)
@@ -88,12 +91,19 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         
         self.sas_menu_config.addItems(self.sas_configs)
 
-        self.ac_entry_address.setText(config["ac"]["ac_entry_address"])
-        self.scope_entry_address.setText(config["scope"]["scope_entry_address"])
-        self.rlc_entry_address_r.setText(config["rlc"]["rlc_entry_address_r"])
-        self.rlc_entry_address_p.setText(config["rlc"]["rlc_entry_address_p"])
-        self.sas_entry_address.setText(config["sas"]["sas_entry_address"])
-        self.chamber_entry_address.setText(config["chamber"]["chamber_entry_address"])
+        # self.ac_entry_address.setText(config["ac"]["ac_entry_address"])
+        # self.scope_entry_address.setText(config["scope"]["scope_entry_address"])
+        # self.rlc_entry_address_r.setText(config["rlc"]["rlc_entry_address_r"])
+        # self.rlc_entry_address_p.setText(config["rlc"]["rlc_entry_address_p"])
+        # self.sas_entry_address.setText(config["sas"]["sas_entry_address"])
+        # self.chamber_entry_address.setText(config["chamber"]["chamber_entry_address"])
+        
+        self.ac_entry_address.addItems(auto_discovered_connection_addresses)
+        self.scope_entry_address.addItems(auto_discovered_connection_addresses)
+        self.rlc_entry_address_r.addItems(auto_discovered_connection_addresses)
+        self.rlc_entry_address_p.addItems(auto_discovered_connection_addresses)
+        self.sas_entry_address.addItems(auto_discovered_connection_addresses)
+        self.chamber_entry_address.addItems(auto_discovered_connection_addresses)
 
         self.sas_menu_config.setCurrentIndex(config["sas"]["sas_menu_config"]["index"])
         self.ac_menu_driver.setCurrentIndex(config["ac"]["ac_menu_driver"]["index"])
@@ -101,16 +111,23 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         self.rlc_menu_driver.setCurrentIndex(config["rlc"]["rlc_menu_driver"]["index"])
         self.sas_menu_driver.setCurrentIndex(config["sas"]["sas_menu_driver"]["index"])
         self.chamber_menu_driver.setCurrentIndex(config["chamber"]["chamber_menu_driver"]["index"])
+        
+        self.ac_entry_address.setCurrentText(config["ac"]["ac_entry_address"])
+        self.scope_entry_address.setCurrentText(config["scope"]["scope_entry_address"])
+        self.rlc_entry_address_r.setCurrentText(config["rlc"]["rlc_entry_address_r"])
+        self.rlc_entry_address_p.setCurrentText(config["rlc"]["rlc_entry_address_p"])
+        self.sas_entry_address.setCurrentText(config["sas"]["sas_entry_address"])
+        self.chamber_entry_address.setCurrentText(config["chamber"]["chamber_entry_address"])
 
         self.device_entry_startup.setChecked(config["setup_devices"])
 
         self.auto_connect()
 
     _dialog_entries = 'ac_entry_address, scope_entry_address, rlc_entry_address_r, rlc_entry_address_p, sas_entry_address, chamber_entry_address'
-    def _when_dialog_entries__editingFinished(self):
+    def _when_dialog_entries__activated(self):
         obj = self.sender()
         obj_name = obj.objectName()
-        state = obj.text()
+        state = obj.currentText()
 
         prefix = obj_name.split('_')[0]
         self.config[prefix][obj_name] = state
@@ -167,6 +184,7 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
 class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal): 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
         self.setupUi(self)
         self.setup_logging()
         self.setup_config()
@@ -459,6 +477,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     def _on_options_action_devices__triggered(self):
         self.LOG.info("Device setup triggered")
+        
         dlg = DevicesDialog(self.l_config)
         result = dlg.exec()
 

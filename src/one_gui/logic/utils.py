@@ -1,5 +1,7 @@
 from typing import Dict, Any, TypeVar
 from pathlib import Path
+from serial.tools.list_ports import comports
+from pyvisa import ResourceManager
 
 KeyType = TypeVar('KeyType')
 
@@ -28,3 +30,22 @@ def uniquify(filepath):
         counter += 1
 
     return filepath_P
+
+def discover_addresses():
+    """
+    Generates a list of com ports and gpib addresses
+
+    Returns:
+        A sorted list of the available com and GPIB ports
+    """
+    # fetch a list of ListPortInfo object
+    all_serial_port_info = comports()
+    try:
+        all_visa_addresses = ResourceManager().list_resources()
+    except ValueError:
+        all_visa_addresses = []
+
+    # extract device name(path) from the list
+    filtered_addresses = [port_info.device for port_info in all_serial_port_info]
+    filtered_addresses += [address for address in all_visa_addresses if 'GPIB' in address]
+    return sorted(filtered_addresses)
