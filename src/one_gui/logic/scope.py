@@ -1,9 +1,9 @@
 from pathlib import Path
 from time import strftime, localtime, sleep
 from concurrent import futures
-from logic.equipment_library import import_class_from_string
+from one_gui.logic.equipment_library import import_class_from_string
 from threading import Thread
-from logic.utils import uniquify
+from one_gui.logic.utils import uniquify
 
 thread_pool_executor = futures.ThreadPoolExecutor(max_workers=1)
 

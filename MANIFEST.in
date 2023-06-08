@@ -1,2 +1,2 @@
 # Include config files (json)
-include src/config/*
+include src/one_gui/config/config.json

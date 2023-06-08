@@ -1,4 +1,4 @@
-from logic.equipment_library import import_class_from_string
+from one_gui.logic.equipment_library import import_class_from_string
 
 class Chamber():
     def __init__(self, driver_path, *args, **kwargs):

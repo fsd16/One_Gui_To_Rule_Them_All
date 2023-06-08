@@ -1,4 +1,6 @@
 __pycache__/
 .vscode/
 captures/
+dist/
 local_config.json
+*.egg-info

@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
     QRadioButton, QSizePolicy, QSpacerItem, QSpinBox,
     QStatusBar, QTabWidget, QWidget)
 
-from .log import QPlainTextEditLogger
+from one_gui.ui.log import QPlainTextEditLogger
 from pyqtgraph import PlotWidget
 
 class Ui_MainWindow(object):
@@ -608,7 +608,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.tabWidget.setCurrentIndex(4)
+        self.tabWidget.setCurrentIndex(0)
         self.ac_menu_abnormal.setCurrentIndex(-1)
 
 

@@ -1,5 +1,5 @@
 from enphase_equipment.rlc_load.common import calculate_rlc_from_real_and_reactive_power
-from logic.equipment_library import import_class_from_string
+from one_gui.logic.equipment_library import import_class_from_string
 from time import sleep
 
 class RLC():

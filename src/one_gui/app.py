@@ -12,17 +12,17 @@ from PySide6.QtCore import QTimer, Qt
 from pyqtgraph import ViewBox, PlotCurveItem, ScatterPlotItem
 from numpy import array
 
-from ui.One_GUI_To_Rule_Them_All_ui import Ui_MainWindow
-from ui.Devices_Dialog_ui import Ui_DevicesDialog
-from ui.Loading_Dialog_ui import Ui_LoadingDialog
-from logic.ac_src import AC_SRC
-from logic.scope import Scope
-from logic.rlc import RLC
-from logic.sas import SAS
-from logic.chamber import Chamber
-from logic.signal import SmartSignal
-from logic.equipment_library import EquipmentDrivers
-from logic.utils import dict_value_to_index, deep_update
+from one_gui.ui.One_GUI_To_Rule_Them_All_ui import Ui_MainWindow
+from one_gui.ui.Devices_Dialog_ui import Ui_DevicesDialog
+from one_gui.ui.Loading_Dialog_ui import Ui_LoadingDialog
+from one_gui.logic.ac_src import AC_SRC
+from one_gui.logic.scope import Scope
+from one_gui.logic.rlc import RLC
+from one_gui.logic.sas import SAS
+from one_gui.logic.chamber import Chamber
+from one_gui.logic.signal import SmartSignal
+from one_gui.logic.equipment_library import EquipmentDrivers
+from one_gui.logic.utils import dict_value_to_index, deep_update
 from serial.serialutil import SerialException
 from pyvisa.errors import VisaIOError
 from pathlib import Path
@@ -196,11 +196,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     def setup_config(self):
         dir_path = Path(__file__).resolve().parent
-        with open(f"{dir_path}/config/config.json", "r") as jsonfile:
+        with open(dir_path.joinpath("config", "config.json"), "r") as jsonfile:
             self.d_config = json.load(jsonfile)
 
         try:
-            with open(f"{dir_path}/config/local_config.json", "r") as jsonfile:
+            with open(dir_path.joinpath("config", "local_config.json"), "r") as jsonfile:
                 self.l_config = json.load(jsonfile)
         except IOError:
             self.l_config = self.d_config
@@ -474,7 +474,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
         # save config
         dir_path = Path(__file__).resolve().parent
-        with open(f"{dir_path}/config/local_config.json", "w") as jsonfile:
+        with open(dir_path.joinpath("config", "local_config.json"), "w") as jsonfile:
             json.dump(self.l_config, jsonfile)
 
         self.LOG.info("Config saved")

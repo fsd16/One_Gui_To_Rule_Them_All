@@ -1,6 +1,6 @@
 import numpy as np
 from enphase_equipment.solar_array_simulator.agilent import AgilentE4360A, AgilentE43XXCluster
-from logic.equipment_library import import_class_from_string
+from one_gui.logic.equipment_library import import_class_from_string
 
 class SAS(AgilentE43XXCluster):
 
