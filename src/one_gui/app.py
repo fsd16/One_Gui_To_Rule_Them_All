@@ -105,7 +105,7 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
 
         self.auto_connect()
 
-    _dialog_entries = 'ac_entry_address, scope_entry_address, rlc_entry_address_r, rlc_entry_address_p sas_entry_address, chamber_entry_address'
+    _dialog_entries = 'ac_entry_address, scope_entry_address, rlc_entry_address_r, rlc_entry_address_p, sas_entry_address, chamber_entry_address'
     def _when_dialog_entries__editingFinished(self):
         obj = self.sender()
         obj_name = obj.objectName()
