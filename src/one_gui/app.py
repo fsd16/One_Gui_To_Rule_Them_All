@@ -302,12 +302,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.chamber = None
         try:
             if self.l_config["chamber"]["chamber_menu_driver"]["item"] != None:
-                address = int(re.sub('\\D', '', self.l_config["chamber"]["chamber_entry_address"]))
+                if self.l_config["chamber"]["chamber_entry_address"] == 'enphase_equipment.thermal_chamber.watlow.WatlowF4':
+                    address = int(re.sub('\\D', '', self.l_config["chamber"]["chamber_entry_address"]))
+                else:
+                    address = self.l_config["chamber"]["chamber_entry_address"]
                 try:
                     self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
                 except SerialException:
                     self.chamber.close()
-                    self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], self.l_config["chamber"]["chamber_entry_address"])
+                    self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
                 self.LOG.info("Chamber configured")
             else:
                 self.chamber_tab.setDisabled(True)
