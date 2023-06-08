@@ -7,8 +7,8 @@ import logging
 import re
 
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QFileDialog, QProgressDialog 
-from PySide6.QtCore import QTimer, Qt
+from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QFileDialog, QProgressDialog
+from PySide6.QtCore import QTimer, Qt, QSize
 from pyqtgraph import ViewBox, PlotCurveItem, ScatterPlotItem
 from numpy import array
 
@@ -174,6 +174,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
         self.error_msg = QErrorMessage()
         self.error_msg.setWindowModality(Qt.ApplicationModal)
+        self.error_msg.resize(QSize(350, 200))
 
         if self.l_config["setup_devices"]:
             self._on_options_action_devices__triggered()
@@ -192,7 +193,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.LOG = logging.getLogger(__name__)
         self.LOG.addHandler(self.central_textEdit_log)
         # You can control the logging level
-        self.LOG.setLevel(logging.INFO)
+        self.LOG.setLevel(logging.ERROR)
 
     def setup_config(self):
         dir_path = Path(__file__).resolve().parent
@@ -219,84 +220,120 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             
 
     def setup_equipment(self):
+        errors = list()
         loading_dlg = LoadingDialog()
         loading_dlg.set_progress(0)
         loading_dlg.show()
         QApplication.processEvents()
 
-        if self.l_config["ac"]["ac_menu_driver"]["item"] != None:
-            self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"]["item"], self.l_config["ac"]["ac_entry_address"])
-            self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
-            self.ac_menu_profile.addItems(self.ac_src.PROFILES)
-            self.LOG.info("AC Source configured")
-        else:
+        try:
+            if self.l_config["ac"]["ac_menu_driver"]["item"] != None:
+                self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"]["item"], self.l_config["ac"]["ac_entry_address"])
+                self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
+                self.ac_menu_profile.addItems(self.ac_src.PROFILES)
+                self.LOG.info("AC Source configured")
+            else:
+                self.ac_tab.setDisabled(True)
+                self.LOG.info("AC Source not configured")    
+        except VisaIOError:
             self.ac_tab.setDisabled(True)
-            self.LOG.info("AC Source not configured")
+            self.LOG.error("AC Source connection failed")
+            errors.append('AC Source')
+            
         loading_dlg.set_progress(20)
         QApplication.processEvents()
         
-        if self.l_config["scope"]["scope_menu_driver"]["item"] != None:
-            self.scope = Scope(self.l_config["scope"]["scope_menu_driver"]["item"], self.l_config["scope"]["scope_entry_address"])
-            self.LOG.info("Scope configured")
-        else:
+        try:
+            if self.l_config["scope"]["scope_menu_driver"]["item"] != None:
+                self.scope = Scope(self.l_config["scope"]["scope_menu_driver"]["item"], self.l_config["scope"]["scope_entry_address"])
+                self.LOG.info("Scope configured")
+            else:
+                self.scope_tab.setDisabled(True)
+                self.LOG.info("Scope not configured") 
+        except VisaIOError:
             self.scope_tab.setDisabled(True)
-            self.LOG.info("Scope not configured")
+            self.LOG.error("Scope connection failed")
+            errors.append('Scope')
+            
         loading_dlg.set_progress(40)
         QApplication.processEvents()
 
-        if self.l_config["rlc"]["rlc_menu_driver"]["item"] != None:
-            try:
-                self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
-            except SerialException:
-                self.rlc.close()
-                self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
-            self.LOG.info("RLC configured")
-        else:
+        try:
+            if self.l_config["rlc"]["rlc_menu_driver"]["item"] != None:
+                try:
+                    self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
+                except SerialException:
+                    self.rlc.close()
+                    self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
+                self.LOG.info("RLC configured")
+            else:
+                self.rlc_tab.setDisabled(True)
+                self.LOG.info("RLC not configured")
+        except VisaIOError:
             self.rlc_tab.setDisabled(True)
-            self.LOG.info("RLC not configured")
+            self.LOG.error("RLC connection failed")
+            errors.append('RLC')
         
         loading_dlg.set_progress(60)
         QApplication.processEvents()
 
-        if self.l_config["sas"]["sas_menu_driver"]["item"] != None:
-            sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_address"].split(',')]
-            self.sas = SAS(self.l_config["sas"]["sas_menu_driver"]["item"], sas_addresses, self.l_config["sas"]["sas_menu_config"]["item"])
-            self.LOG.info(self.l_config["sas"]["sas_menu_config"])
-            self.LOG.info("SAS configured")
-        else:
+        try:
+            if self.l_config["sas"]["sas_menu_driver"]["item"] != None:
+                sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_address"].split(',')]
+                self.sas = SAS(self.l_config["sas"]["sas_menu_driver"]["item"], sas_addresses, self.l_config["sas"]["sas_menu_config"]["item"])
+                self.LOG.info(self.l_config["sas"]["sas_menu_config"])
+                self.LOG.info("SAS configured")
+            else:
+                self.sas_tab.setDisabled(True)
+                self.LOG.info("SAS not configured")
+        except VisaIOError:
             self.sas_tab.setDisabled(True)
-            self.LOG.info("SAS not configured")
+            self.LOG.error("SAS connection failed")
+            errors.append('SAS')
 
         loading_dlg.set_progress(80)
         QApplication.processEvents()
 
-        if self.l_config["chamber"]["chamber_menu_driver"]["item"] != None:
-            address = int(re.sub('\\D', '', self.l_config["chamber"]["chamber_entry_address"]))
-            try:
-                self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
-            except SerialException:
-                self.chamber.close()
-                self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], self.l_config["chamber"]["chamber_entry_address"])
-            self.LOG.info("Chamber configured")
-        else:
-            # self.Chamber_tab.setDisabled(True)
-            self.LOG.info("Chamber not configured")
+        try:
+            if self.l_config["chamber"]["chamber_menu_driver"]["item"] != None:
+                address = int(re.sub('\\D', '', self.l_config["chamber"]["chamber_entry_address"]))
+                try:
+                    self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
+                except SerialException:
+                    self.chamber.close()
+                    self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], self.l_config["chamber"]["chamber_entry_address"])
+                self.LOG.info("Chamber configured")
+            else:
+                self.chamber_tab.setDisabled(True)
+                self.LOG.info("Chamber not configured")
+        except VisaIOError:
+            self.chamber_tab.setDisabled(True)
+            self.LOG.error("Chamber connection failed")
+            errors.append('Chamber')
 
         loading_dlg.set_progress(100)
         QApplication.processEvents()
 
         loading_dlg.close()
         self.LOG.info("Equipment setup complete")
+        
+        return errors
 
     def setup_equipment_connection(self):
         self.LOG.info("Equipment connect triggered")
-        try:
-            if RUN_EQUIPMENT:
-                self.setup_equipment()
-        except VisaIOError:
-            self.error_msg.setWindowTitle("Connection failed")
-            self.error_msg.showMessage("Ensure equipment is on and address is correct<br/>Retry connection:<br/>(Options->Reconnect Equipment)")
-            self.error_msg.exec()
+        if RUN_EQUIPMENT:
+            errors = self.setup_equipment()
+            
+            if len(errors) != 0:
+                self.error_msg.setWindowTitle("Connection failed")
+                error_msg = ''.join(f'&nbsp;&nbsp;&nbsp;&nbsp;{errored}<br/>' for errored in errors)
+                self.error_msg.showMessage("The following equipment failed to connect:<br/>"\
+                                           f"{error_msg}"\
+                                            "Ensure equipment is turned on and address is correct.<br/>"\
+                                            "&nbsp;&nbsp;&nbsp;&nbsp;(Options->Configure Equipment)<br/>"
+                                            "Then retry connection.<br/>"\
+                                            "&nbsp;&nbsp;&nbsp;&nbsp;(Options->Reconnect Equipment)")
+                self.error_msg.exec()
 
     def setup_sas_plot(self):
         self.sas_plot.setBackground('w')
