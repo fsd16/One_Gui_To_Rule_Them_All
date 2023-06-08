@@ -3,6 +3,7 @@ start_time = time.time()
 
 import sys
 import json
+import traceback
 import logging
 import re
 
@@ -226,6 +227,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         loading_dlg.show()
         QApplication.processEvents()
 
+        self.ac_src = None
         try:
             if self.l_config["ac"]["ac_menu_driver"]["item"] != None:
                 self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"]["item"], self.l_config["ac"]["ac_entry_address"])
@@ -243,6 +245,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         loading_dlg.set_progress(20)
         QApplication.processEvents()
         
+        self.scope = None
         try:
             if self.l_config["scope"]["scope_menu_driver"]["item"] != None:
                 self.scope = Scope(self.l_config["scope"]["scope_menu_driver"]["item"], self.l_config["scope"]["scope_entry_address"])
@@ -258,6 +261,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         loading_dlg.set_progress(40)
         QApplication.processEvents()
 
+        self.rlc = None
         try:
             if self.l_config["rlc"]["rlc_menu_driver"]["item"] != None:
                 try:
@@ -277,6 +281,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         loading_dlg.set_progress(60)
         QApplication.processEvents()
 
+        self.sas = None
         try:
             if self.l_config["sas"]["sas_menu_driver"]["item"] != None:
                 sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_address"].split(',')]
@@ -294,6 +299,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         loading_dlg.set_progress(80)
         QApplication.processEvents()
 
+        self.chamber = None
         try:
             if self.l_config["chamber"]["chamber_menu_driver"]["item"] != None:
                 address = int(re.sub('\\D', '', self.l_config["chamber"]["chamber_entry_address"]))
@@ -321,20 +327,23 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     def setup_equipment_connection(self):
         self.LOG.info("Equipment connect triggered")
-        if RUN_EQUIPMENT:
-            errors = self.setup_equipment()
-            
-            if len(errors) != 0:
-                self.error_msg.setWindowTitle("Connection failed")
-                error_msg = ''.join(f'&nbsp;&nbsp;&nbsp;&nbsp;{errored}<br/>' for errored in errors)
-                self.error_msg.showMessage("The following equipment failed to connect:<br/>"\
-                                           f"{error_msg}"\
-                                            "Ensure equipment is turned on and address is correct.<br/>"\
-                                            "&nbsp;&nbsp;&nbsp;&nbsp;(Options->Configure Equipment)<br/>"
-                                            "Then retry connection.<br/>"\
-                                            "&nbsp;&nbsp;&nbsp;&nbsp;(Options->Reconnect Equipment)")
-                self.error_msg.exec()
-
+        try:
+            if RUN_EQUIPMENT:
+                errors = self.setup_equipment()
+                
+                if len(errors) != 0:
+                    self.error_msg.setWindowTitle("Connection failed")
+                    error_msg = ''.join(f'&nbsp;&nbsp;&nbsp;&nbsp;{errored}<br/>' for errored in errors)
+                    self.error_msg.showMessage("The following equipment failed to connect:<br/>"\
+                                            f"{error_msg}"\
+                                                "Ensure equipment is turned on and address is correct.<br/>"\
+                                                "&nbsp;&nbsp;&nbsp;&nbsp;(Options->Configure Equipment)<br/>"
+                                                "Then retry connection.<br/>"\
+                                                "&nbsp;&nbsp;&nbsp;&nbsp;(Options->Reconnect Equipment)")
+                    self.error_msg.exec()
+        except Exception as e:
+            self.LOG.error(traceback.format_exc())
+        
     def setup_sas_plot(self):
         self.sas_plot.setBackground('w')
 
@@ -484,28 +493,19 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     def _when_closers__clicked(self):
         self.LOG.info("Close clicked")
         self.hide()
-        try:
+        
+        if self.ac_src != None:
             self.ac_src.turn_off()
             self.ac_src.return_manual()
-        except AttributeError:
-            pass
-        try:  
+        if self.sas != None:
             self.sas.turn_off()
-        except AttributeError:
-            pass
-        try:
+        if self.rlc != None:
             self.rlc.close()
             # self.rlc.turn_off()
-        except AttributeError:
-            pass
-        try:
+        if self.scope != None:
             self.scope.turn_off()
-        except AttributeError:
-            pass
-        try:
+        if self.chamber != None:
             self.chamber.close()
-        except AttributeError:
-            pass
 
         self.LOG.info("Equipment turned off")
 
