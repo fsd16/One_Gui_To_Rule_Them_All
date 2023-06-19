@@ -59,11 +59,6 @@ class Ui_DevicesDialog(object):
 
         self.gridLayout.addWidget(self.chamber_menu_driver, 8, 1, 1, 1)
 
-        self.label = QLabel(DevicesDialog)
-        self.label.setObjectName(u"label")
-
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-
         self.rlc_menu_driver = QComboBox(DevicesDialog)
         self.rlc_menu_driver.setObjectName(u"rlc_menu_driver")
 
@@ -132,6 +127,11 @@ class Ui_DevicesDialog(object):
 
         self.gridLayout.addWidget(self.ac_entry_address, 0, 2, 1, 1)
 
+        self.label = QLabel(DevicesDialog)
+        self.label.setObjectName(u"label")
+
+        self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
+
 
         self.gridLayout_2.addLayout(self.gridLayout, 1, 1, 1, 1)
 
@@ -171,7 +171,6 @@ class Ui_DevicesDialog(object):
         self.scope_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
         self.label_3.setText(QCoreApplication.translate("DevicesDialog", u"RLC Load", None))
         self.chamber_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
-        self.label.setText(QCoreApplication.translate("DevicesDialog", u"AC Source", None))
         self.rlc_menu_driver.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"Select Driver", None))
         self.label_2.setText(QCoreApplication.translate("DevicesDialog", u"Scope", None))
         self.rlc_entry_address_p.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"COM<address> (rcc)", None))
@@ -183,6 +182,7 @@ class Ui_DevicesDialog(object):
         self.rlc_entry_address_r.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"COM<address> (pcc)", None))
         self.scope_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
         self.ac_entry_address.setPlaceholderText(QCoreApplication.translate("DevicesDialog", u"GPIB0::<address>::INSTR", None))
+        self.label.setText(QCoreApplication.translate("DevicesDialog", u"AC Source", None))
         self.device_entry_startup.setText(QCoreApplication.translate("DevicesDialog", u"Show on Startup", None))
     # retranslateUi
 

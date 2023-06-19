@@ -32,25 +32,9 @@ from pathlib import Path
 import_time = time.time()
 print(f"Import time: {import_time - start_time}")
 
-# TODO: Auto import station
-# TODO: Save and recall scope setups from gui
-# TODO: After autocapture stops, return the scope to the mode it was in before autocapture was started (or just to run mode)
 # TODO: Some serious commenting is needed
 
 RUN_EQUIPMENT = True
-
-# logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-class Dummy:
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def __call__(self, *args, **kwargs):
-        return self
-
-    def __getattr__(self, *args, **kwargs):
-        return self
 
 #--------------------------------------------------------
 #                   Loading Dialog                      #
@@ -87,17 +71,17 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         self.scope_menu_driver.addItems(self.drivers.SCOPE_DRIVERS)
         self.rlc_menu_driver.addItems(self.drivers.RLC_DRIVERS)
         self.sas_menu_driver.addItems(self.drivers.SAS_DRIVERS)
+        self.sas_menu_config.addItems(self.sas_configs)
         self.chamber_menu_driver.addItems(self.drivers.CHAMBER_DRIVERS)
         
-        self.sas_menu_config.addItems(self.sas_configs)
+        self.sas_menu_config.setCurrentIndex(config["sas"]["sas_menu_config"]["index"])
+        self.ac_menu_driver.setCurrentIndex(config["ac"]["ac_menu_driver"]["index"])
+        self.scope_menu_driver.setCurrentIndex(config["scope"]["scope_menu_driver"]["index"])
+        self.rlc_menu_driver.setCurrentIndex(config["rlc"]["rlc_menu_driver"]["index"])
+        self.sas_menu_driver.setCurrentIndex(config["sas"]["sas_menu_driver"]["index"])
+        self.sas_menu_config.setCurrentIndex(config["sas"]["sas_menu_config"]["index"])
+        self.chamber_menu_driver.setCurrentIndex(config["chamber"]["chamber_menu_driver"]["index"])
 
-        # self.ac_entry_address.setText(config["ac"]["ac_entry_address"])
-        # self.scope_entry_address.setText(config["scope"]["scope_entry_address"])
-        # self.rlc_entry_address_r.setText(config["rlc"]["rlc_entry_address_r"])
-        # self.rlc_entry_address_p.setText(config["rlc"]["rlc_entry_address_p"])
-        # self.sas_entry_address.setText(config["sas"]["sas_entry_address"])
-        # self.chamber_entry_address.setText(config["chamber"]["chamber_entry_address"])
-        
         self.ac_entry_address.addItems(auto_discovered_connection_addresses)
         self.scope_entry_address.addItems(auto_discovered_connection_addresses)
         self.rlc_entry_address_r.addItems(auto_discovered_connection_addresses)
@@ -105,13 +89,6 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
         self.sas_entry_address.addItems(auto_discovered_connection_addresses)
         self.chamber_entry_address.addItems(auto_discovered_connection_addresses)
 
-        self.sas_menu_config.setCurrentIndex(config["sas"]["sas_menu_config"]["index"])
-        self.ac_menu_driver.setCurrentIndex(config["ac"]["ac_menu_driver"]["index"])
-        self.scope_menu_driver.setCurrentIndex(config["scope"]["scope_menu_driver"]["index"])
-        self.rlc_menu_driver.setCurrentIndex(config["rlc"]["rlc_menu_driver"]["index"])
-        self.sas_menu_driver.setCurrentIndex(config["sas"]["sas_menu_driver"]["index"])
-        self.chamber_menu_driver.setCurrentIndex(config["chamber"]["chamber_menu_driver"]["index"])
-        
         self.ac_entry_address.setCurrentText(config["ac"]["ac_entry_address"])
         self.scope_entry_address.setCurrentText(config["scope"]["scope_entry_address"])
         self.rlc_entry_address_r.setCurrentText(config["rlc"]["rlc_entry_address_r"])
