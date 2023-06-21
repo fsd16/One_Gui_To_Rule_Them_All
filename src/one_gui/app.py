@@ -55,11 +55,16 @@ RUN_EQUIPMENT = True
 class LoadingDialog(QDialog, Ui_LoadingDialog):
     """Class to show a loading dialog with a programmable progress bar
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self, steps, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
         self.setWindowModality(Qt.ApplicationModal)
+        self.progress = 0
+        self.step = 100/steps
 
+        self.set_progress(self.progress)
+        self.show()
+        
     def set_progress(self, value):
         """Function to set the progress of the progress bar
 
@@ -67,6 +72,14 @@ class LoadingDialog(QDialog, Ui_LoadingDialog):
             value (int): Progress value as a percentage. i.e value=50 for 50%
         """
         self.progressBar.setValue(value)
+        QApplication.processEvents()
+    
+    def step_progress(self):
+        self.progress += self.step
+        self.set_progress(int(self.progress))
+    
+    def progress_complete(self):
+        self.close()
 
 #--------------------------------------------------------
 #                   Devices Dialog                      #
@@ -214,7 +227,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.error_msg.resize(QSize(350, 200))
 
         if self.l_config["setup_devices"]:
-            self._on_options_action_devices__triggered()
+            self.setup_devices_dialog()
 
         self.setup_equipment_connection()
             
@@ -280,10 +293,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             list: A list of equipment that errored and was not setup during during initialization.
         """
         errors = list()
-        loading_dlg = LoadingDialog()
-        loading_dlg.set_progress(0)
-        loading_dlg.show()
-        QApplication.processEvents()
+        loading_dlg = LoadingDialog(steps=5)
 
         self.ac_src = None
         try:
@@ -300,8 +310,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.LOG.error("AC Source connection failed")
             errors.append('AC Source')
             
-        loading_dlg.set_progress(20)
-        QApplication.processEvents()
+        loading_dlg.step_progress()
         
         self.scope = None
         try:
@@ -316,8 +325,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.LOG.error("Scope connection failed")
             errors.append('Scope')
             
-        loading_dlg.set_progress(40)
-        QApplication.processEvents()
+        loading_dlg.step_progress()
 
         self.rlc = None
         try:
@@ -336,8 +344,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.LOG.error("RLC connection failed")
             errors.append('RLC')
         
-        loading_dlg.set_progress(60)
-        QApplication.processEvents()
+        loading_dlg.step_progress()
 
         self.sas = None
         try:
@@ -354,8 +361,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.LOG.error("SAS connection failed")
             errors.append('SAS')
 
-        loading_dlg.set_progress(80)
-        QApplication.processEvents()
+        loading_dlg.step_progress()
 
         self.chamber = None
         try:
@@ -378,10 +384,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.LOG.error("Chamber connection failed")
             errors.append('Chamber')
 
-        loading_dlg.set_progress(100)
-        QApplication.processEvents()
-
-        loading_dlg.close()
+        loading_dlg.step_progress()
+        loading_dlg.progress_complete()
         self.LOG.info("Equipment setup complete")
         
         return errors
