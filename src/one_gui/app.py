@@ -34,25 +34,52 @@ print(f"Import time: {import_time - start_time}")
 
 # TODO: Some serious commenting is needed
 
+# TODO: Setup mock equipment
+class Dummy:
+    """Dummy class to be used to mock equipmennt"""
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return self
+
+    def __getattr__(self, *args, **kwargs):
+        return self
+
 RUN_EQUIPMENT = True
 
 #--------------------------------------------------------
 #                   Loading Dialog                      #
 #--------------------------------------------------------
 class LoadingDialog(QDialog, Ui_LoadingDialog):
+    """Class to show a loading dialog with a programmable progress bar
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
         self.setWindowModality(Qt.ApplicationModal)
 
     def set_progress(self, value):
+        """Function to set the progress of the progress bar
+
+        Args:
+            value (int): Progress value as a percentage. i.e value=50 for 50%
+        """
         self.progressBar.setValue(value)
 
 #--------------------------------------------------------
 #                   Devices Dialog                      #
 #--------------------------------------------------------
 class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
+    """Class to allow the user to setup the equipment to be controlled
+    """
     def __init__(self, config, *args, **kwargs):
+        """Initialise the class
+
+        Args:
+            config (dict): Dictionary containing the persistant configuration settings. This is overwritten with the updated configuration.
+        """
         super().__init__()
         self.drivers = EquipmentDrivers()
 
@@ -102,6 +129,8 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
 
     _dialog_entries = 'ac_entry_address, scope_entry_address, rlc_entry_address_r, rlc_entry_address_p, sas_entry_address, chamber_entry_address'
     def _when_dialog_entries__activated(self):
+        """Function to handle dialog entries. Will be called when the user completes an entry by pressing enter or losing focus.
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.currentText()
@@ -124,6 +153,8 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
     
     _dialog_menus = 'sas_menu_config, ac_menu_driver, scope_menu_driver, rlc_menu_driver, sas_menu_driver, chamber_menu_driver'
     def _when_dialog_menus__activated(self):
+        """Function to handle dialog menus. Will be called when the user selects an item from a menu.
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.currentText()
@@ -150,16 +181,26 @@ class DevicesDialog(QDialog, Ui_DevicesDialog, SmartSignal):
             print(f"Chamber source driver selected: {state}")
             self.config["chamber"][obj_name]["item"] = self.drivers.CHAMBER_DRIVERS[state]
 
-    def _on_device_entry_startup__stateChanged(self):
-        state = self.sender().isChecked()
-        print (f"Startup behaviour checked: {state}")
+    _dialog_checks = 'device_entry_startup'
+    def _when_dialog_checks__stateChanged(self):
+        """Function to handle dialog check boxes. Will be called when the user toggles a checkbox.
+        """
+        obj = self.sender()
+        obj_name = obj.objectName()
+        state = obj.isChecked()
+
         self.config["setup_devices"] = state
+        print (f"Startup behaviour checked: {state}")
 
 #--------------------------------------------------------
 #                   Main Window                         #
 #--------------------------------------------------------
-class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal): 
+class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
+    """Class for the main GUI window. This class allows the user to control the configured equipment on a bench.
+    """
     def __init__(self, *args, **kwargs):
+        """Initilise the class
+        """
         super().__init__(*args, **kwargs)
         
         self.setupUi(self)
@@ -183,6 +224,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     #                       Helpers                         #
     #--------------------------------------------------------
     def setup_logging(self):
+        """Function to setup logging for the gui application
+        """
+
         # You can format what is printed to text box
         self.central_textEdit_log.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
         # self.central_textEdit_log.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
@@ -192,6 +236,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.LOG.setLevel(logging.ERROR)
 
     def setup_config(self):
+        """Function to load the persistant configuration settings
+        """
         dir_path = Path(__file__).resolve().parent
         with open(dir_path.joinpath("config", "config.json"), "r") as jsonfile:
             self.d_config = json.load(jsonfile)
@@ -208,14 +254,31 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.LOG.info("Config loaded")
 
     def setup_view(self):
+        """Function to setup embedded logging box using persistent settings
+        """
         self.view_action_log.setChecked(self.l_config["view"]["view_action_log"])
         
         if not self.l_config["view"]["view_action_log"]:
             self.central_textEdit_log.hide()
             self.resize(self.minimumSizeHint())
             
+    def setup_devices_dialog(self):
+        self.LOG.info("Device setup triggered")
+        
+        dlg = DevicesDialog(self.l_config)
+        result = dlg.exec()
+
+        if result:
+            self.l_config = dlg.config
+        else:
+            sys.exit()
 
     def setup_equipment(self):
+        """Function to initialise and setup bench equipment.
+
+        Returns:
+            list: A list of equipment that errored and was not setup during during initialization.
+        """
         errors = list()
         loading_dlg = LoadingDialog()
         loading_dlg.set_progress(0)
@@ -324,6 +387,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         return errors
 
     def setup_equipment_connection(self):
+        """Function to handle equipment setup
+        """
         self.LOG.info("Equipment connect triggered")
         try:
             if RUN_EQUIPMENT:
@@ -343,6 +408,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.LOG.error(traceback.format_exc())
         
     def setup_sas_plot(self):
+        """Funtion to setup the plot embedded in the GUI for the SAS.
+        """
         self.sas_plot.setBackground('w')
 
         # Set up plot item
@@ -371,6 +438,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.sas_timer.timeout.connect(self.sas_update_plot_pv)
 
     def sas_plot_pvi(self, data):
+        """Function to update the embedded sas plot with the curve set by the sas variables.
+
+        Args:
+            data (dict): Dictionary containing the power, voltage, and current data for the plot.
+        """
         current = data["i"]
         voltage = data["v"]
         power = data["p"]
@@ -390,12 +462,16 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.left_vb.addItem(self.pv_point)
 
     def sas_update_plot_pv(self):
+        """Function to update the embedded sas plot with the current power voltage point.
+        """
         power, voltage = self.sas.get_sas_pv()
         # self.LOG.info(f"Power: {power}, Voltage: {voltage}")
         self.pv_point.clear()
         self.pv_point.addPoints(array([voltage]), array([power]), pen='g', symbol='o')
 
     def rlc_auto_update_params(self):
+        """Function to set the rlc parameters based on the present sas and ac source paramters
+        """
         if self.rlc_check_auto.isChecked():
             self.rlc_entry_ac_volts.setValue(self.l_config["ac"]["ac_entry_ac_volts"])
             self.rlc_entry_freq.setValue(self.l_config["ac"]["ac_entry_freq"])
@@ -405,6 +481,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.rlc.turn_on(self.l_config["rlc"])
 
     def force_update_ui(self, config):
+        """Function to force update the gui elements with the persistant settings
+
+        Args:
+            config (dict): Dictionary containing the persistant settings
+        """
         children = []
         children += self.findChildren(QSpinBox)
         children += self.findChildren(QDoubleSpinBox)
@@ -449,37 +530,34 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     #--------------------------------------------------------
     #                       Main Items                      #
     #--------------------------------------------------------
-    def _on_options_action_connect__triggered(self):
-        self.setup_equipment_connection()
-
-    def _on_options_action_devices__triggered(self):
-        self.LOG.info("Device setup triggered")
-        
-        dlg = DevicesDialog(self.l_config)
-        result = dlg.exec()
-
-        if result:
-            self.l_config = dlg.config
-        else:
-            sys.exit()
-
-    def _on_options_action_restore__triggered(self):
-        self.LOG.info("Restore defaults triggered")
-        self.force_update_ui(self.d_config)
-
-    def _on_view_action_log__triggered(self):
+    _actions = 'options_action_connect, options_action_devices, options_action_restore, view_action_log'
+    def _when_actions__triggered(self):
+        """Function to handle menubar actions. Will be called when the user selects an item from a menu in the menubar.
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.isChecked()
 
-        self.l_config["view"][obj_name] = state
+        if obj_name == "options_action_connect":
+            self.LOG.info("Reconnect Equipement clicked")
+            if RUN_EQUIPMENT:
+                self.setup_equipment_connection()
+        elif obj_name == "options_action_devices":
+            self.LOG.info("Configure Equipment clicked")
+            self.setup_devices_dialog()
+        elif obj_name == "options_action_restore":
+            self.LOG.info("Restore Defaults clicked")
+            self.force_update_ui(self.d_config)
+        elif obj_name == "view_action_log":
+            self.LOG.info("View Log clicked")
+            self.l_config["view"][obj_name] = state
 
-        if state:
-            self.central_textEdit_log.show()
-        else:
-            self.central_textEdit_log.hide()
-            self.resize(self.minimumSizeHint())
-    
+            if state:
+                self.central_textEdit_log.show()
+            else:
+                self.central_textEdit_log.hide()
+                self.resize(self.minimumSizeHint())
+
     def closeEvent(self, event):
         self._when_closers__clicked()
 
@@ -490,6 +568,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     _closers = 'sas_butt_close, ac_butt_close, scope_butt_close, rlc_butt_close, chamber_butt_close'
     def _when_closers__clicked(self):
+        """Fucntion to handle close events. Will be called when any of the close buttons are clicked
+        """
         self.LOG.info("Close clicked")
         self.hide()
         
@@ -522,6 +602,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     #--------------------------------------------------------
     _ac_buttons = 'ac_butt_apply, ac_butt_off, ac_butt_on'
     def _when_ac_buttons__clicked(self):
+        """Function to handle the ac tab buttons. Will be called whenever a button on the ac tab is clicked
+        """
         obj = self.sender()
         obj_name = obj.objectName()
 
@@ -540,12 +622,16 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                 self.ac_src.turn_off()
         
     def _on_ac_check_abnormal__stateChanged(self):
+        """Function to handle the ac tab check buttons. Will be called whenever a check on the ac tab is toggled
+        """
         state = self.sender().isChecked()
         self.LOG.info (f"Abnormal checked: {state}")
         self.l_config["ac"]["ac_check_abnormal"] = state
 
     _ac_entries = 'ac_entry_step_size, ac_entry_freq, ac_entry_ac_volts'
     def _when_ac_entries__valueChanged(self):
+        """Function to handle the ac tab entries. Will be called whenever a entry on the ac tab is completed or focus is lost
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.value()
@@ -561,6 +647,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     _ac_menus = 'ac_menu_abnormal, ac_menu_profile'
     def _when_ac_menus__activated(self):
+        """Function to handle the ac tab menus. Will be called whenever a menu on the ac tab is activated
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.currentText()
@@ -585,6 +673,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     _ac_radios = 'ac_radio_single, ac_radio_split, ac_radio_three'
     def _when_ac_radios__toggled(self):
+        """Function to handle the ac tab radio buttons. Will be called whenever a radio button on the ac tab is toggled
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.isChecked()
@@ -603,6 +693,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     #--------------------------------------------------------
     _rlc_buttons = 'rlc_butt_off, rlc_butt_on'
     def _when_rlc_buttons__clicked(self):
+        """Function to handle the rlc tab buttons. Will be called whenever a button on the rlc tab is clicked
+        """
         obj = self.sender()
         obj_name = obj.objectName()
 
@@ -631,6 +723,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     _rlc_entries = 'rlc_entry_ac_volts, rlc_entry_freq, rlc_entry_reactive_pwr, rlc_entry_real_pwr'
     def _when_rlc_entries__valueChanged(self):
+        """Function to handle the rlc tab entries. Will be called whenever a entry on the rlc tab is completed or focus is lost
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.value()
@@ -648,6 +742,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     _rlc_checks = 'rlc_check_auto'
     def _when_rlc_checks__stateChanged(self):
+        """Function to handle the rlc tab check buttons. Will be called whenever a check button on the rlc tab is toggled
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.isChecked()
@@ -677,6 +773,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     
     _rlc_auto_check_entries = 'ac_entry_ac_volts, ac_entry_freq, sas_entry_pmp'
     def _when_rlc_auto_check_entries__valueChanged(self):
+        """Function to handle the rlc tab autofill entries. Will be called whenever a snooped entry is completed
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.value()
@@ -691,6 +789,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     _rlc_auto_check_applies = 'ac_butt_apply'
     def _when_rlc_auto_checks__clicked(self):
+        """Function to handle the rlc tab auto buttons. Will be called whenever a snooped button is clicked
+        """
         obj = self.sender()
         obj_name = obj.objectName()
 
@@ -705,6 +805,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     #--------------------------------------------------------
     _sas_buttons = 'sas_butt_off, sas_butt_on, sas_butt_apply'
     def _when_sas_buttons__clicked(self):
+        """Function to handle the sas tab buttons. Will be called whenever a button on the sas tab is clicked
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.text()
@@ -727,6 +829,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     _sas_entries = 'sas_entry_vmp, sas_entry_pmp, sas_entry_ff, sas_entry_irrad'
     def _when_sas_entries__editingFinished(self):
+        """Function to handle the sas tab entries. Will be called whenever a entry on the sas tab is complted or focus is lost
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.value()
@@ -747,6 +851,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     #--------------------------------------------------------
     _scope_buttons = 'scope_butt_cap, scope_butt_apply, scope_butt_browse'
     def _when_scope_buttons__clicked(self):
+        """Function to handle the scope tab buttons. Will be called whenever a button on the scope tab is clicked
+        """
         obj = self.sender()
         obj_name = obj.objectName()
 
@@ -766,6 +872,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         
     _scope_checks = 'scope_check_auto, scope_check_date, scope_check_invert'
     def _when_scope_checks__stateChanged(self):
+        """Function to handle the scope tab check buttons. Will be called whenever a checkbutton on the scope tab is toggled
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.isChecked()
@@ -787,6 +895,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     
     _scope_entries = 'scope_line_cap_name, scope_line_cap_path, scope_line_ch1_lab, scope_line_ch2_lab, scope_line_ch3_lab, scope_line_ch4_lab'
     def _when_scope_entries__editingFinished(self):
+        """Function to handle the scope tab entries. Will be called whenever a entry on the scope tab is completed or focus is lost
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.text()
@@ -811,6 +921,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     #--------------------------------------------------------
     _chamber_buttons = 'chamber_butt_apply'
     def _when_chamber_buttons__clicked(self):
+        """Function to handle the chamber tab buttons. Will be called whenever a button on the chamber tab is clicked
+        """
         obj = self.sender()
         obj_name = obj.objectName()
 
@@ -821,6 +933,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
     _chamber_entries = 'chamber_entry_temp'
     def _when_chamber_entries__editingFinished(self):
+        """Function to handle the chamber tab entries. Will be called whenever a entry on the chamber tab is completed or focus is lost
+        """
         obj = self.sender()
         obj_name = obj.objectName()
         state = obj.value()
@@ -832,6 +946,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
 
 def main():
+    """Funciton to invoke the main process
+    """
     app = QApplication(sys.argv)
     app_time = time.time()
     print(f"App time: {app_time - import_time}")
