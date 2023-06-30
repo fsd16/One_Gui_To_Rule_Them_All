@@ -1,9 +1,8 @@
 from pathlib import Path
 from time import strftime, localtime, sleep
 from concurrent import futures
-from one_gui.logic.equipment_library import import_class_from_string
 from threading import Thread
-from one_gui.logic.utils import uniquify
+from one_gui.logic.utils import import_class_from_string, uniquify
 
 thread_pool_executor = futures.ThreadPoolExecutor(max_workers=1)
 
@@ -165,3 +164,27 @@ class Scope():
     def turn_off(self):
         self.close()
         print("Scope conection closed")
+        
+class Mock_Scope():
+
+    def __init__(self, *args, **kwargs):
+        pass
+        
+    # callback to take the scope capture
+    def capture_display(self, *args, **kwargs):
+        pass
+
+    # callback to apply the labels
+    def label(self, *args, **kwargs):
+        pass
+
+    # Create thread for auto capture to run in
+    def auto_capture_on(self, *args, **kwargs):
+        pass
+
+    def auto_capture_off(self, *args, **kwargs):
+        pass
+        
+    # callback to clean up and exit, used by the Close button
+    def turn_off(self, *args, **kwargs):
+        pass

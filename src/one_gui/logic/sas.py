@@ -1,32 +1,43 @@
 import numpy as np
-from enphase_equipment.solar_array_simulator.agilent import AgilentE4360A, AgilentE43XXCluster
-from one_gui.logic.equipment_library import import_class_from_string
+from enphase_equipment.solar_array_simulator.agilent import DcSupplyCluster
+from one_gui.logic.utils import import_class_from_string
 
-class SAS(AgilentE43XXCluster):
+class SAS:
 
-    def __init__(self, driver_path, addresses, *args, **kwargs):
-        sass = []
-        for address in addresses:
+    def __init__(self, driver_path, addresses, config, *args, **kwargs):
+        if type(driver_path) == type(dict()):
+            clusters = []
+            for address in addresses:
+                sas_class = import_class_from_string(driver_path['SAS Drivers'])
+                clusters.append(sas_class(address))
+            parent_class = import_class_from_string(driver_path['Cluster Driver'])
+            self.parent_instance = parent_class()
+        else:
             parent_class = import_class_from_string(driver_path)
-            sass.append(parent_class(address))
-        super().__init__(sass, *args, **kwargs)
-        
+            self.parent_instance = parent_class(config)
+
     def get_sas_pv(self):
 
-        sas_measurement = self.measurement()
+        sas_measurement = self.parent_instance.measurement()
 
         measured_v = sas_measurement['dc_volts']
         measured_i = sas_measurement['dc_amps']
         calculated_p = measured_v * measured_i
 
-        return calculated_p, measured_v
+        sas_data  = {
+            "v": measured_v,
+            "i": measured_i,
+            "p": calculated_p
+        }
+
+        return sas_data
 
     def apply(self, sas_config):
         Pmp = sas_config["sas_entry_pmp"]
         Vmp = sas_config["sas_entry_vmp"]
         ff = sas_config["sas_entry_ff"]
         irrad = sas_config["sas_entry_irrad"]
-        sas_curve = self.create_table(Pmp=float(Pmp),
+        sas_curve = self.parent_instance.create_table(Pmp=float(Pmp),
                                         Vmp=float(Vmp),
                                         FillFactor=float(ff),
                                         irradiance=float(irrad))
@@ -40,16 +51,46 @@ class SAS(AgilentE43XXCluster):
             "p": p_array
         }
 
-        self.select_table()
-        self.select_table_mode()
+        self.parent_instance.select_table()
+        self.parent_instance.select_table_mode()
         print(f"SAS parameters applied: Pmp = {Pmp}, Vmp = {Vmp}, FF = {ff}, Irradiance = {irrad}")
         return sas_data
 
     def turn_on(self):
-        self.on()
+        self.parent_instance.on()
         print("SAS on")
 
     def turn_off(self):
-        self.off()
+        self.parent_instance.off()
         print("SAS off")
         
+class Mock_SAS:
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def get_sas_pv(self, *args, **kwargs):
+
+        sas_data  = {
+            "v": 0,
+            "i": 0,
+            "p": 0
+        }
+
+        return sas_data
+
+    def apply(self, *args, **kwargs):
+        
+        sas_data  = {
+            "v": [0],
+            "i": [0],
+            "p": [0]
+        }
+        
+        return sas_data
+
+    def turn_on(self, *args, **kwargs):
+        pass
+
+    def turn_off(self, *args, **kwargs):
+        pass

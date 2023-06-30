@@ -16,11 +16,11 @@ from numpy import array
 from one_gui.ui.One_GUI_To_Rule_Them_All_ui import Ui_MainWindow
 from one_gui.ui.Devices_Dialog_ui import Ui_DevicesDialog
 from one_gui.ui.Loading_Dialog_ui import Ui_LoadingDialog
-from one_gui.logic.ac_src import AC_SRC
-from one_gui.logic.scope import Scope
-from one_gui.logic.rlc import RLC
-from one_gui.logic.sas import SAS
-from one_gui.logic.chamber import Chamber
+from one_gui.logic.ac_src import AC_SRC, Mock_AC_SRC
+from one_gui.logic.scope import Scope, Mock_Scope
+from one_gui.logic.rlc import RLC, Mock_RLC
+from one_gui.logic.sas import SAS, Mock_SAS
+from one_gui.logic.chamber import Chamber, Mock_Chamber
 from one_gui.logic.signal import SmartSignal
 from one_gui.logic.equipment_library import EquipmentDrivers
 from one_gui.logic.utils import dict_value_to_index, deep_update, discover_addresses
@@ -33,21 +33,10 @@ import_time = time.time()
 print(f"Import time: {import_time - start_time}")
 
 # TODO: Some serious commenting is needed
+# TODO: Fix double entry ranges (AC src ff, irrad)
+# TODO: Setup mock equipment. Use dummay class as path for equipment driver
 
-# TODO: Setup mock equipment
-class Dummy:
-    """Dummy class to be used to mock equipmennt"""
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def __call__(self, *args, **kwargs):
-        return self
-
-    def __getattr__(self, *args, **kwargs):
-        return self
-
-RUN_EQUIPMENT = True
+RUN_EQUIPMENT = False
 
 #--------------------------------------------------------
 #                   Loading Dialog                      #
@@ -249,13 +238,22 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         """Method to setup logging for the gui application
         """
 
-        # You can format what is printed to text box
-        self.central_textEdit_log.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
-        # self.central_textEdit_log.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
-        self.LOG = logging.getLogger(__name__)
-        self.LOG.addHandler(self.central_textEdit_log)
+        self.log = logging.getLogger(__name__)
+        
         # You can control the logging level
-        self.LOG.setLevel(logging.ERROR)
+        self.log.setLevel(logging.INFO)
+
+        # You can format what is printed to text box
+        formatter = logging.Formatter('%(levelname)s - %(message)s')
+
+        self.central_textEdit_log.setFormatter(formatter)
+        self.log.addHandler(self.central_textEdit_log)
+        
+        self.std_out_handler = logging.StreamHandler(sys.stdout)
+        self.std_out_handler.setFormatter(formatter)
+        self.log.addHandler(self.std_out_handler)
+
+        
 
     def setup_config(self):
         """Method to load the persistant configuration settings
@@ -273,7 +271,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config = deep_update(self.d_config, self.l_config)
 
         self.force_update_ui(self.l_config)
-        self.LOG.info("Config loaded")
+        self.log.info("Config loaded")
 
     def setup_view(self):
         """Method to setup embedded logging box using persistent settings
@@ -285,7 +283,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.resize(self.minimumSizeHint())
             
     def setup_devices_dialog(self):
-        self.LOG.info("Device setup triggered")
+        self.log.info("Device setup triggered")
         
         dlg = DevicesDialog(self.l_config)
         result = dlg.exec()
@@ -307,16 +305,19 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.ac_src = None
         try:
             if self.l_config["ac"]["ac_menu_driver"]["item"] != None:
-                self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"]["item"], self.l_config["ac"]["ac_entry_address"])
+                if RUN_EQUIPMENT:
+                    self.ac_src = AC_SRC(self.l_config["ac"]["ac_menu_driver"]["item"], self.l_config["ac"]["ac_entry_address"])
+                else:
+                    self.ac_src = Mock_AC_SRC()
                 self.ac_menu_abnormal.addItems(self.ac_src.AB_WAVEFORMS)
                 self.ac_menu_profile.addItems(self.ac_src.PROFILES)
-                self.LOG.info("AC Source configured")
+                self.log.info("AC Source configured")
             else:
                 self.ac_tab.setDisabled(True)
-                self.LOG.info("AC Source not configured")    
+                self.log.info("AC Source not configured")    
         except VisaIOError:
             self.ac_tab.setDisabled(True)
-            self.LOG.error("AC Source connection failed")
+            self.log.error("AC Source connection failed")
             errors.append('AC Source')
             
         loading_dlg.step_progress()
@@ -324,14 +325,17 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.scope = None
         try:
             if self.l_config["scope"]["scope_menu_driver"]["item"] != None:
-                self.scope = Scope(self.l_config["scope"]["scope_menu_driver"]["item"], self.l_config["scope"]["scope_entry_address"])
-                self.LOG.info("Scope configured")
+                if RUN_EQUIPMENT:
+                    self.scope = Scope(self.l_config["scope"]["scope_menu_driver"]["item"], self.l_config["scope"]["scope_entry_address"])
+                else:
+                    self.scope = Mock_Scope()
+                self.log.info("Scope configured")
             else:
                 self.scope_tab.setDisabled(True)
-                self.LOG.info("Scope not configured") 
+                self.log.info("Scope not configured") 
         except VisaIOError:
             self.scope_tab.setDisabled(True)
-            self.LOG.error("Scope connection failed")
+            self.log.error("Scope connection failed")
             errors.append('Scope')
             
         loading_dlg.step_progress()
@@ -339,18 +343,21 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.rlc = None
         try:
             if self.l_config["rlc"]["rlc_menu_driver"]["item"] != None:
-                try:
-                    self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
-                except SerialException:
-                    self.rlc.close()
-                    self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
-                self.LOG.info("RLC configured")
+                if RUN_EQUIPMENT:
+                    try:
+                        self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
+                    except SerialException:
+                        self.rlc.close()
+                        self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
+                    self.log.info("RLC configured")
+                else:
+                    self.rlc = Mock_RLC()
             else:
                 self.rlc_tab.setDisabled(True)
-                self.LOG.info("RLC not configured")
+                self.log.info("RLC not configured")
         except VisaIOError:
             self.rlc_tab.setDisabled(True)
-            self.LOG.error("RLC connection failed")
+            self.log.error("RLC connection failed")
             errors.append('RLC')
         
         loading_dlg.step_progress()
@@ -359,15 +366,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         try:
             if self.l_config["sas"]["sas_menu_driver"]["item"] != None:
                 sas_addresses = [x.strip() for x in self.l_config["sas"]["sas_entry_address"].split(',')]
-                self.sas = SAS(self.l_config["sas"]["sas_menu_driver"]["item"], sas_addresses, self.l_config["sas"]["sas_menu_config"]["item"])
-                self.LOG.info(self.l_config["sas"]["sas_menu_config"])
-                self.LOG.info("SAS configured")
+                if RUN_EQUIPMENT:
+                    self.sas = SAS(self.l_config["sas"]["sas_menu_driver"]["item"], sas_addresses, self.l_config["sas"]["sas_menu_config"]["item"])
+                else:
+                    self.sas = Mock_SAS()
+                self.log.info(self.l_config["sas"]["sas_menu_config"])
+                self.log.info("SAS configured")
             else:
                 self.sas_tab.setDisabled(True)
-                self.LOG.info("SAS not configured")
+                self.log.info("SAS not configured")
         except VisaIOError:
             self.sas_tab.setDisabled(True)
-            self.LOG.error("SAS connection failed")
+            self.log.error("SAS connection failed")
             errors.append('SAS')
 
         loading_dlg.step_progress()
@@ -379,46 +389,49 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                     address = int(re.sub('\\D', '', self.l_config["chamber"]["chamber_entry_address"]))
                 else:
                     address = self.l_config["chamber"]["chamber_entry_address"]
-                try:
-                    self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
-                except SerialException:
-                    self.chamber.close()
-                    self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
-                self.LOG.info("Chamber configured")
+                if RUN_EQUIPMENT:
+                    try:
+                        self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
+                    except SerialException:
+                        self.chamber.close()
+                        self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
+                    self.log.info("Chamber configured")
+                else:
+                    self.chamber = Mock_Chamber()
+                self.log.info("Chamber configured")
             else:
                 self.chamber_tab.setDisabled(True)
-                self.LOG.info("Chamber not configured")
+                self.log.info("Chamber not configured")
         except VisaIOError:
             self.chamber_tab.setDisabled(True)
-            self.LOG.error("Chamber connection failed")
+            self.log.error("Chamber connection failed")
             errors.append('Chamber')
 
         loading_dlg.step_progress()
         loading_dlg.progress_complete()
-        self.LOG.info("Equipment setup complete")
+        self.log.info("Equipment setup complete")
         
         return errors
 
     def setup_equipment_connection(self):
         """Method to handle equipment setup
         """
-        self.LOG.info("Equipment connect triggered")
+        self.log.info("Equipment connect triggered")
         try:
-            if RUN_EQUIPMENT:
-                errors = self.setup_equipment()
-                
-                if len(errors) != 0:
-                    self.error_msg.setWindowTitle("Connection failed")
-                    error_msg = ''.join(f'&nbsp;&nbsp;&nbsp;&nbsp;{errored}<br/>' for errored in errors)
-                    self.error_msg.showMessage("The following equipment failed to connect:<br/>"\
-                                            f"{error_msg}"\
-                                                "Ensure equipment is turned on and address is correct.<br/>"\
-                                                "&nbsp;&nbsp;&nbsp;&nbsp;(Options->Configure Equipment)<br/>"
-                                                "Then retry connection.<br/>"\
-                                                "&nbsp;&nbsp;&nbsp;&nbsp;(Options->Reconnect Equipment)")
-                    self.error_msg.exec()
+            errors = self.setup_equipment()
+            
+            if len(errors) != 0:
+                self.error_msg.setWindowTitle("Connection failed")
+                error_msg = ''.join(f'&nbsp;&nbsp;&nbsp;&nbsp;{errored}<br/>' for errored in errors)
+                self.error_msg.showMessage("The following equipment failed to connect:<br/>"\
+                                        f"{error_msg}"\
+                                            "Ensure equipment is turned on and address is correct.<br/>"\
+                                            "&nbsp;&nbsp;&nbsp;&nbsp;(Options->Configure Equipment)<br/>"
+                                            "Then retry connection.<br/>"\
+                                            "&nbsp;&nbsp;&nbsp;&nbsp;(Options->Reconnect Equipment)")
+                self.error_msg.exec()
         except Exception as e:
-            self.LOG.error(traceback.format_exc())
+            self.log.error(traceback.format_exc())
         
     def setup_sas_plot(self):
         """Funtion to setup the plot embedded in the GUI for the SAS.
@@ -477,8 +490,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     def sas_update_plot_pv(self):
         """Method to update the embedded sas plot with the current power voltage point.
         """
-        power, voltage = self.sas.get_sas_pv()
-        # self.LOG.info(f"Power: {power}, Voltage: {voltage}")
+        data = self.sas.get_sas_pv()
+        current = data["i"]
+        voltage = data["v"]
+        power = data["p"]
+        # self.log.info(f"Power: {power}, Voltage: {voltage}")
         self.pv_point.clear()
         self.pv_point.addPoints(array([voltage]), array([power]), pen='g', symbol='o')
 
@@ -490,8 +506,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
             self.rlc_entry_freq.setValue(self.l_config["ac"]["ac_entry_freq"])
             self.rlc_entry_reactive_pwr.setValue(0)
             self.rlc_entry_real_pwr.setValue(self.l_config["sas"]["sas_entry_pmp"])
-            if RUN_EQUIPMENT:
-                self.rlc.turn_on(self.l_config["rlc"])
+            self.rlc.turn_on(self.l_config["rlc"])
 
     def force_update_ui(self, config):
         """Method to force update the gui elements with the persistant settings
@@ -552,17 +567,16 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         state = obj.isChecked()
 
         if obj_name == "options_action_connect":
-            self.LOG.info("Reconnect Equipement clicked")
-            if RUN_EQUIPMENT:
-                self.setup_equipment_connection()
+            self.log.info("Reconnect Equipement clicked")
+            self.setup_equipment_connection()
         elif obj_name == "options_action_devices":
-            self.LOG.info("Configure Equipment clicked")
+            self.log.info("Configure Equipment clicked")
             self.setup_devices_dialog()
         elif obj_name == "options_action_restore":
-            self.LOG.info("Restore Defaults clicked")
+            self.log.info("Restore Defaults clicked")
             self.force_update_ui(self.d_config)
         elif obj_name == "view_action_log":
-            self.LOG.info("View Log clicked")
+            self.log.info("View Log clicked")
             self.l_config["view"][obj_name] = state
 
             if state:
@@ -583,7 +597,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
     def _when_closers__clicked(self):
         """Fucntion to handle close events. Will be called when any of the close buttons are clicked
         """
-        self.LOG.info("Close clicked")
+        self.log.info("Close clicked")
         self.hide()
         
         if self.ac_src != None:
@@ -592,21 +606,20 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         if self.sas != None:
             self.sas.turn_off()
         if self.rlc != None:
-            self.rlc.close()
-            # self.rlc.turn_off()
+            self.rlc.turn_off()
         if self.scope != None:
             self.scope.turn_off()
         if self.chamber != None:
             self.chamber.close()
 
-        self.LOG.info("Equipment turned off")
+        self.log.info("Equipment turned off")
 
         # save config
         dir_path = Path(__file__).resolve().parent
         with open(dir_path.joinpath("config", "local_config.json"), "w") as jsonfile:
             json.dump(self.l_config, jsonfile)
 
-        self.LOG.info("Config saved")
+        self.log.info("Config saved")
 
         sys.exit()
 
@@ -621,24 +634,21 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
 
         if obj_name == "ac_butt_apply":
-            self.LOG.info("Apply clicked")
-            if RUN_EQUIPMENT:
-                self.ac_src.apply(self.l_config["ac"])
+            self.log.info("Apply clicked")
+            self.ac_src.apply(self.l_config["ac"])
             self.rlc_auto_update_params()
         elif obj_name == "ac_butt_on":
-            self.LOG.info("AC on clicked")
-            if RUN_EQUIPMENT:
-                self.ac_src.turn_on()
+            self.log.info("AC on clicked")
+            self.ac_src.turn_on()
         elif obj_name == "ac_butt_off":
-            self.LOG.info("AC off clicked")
-            if RUN_EQUIPMENT:
-                self.ac_src.turn_off()
+            self.log.info("AC off clicked")
+            self.ac_src.turn_off()
         
     def _on_ac_check_abnormal__stateChanged(self):
         """Method to handle the ac tab check buttons. Will be called whenever a check on the ac tab is toggled
         """
         state = self.sender().isChecked()
-        self.LOG.info (f"Abnormal checked: {state}")
+        self.log.info (f"Abnormal checked: {state}")
         self.l_config["ac"]["ac_check_abnormal"] = state
 
     _ac_entries = 'ac_entry_step_size, ac_entry_freq, ac_entry_ac_volts'
@@ -652,11 +662,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["ac"][obj_name] = state
 
         if obj_name == "ac_entry_step_size":
-            self.LOG.info(f"Step size entered: {state}")
+            self.log.info(f"Step size entered: {state}")
         elif obj_name == "ac_entry_freq":
-            self.LOG.info(f"Frequency entered: {state}")
+            self.log.info(f"Frequency entered: {state}")
         elif obj_name == "ac_entry_ac_volts":
-            self.LOG.info(f"Ac Volts entered: {state}")
+            self.log.info(f"Ac Volts entered: {state}")
 
     _ac_menus = 'ac_menu_abnormal, ac_menu_profile'
     def _when_ac_menus__activated(self):
@@ -669,11 +679,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["ac"][obj_name] = state
 
         if obj_name == "ac_menu_abnormal":
-            self.LOG.info(f"Abnormal waveform selected: {state}")
+            self.log.info(f"Abnormal waveform selected: {state}")
         elif obj_name == "ac_menu_profile":
-            self.LOG.info(f"Profile selected: {state}")
-            if RUN_EQUIPMENT:
-                profile = self.ac_src.PROFILES[state]
+            self.log.info(f"Profile selected: {state}")
+            profile = self.ac_src.PROFILES[state]
             self.ac_entry_ac_volts.setValue(profile[0])
             self.ac_entry_freq.setValue(profile[1])
             
@@ -695,11 +704,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["ac"][obj_name] = state
 
         if obj_name == "ac_radio_single" and state:
-            self.LOG.info("Single selected")
+            self.log.info("Single selected")
         elif obj_name == "ac_radio_split" and state:
-            self.LOG.info("Split selected")
+            self.log.info("Split selected")
         elif obj_name == "ac_radio_three" and state:
-            self.LOG.info("Three selected")
+            self.log.info("Three selected")
 
     #--------------------------------------------------------
     #                       RLC Tab                         #
@@ -712,15 +721,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
 
         if obj_name == "rlc_butt_off":
-            self.LOG.info("RLC off clicked")
-            if RUN_EQUIPMENT:
-                self.rlc.turn_off()
+            self.log.info("RLC off clicked")
+            self.rlc.turn_off()
         elif obj_name == "rlc_butt_on":
-            self.LOG.info("RLC on clicked")
+            self.log.info("RLC on clicked")
             rlc_config = self.l_config["rlc"]
             try:
-                if RUN_EQUIPMENT:
-                    self.rlc.turn_on(rlc_config)
+                self.rlc.turn_on(rlc_config)
             except self.rlc.NoInput:
                 self.error_msg.setWindowTitle("No Inputs")
                 self.error_msg.showMessage("Why do I even exist?")
@@ -745,13 +752,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["rlc"][obj_name] = state
 
         if obj_name == "rlc_entry_ac_volts":
-            self.LOG.info(f"Ac Volts entered: {state}")
+            self.log.info(f"Ac Volts entered: {state}")
         elif obj_name == "rlc_entry_freq":
-            self.LOG.info(f"Frequency entered: {state}")
+            self.log.info(f"Frequency entered: {state}")
         elif obj_name == "rlc_entry_reactive_pwr":
-            self.LOG.info(f"Reactive power entered: {state}")
+            self.log.info(f"Reactive power entered: {state}")
         elif obj_name == "rlc_entry_real_pwr":
-            self.LOG.info(f"Real power entered: {state}")
+            self.log.info(f"Real power entered: {state}")
 
     _rlc_checks = 'rlc_check_auto'
     def _when_rlc_checks__stateChanged(self):
@@ -764,7 +771,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["rlc"][obj_name] = state
 
         if obj_name == "rlc_check_auto":
-            self.LOG.info (f"Auto set RLC parameters checked: {state}")
+            self.log.info (f"Auto set RLC parameters checked: {state}")
             if state:
                 self.rlc_entry_ac_volts.setValue(self.l_config["ac"]["ac_entry_ac_volts"])
                 self.rlc_entry_freq.setValue(self.l_config["ac"]["ac_entry_freq"])
@@ -809,9 +816,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
 
         if self.rlc_check_auto.isChecked():
             if obj_name == "ac_butt_apply":
-                if RUN_EQUIPMENT:
-                        rlc_config = self.rlc.turn_on(rlc_config)
-                        self.l_config["rlc"].update(rlc_config)
+                    rlc_config = self.rlc.turn_on(rlc_config)
+                    self.l_config["rlc"].update(rlc_config)
 
     #--------------------------------------------------------
     #                       SAS Tab                         #
@@ -825,19 +831,16 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         state = obj.text()
 
         if obj_name == "sas_butt_off":
-            self.LOG.info("SAS off clicked")
-            if RUN_EQUIPMENT:
-                self.sas.turn_off()
+            self.log.info("SAS off clicked")
+            self.sas.turn_off()
         elif obj_name == "sas_butt_on":
-            self.LOG.info("SAS on clicked")
-            if RUN_EQUIPMENT:
-                self.sas.turn_on()
+            self.log.info("SAS on clicked")
+            self.sas.turn_on()
         elif obj_name == "sas_butt_apply":
-            self.LOG.info("Apply clicked")
-            if RUN_EQUIPMENT:
-                sas_data =  self.sas.apply(self.l_config["sas"])
-                self.sas_plot_pvi(sas_data)
-                self.sas_timer.start()
+            self.log.info("Apply clicked")
+            sas_data =  self.sas.apply(self.l_config["sas"])
+            self.sas_plot_pvi(sas_data)
+            self.sas_timer.start()
             self.rlc_auto_update_params()
 
     _sas_entries = 'sas_entry_vmp, sas_entry_pmp, sas_entry_ff, sas_entry_irrad'
@@ -851,13 +854,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["sas"][obj_name] = state
         
         if obj_name == "sas_entry_vmp":
-            self.LOG.info(f"Vmp entered: {state}")
+            self.log.info(f"Vmp entered: {state}")
         elif obj_name == "sas_entry_pmp":
-            self.LOG.info(f"Pmp entered: {state}")
+            self.log.info(f"Pmp entered: {state}")
         elif obj_name == "sas_entry_ff":
-            self.LOG.info(f"Fill Factor entered: {state}")
+            self.log.info(f"Fill Factor entered: {state}")
         elif obj_name == "sas_entry_irrad":
-            self.LOG.info(f"Irradiance entered: {state}")
+            self.log.info(f"Irradiance entered: {state}")
 
     #--------------------------------------------------------
     #                       Scope Tab                       #
@@ -870,17 +873,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
 
         if obj_name == "scope_butt_cap":
-            self.LOG.info("Capture clicked")
-            if RUN_EQUIPMENT:
-                self.scope.capture_display(self.l_config["scope"])
+            self.log.info("Capture clicked")
+            self.scope.capture_display(self.l_config["scope"])
         elif obj_name == "scope_butt_apply":
-            self.LOG.info("Apply labels clicked")
-            if RUN_EQUIPMENT:
-                self.scope.label(self.l_config["scope"])
+            self.log.info("Apply labels clicked")
+            self.scope.label(self.l_config["scope"])
         elif obj_name == "scope_butt_browse":
             path = str(QFileDialog.getExistingDirectory())
             self.scope_line_cap_path.setText(path)
-            self.LOG.info(f"Capture path entered: {path}")
+            self.log.info(f"Capture path entered: {path}")
             self.l_config["scope"][obj_name] = path
         
     _scope_checks = 'scope_check_auto, scope_check_date, scope_check_invert'
@@ -894,17 +895,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["scope"][obj_name] = state
 
         if obj_name == "scope_check_auto":
-            self.LOG.info (f"Auto capture checked: {state}")
-            if state:
-                if RUN_EQUIPMENT:    
-                    self.scope.auto_capture_on(self.l_config["scope"])
+            self.log.info (f"Auto capture checked: {state}")
+            if state: 
+                self.scope.auto_capture_on(self.l_config["scope"])
             else:
-                if RUN_EQUIPMENT:
-                    self.scope.auto_capture_off()
+                self.scope.auto_capture_off()
         elif obj_name == "scope_check_date":
-            self.LOG.info (f"Date checked: {state}")
+            self.log.info (f"Date checked: {state}")
         elif obj_name == "scope_check_invert":
-            self.LOG.info (f"Invert checked: {state}")
+            self.log.info (f"Invert checked: {state}")
     
     _scope_entries = 'scope_line_cap_name, scope_line_cap_path, scope_line_ch1_lab, scope_line_ch2_lab, scope_line_ch3_lab, scope_line_ch4_lab'
     def _when_scope_entries__editingFinished(self):
@@ -917,17 +916,17 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["scope"][obj_name] = state
 
         if obj_name == "scope_line_cap_name":
-            self.LOG.info(f"Capture name entered: {state}")
+            self.log.info(f"Capture name entered: {state}")
         elif obj_name == "scope_line_cap_path":
-            self.LOG.info(f"Capture path entered: {state}")
+            self.log.info(f"Capture path entered: {state}")
         elif obj_name == "scope_line_ch1_lab":
-            self.LOG.info(f"CH1 label entered: {state}")
+            self.log.info(f"CH1 label entered: {state}")
         elif obj_name == "scope_line_ch2_lab":
-            self.LOG.info(f"CH2 label entered: {state}")
+            self.log.info(f"CH2 label entered: {state}")
         elif obj_name == "scope_line_ch3_lab":
-            self.LOG.info(f"CH3 label entered: {state}")
+            self.log.info(f"CH3 label entered: {state}")
         elif obj_name == "scope_line_ch4_lab":
-            self.LOG.info(f"CH4 label entered: {state}")
+            self.log.info(f"CH4 label entered: {state}")
 
     #--------------------------------------------------------
     #                     Chamber Tab                       #
@@ -940,9 +939,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         obj_name = obj.objectName()
 
         if obj_name == "chamber_butt_apply":
-            self.LOG.info("Apply clicked")
-            if RUN_EQUIPMENT:
-                self.chamber.set_temperature(self.l_config["chamber"]["chamber_entry_temp"])
+            self.log.info("Apply clicked")
+            self.chamber.apply(self.l_config["chamber"]["chamber_entry_temp"])
 
     _chamber_entries = 'chamber_entry_temp'
     def _when_chamber_entries__editingFinished(self):
@@ -955,7 +953,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.l_config["chamber"][obj_name] = state
 
         if obj_name == "chamber_entry_temp":
-            self.LOG.info(f"Temperature entered: {state}")
+            self.log.info(f"Temperature entered: {state}")
 
 
 def main():

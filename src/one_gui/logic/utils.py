@@ -2,6 +2,7 @@ from typing import Dict, Any, TypeVar
 from pathlib import Path
 from serial.tools.list_ports import comports
 from pyvisa import ResourceManager
+import importlib
 
 KeyType = TypeVar('KeyType')
 
@@ -49,3 +50,39 @@ def discover_addresses():
     filtered_addresses = [port_info.device for port_info in all_serial_port_info]
     filtered_addresses += [address for address in all_visa_addresses if 'GPIB' in address]
     return sorted(filtered_addresses)
+
+def import_class_from_string(path):
+    '''Takes `path`, a string, and returns a class.'''
+    module = '.'.join(path.split('.')[:-1])
+    class_ = path.split('.')[-1]
+    imported_module = importlib.import_module(name=module)
+    return getattr(imported_module, class_)
+
+class DummyClass:
+    """Class to to be used as a dummy. Ideal behaviour is any interaction with the class does nothing. Not perfect when a specific return is expected 
+    """
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __getitem__(self, key):
+        return [0]
+    
+    def __iter__(self):
+        while True:
+            yield None
+
+    def __getattribute__(self, name):
+        return self
+    
+    def __getattr__(self, name):
+        return self
+
+    def __setattr__(self, name, value):
+        pass
+
+    def __delattr__(self, name):
+        pass
+
+    def __call__(self, *args, **kwargs):
+        return self
