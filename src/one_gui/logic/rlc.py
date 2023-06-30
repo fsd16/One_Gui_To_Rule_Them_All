@@ -3,6 +3,8 @@ from one_gui.logic.utils import import_class_from_string
 from time import sleep
 
 class RLC:
+    """Class wrapper for the RLC load
+    """
     def __init__(self, driver_path, address, *args, **kwargs):
         parent_class = import_class_from_string(driver_path)
         self.parent_instance = parent_class(address)

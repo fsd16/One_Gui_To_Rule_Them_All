@@ -214,7 +214,7 @@
                <bool>false</bool>
               </property>
               <property name="maximum">
-               <double>999.899999999999977</double>
+               <double>1.000000000000000</double>
               </property>
               <property name="value">
                <double>0.780000000000000</double>
@@ -252,7 +252,7 @@
                <bool>false</bool>
               </property>
               <property name="maximum">
-               <double>999.990000000000009</double>
+               <double>1.000000000000000</double>
               </property>
               <property name="value">
                <double>1.000000000000000</double>

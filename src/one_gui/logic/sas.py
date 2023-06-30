@@ -3,7 +3,8 @@ from enphase_equipment.solar_array_simulator.agilent import DcSupplyCluster
 from one_gui.logic.utils import import_class_from_string
 
 class SAS:
-
+    """Class wrapper for the SAS
+    """
     def __init__(self, driver_path, addresses, config, *args, **kwargs):
         if type(driver_path) == type(dict()):
             clusters = []
@@ -65,7 +66,8 @@ class SAS:
         print("SAS off")
         
 class Mock_SAS:
-
+    """Class wrapper for the SAS
+    """
     def __init__(self, *args, **kwargs):
         pass
 

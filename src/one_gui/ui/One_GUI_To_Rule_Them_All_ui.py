@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDoubleSpinBo
     QRadioButton, QSizePolicy, QSpacerItem, QSpinBox,
     QStatusBar, QTabWidget, QWidget)
 
-from one_gui.ui.log import QPlainTextEditLogger
+from .log import QPlainTextEditLogger
 from pyqtgraph import PlotWidget
 
 class Ui_MainWindow(object):
@@ -129,7 +129,7 @@ class Ui_MainWindow(object):
         self.sas_entry_ff.setFrame(True)
         self.sas_entry_ff.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
         self.sas_entry_ff.setAccelerated(False)
-        self.sas_entry_ff.setMaximum(999.899999999999977)
+        self.sas_entry_ff.setMaximum(1.000000000000000)
         self.sas_entry_ff.setValue(0.780000000000000)
 
         self.formLayout.setWidget(2, QFormLayout.FieldRole, self.sas_entry_ff)
@@ -146,7 +146,7 @@ class Ui_MainWindow(object):
         self.sas_entry_irrad.setFrame(True)
         self.sas_entry_irrad.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
         self.sas_entry_irrad.setAccelerated(False)
-        self.sas_entry_irrad.setMaximum(999.990000000000009)
+        self.sas_entry_irrad.setMaximum(1.000000000000000)
         self.sas_entry_irrad.setValue(1.000000000000000)
 
         self.formLayout.setWidget(3, QFormLayout.FieldRole, self.sas_entry_irrad)

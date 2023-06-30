@@ -7,7 +7,8 @@ from one_gui.logic.utils import import_class_from_string, uniquify
 thread_pool_executor = futures.ThreadPoolExecutor(max_workers=1)
 
 class Scope():
-
+    """Class wrapper for the scope
+    """
     def __init__(self, driver_path, *args, **kwargs):
         parent_class = import_class_from_string(driver_path)
         self.__class__ = type(self.__class__.__name__,
@@ -166,7 +167,8 @@ class Scope():
         print("Scope conection closed")
         
 class Mock_Scope():
-
+    """Mock Class wrapper for the scope
+    """
     def __init__(self, *args, **kwargs):
         pass
         

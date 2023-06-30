@@ -5,7 +5,8 @@ from one_gui.logic.utils import import_class_from_string
 import pyvisa as visa
 
 class AC_SRC:
-        
+    """Class wrapper for the ac source
+    """    
     def __init__(self, driver_path, address, *args, **kwargs):
         parent_class = import_class_from_string(driver_path)
         self.parent_instance = parent_class(address)
@@ -70,6 +71,8 @@ class AC_SRC:
         print("Manual control of AC source restored")
         
 class Mock_AC_SRC:
+    """Mock Class wrapper for the ac source
+    """
     def __init__(self, *args, **kwargs):
 
         # pre defined profiles
