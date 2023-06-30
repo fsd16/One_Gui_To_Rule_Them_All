@@ -33,7 +33,6 @@ import_time = time.time()
 print(f"Import time: {import_time - start_time}")
 
 # TODO: Some serious commenting is needed
-# TODO: Fix double entry ranges (AC src ff, irrad)
 # TODO: Setup mock equipment. Use dummay class as path for equipment driver
 
 RUN_EQUIPMENT = False
