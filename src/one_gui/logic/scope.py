@@ -110,7 +110,7 @@ class Scope():
         
         if not Path(capture_folder).exists():
             Path(capture_folder).mkdir(parents=True)
-            print(f"Made filepath: {capture_folder}")
+            # print(f"Made filepath: {capture_folder}")
 
         date_prefix = ''
         if sas_config["scope_check_date"]:
@@ -128,7 +128,7 @@ class Scope():
             fileformat = 'PNG'
         self.capture(filename, invert_graticule=sas_config["scope_check_invert"], fileformat=fileformat)
         
-        print(f"Scope display captured to: {filename}")
+        # print(f"Scope display captured to: {filename}")
 
     # callback to apply the labels
     def label(self, sas_config):
@@ -136,7 +136,7 @@ class Scope():
         self.display_labels('ON')
         self.set_channel_labels(ch1, ch2, ch3, ch4)
         
-        print(f"Scope channel labels applied: CH1 = {ch1}, CH2 = {ch2}, CH3 = {ch3}, CH4 = {ch4}")
+        # print(f"Scope channel labels applied: CH1 = {ch1}, CH2 = {ch2}, CH3 = {ch3}, CH4 = {ch4}")
 
     # Automatically scope capture if trigger occurs
     def auto_capture(self, sas_config):
@@ -144,7 +144,7 @@ class Scope():
         
         while self.auto_cap_run:
             if self.get_triggered(): # True when a trigger has occured
-                print("Capture Scope Data")
+                # print("Capture Scope Data")
                 sleep(0.5)
                 self.capture_display(sas_config)
                 self.set_trigger_control("Single")
@@ -157,18 +157,18 @@ class Scope():
         self.auto_cap_run = True
         # self.scope_run_state = self.ask(":RSTate?")
         # print(self.scope_run_state)
-        print("Auto capture started")
+        # print("Auto capture started")
 
     def auto_capture_off(self):
         self.auto_cap_run = False
         # print(f":{self.scope_run_state}")
         # self.write(f":{self.scope_run_state}")
-        print("Auto capture stopped")
+        # print("Auto capture stopped")
         
     # callback to clean up and exit, used by the Close button
     def turn_off(self):
         self.close()
-        print("Scope conection closed")
+        # print("Scope conection closed")
         
 class Mock_Scope():
     """Mock Class wrapper for the scope

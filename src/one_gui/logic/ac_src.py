@@ -54,10 +54,10 @@ class AC_SRC:
         if ac_config["ac_check_abnormal"]:
             choice = ac_config["ac_menu_abnormal"]
             self.parent_instance.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq, waveform=self.AB_WAVEFORMS[choice])
-            print(f"AC parameters applied: Voltages = {ac_voltage_tuple}, Frequency = {ac_freq}, Waveform = {choice}")
+            # print(f"AC parameters applied: Voltages = {ac_voltage_tuple}, Frequency = {ac_freq}, Waveform = {choice}")
         else:
             self.parent_instance.set_steady_state(voltages=ac_voltage_tuple, frequency=ac_freq)
-            print(f"AC parameters applied: Voltages = {ac_voltage_tuple}, Frequency = {ac_freq}")
+            # print(f"AC parameters applied: Voltages = {ac_voltage_tuple}, Frequency = {ac_freq}")
         
     # callback to apply settings and turn on ac output
     def turn_on(self):    
@@ -72,7 +72,7 @@ class AC_SRC:
         b = self.rm.open_resource(self.parent_instance.resource_name)
         #vl.gpib_control_ren(b.session, visa.highlevel.constants.VI_GPIB_REN_DEASSERT)
         self.vl.gpib_control_ren(b.session, visa.highlevel.constants.VI_GPIB_REN_DEASSERT)
-        print("Manual control of AC source restored")
+        # print("Manual control of AC source restored")
         
 class Mock_AC_SRC:
     """Mock Class wrapper for the ac source

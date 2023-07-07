@@ -35,7 +35,7 @@ import_time = time.time()
 print(f"Import time: {import_time - start_time}")
 
 # TODO: Some serious commenting is needed
-# TODO: Improve logging
+# TODO: Improve logging in submodules
 
 RUN_EQUIPMENT = True
 

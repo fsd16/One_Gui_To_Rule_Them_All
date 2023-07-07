@@ -58,16 +58,16 @@ class SAS:
 
         self.parent_instance.select_table()
         self.parent_instance.select_table_mode()
-        print(f"SAS parameters applied: Pmp = {Pmp}, Vmp = {Vmp}, FF = {ff}, Irradiance = {irrad}")
+        # print(f"SAS parameters applied: Pmp = {Pmp}, Vmp = {Vmp}, FF = {ff}, Irradiance = {irrad}")
         return sas_data
 
     def turn_on(self):
         self.parent_instance.on()
-        print("SAS on")
+        # print("SAS on")
 
     def turn_off(self):
         self.parent_instance.off()
-        print("SAS off")
+        # print("SAS off")
         
 class Mock_SAS:
     """Class wrapper for the SAS

@@ -55,18 +55,18 @@ class RLC:
                                                                 ac_volts,
                                                                 ac_freq)
                                                                 
-        print(f"RLC parameters applied: Resistance = {r}, Inductance = {l}, Capacitance = {c}")
-        print(f'RLC configured Power: Real Power = {actual["actual_real_power"]}, Reactive Power = {actual["actual_reactive_power"]}')
+        # print(f"RLC parameters applied: Resistance = {r}, Inductance = {l}, Capacitance = {c}")
+        # print(f'RLC configured Power: Real Power = {actual["actual_real_power"]}, Reactive Power = {actual["actual_reactive_power"]}')
 
     def turn_on(self, rlc_config):
         self.on_power(rlc_config)
-        print("RLC on")
+        # print("RLC on")
 
     # callback to turn off rlc output
     def turn_off(self):
         # open interlock and shutdown master relay power supply
         self.parent_instance.enable_master_relay(False)
-        print("RLC off")
+        # print("RLC off")
         
     def close(self):
         self.parent_instance.close()
