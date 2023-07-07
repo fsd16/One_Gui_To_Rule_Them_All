@@ -1,3 +1,7 @@
+# Finn Drabsch
+# Enphase Energy
+# 2023
+
 from pathlib import Path
 from time import strftime, localtime, sleep
 from concurrent import futures

@@ -1,3 +1,7 @@
+# Finn Drabsch
+# Enphase Energy
+# 2023
+
 from typing import Dict, Any, TypeVar
 from pathlib import Path
 from serial.tools.list_ports import comports

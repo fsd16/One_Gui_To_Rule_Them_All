@@ -1,3 +1,7 @@
+# Finn Drabsch
+# Enphase Energy
+# 2023
+
 import numpy as np
 from enphase_equipment.solar_array_simulator.agilent import DcSupplyCluster
 from one_gui.logic.utils import import_class_from_string
@@ -12,10 +16,10 @@ class SAS:
                 sas_class = import_class_from_string(driver_path['SAS Drivers'])
                 clusters.append(sas_class(address))
             parent_class = import_class_from_string(driver_path['Cluster Driver'])
-            self.parent_instance = parent_class()
+            self.parent_instance = parent_class(clusters, config)
         else:
             parent_class = import_class_from_string(driver_path)
-            self.parent_instance = parent_class(config)
+            self.parent_instance = parent_class(addresses[0])
 
     def get_sas_pv(self):
 

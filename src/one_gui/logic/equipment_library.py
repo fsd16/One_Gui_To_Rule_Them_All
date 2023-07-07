@@ -1,3 +1,6 @@
+# Finn Drabsch
+# Enphase Energy
+# 2023
 class EquipmentDrivers:
     """Class to contain paths to all equipment drivers
     """

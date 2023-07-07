@@ -1,3 +1,7 @@
+# Finn Drabsch
+# Enphase Energy
+# 2023
+
 from math import sqrt
 from pathlib import Path
 from enphase_equipment.ac_source.interface import Waveform 

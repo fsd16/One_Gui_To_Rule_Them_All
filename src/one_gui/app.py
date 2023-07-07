@@ -1,3 +1,7 @@
+# Finn Drabsch
+# Enphase Energy
+# 2023
+
 import time
 start_time = time.time()
 
@@ -5,8 +9,6 @@ import sys
 import json
 import traceback
 import logging
-import re
-
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QErrorMessage, QSpinBox, QDoubleSpinBox, QLineEdit, QCheckBox, QRadioButton, QFileDialog, QProgressDialog
 from PySide6.QtCore import QTimer, Qt, QSize
@@ -33,9 +35,9 @@ import_time = time.time()
 print(f"Import time: {import_time - start_time}")
 
 # TODO: Some serious commenting is needed
-# TODO: Setup mock equipment. Use dummay class as path for equipment driver
+# TODO: Improve logging
 
-RUN_EQUIPMENT = False
+RUN_EQUIPMENT = True
 
 #--------------------------------------------------------
 #                   Loading Dialog                      #
@@ -348,9 +350,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                     except SerialException:
                         self.rlc.close()
                         self.rlc = RLC(self.l_config["rlc"]["rlc_menu_driver"]["item"], self.l_config["rlc"]["rlc_entry_address_r"], self.l_config["rlc"]["rlc_entry_address_p"])
-                    self.log.info("RLC configured")
                 else:
                     self.rlc = Mock_RLC()
+                self.log.info("RLC configured")
             else:
                 self.rlc_tab.setDisabled(True)
                 self.log.info("RLC not configured")
@@ -369,7 +371,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
                     self.sas = SAS(self.l_config["sas"]["sas_menu_driver"]["item"], sas_addresses, self.l_config["sas"]["sas_menu_config"]["item"])
                 else:
                     self.sas = Mock_SAS()
-                self.log.info(self.l_config["sas"]["sas_menu_config"])
                 self.log.info("SAS configured")
             else:
                 self.sas_tab.setDisabled(True)
@@ -384,17 +385,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         self.chamber = None
         try:
             if self.l_config["chamber"]["chamber_menu_driver"]["item"] != None:
-                if self.l_config["chamber"]["chamber_entry_address"] == 'enphase_equipment.thermal_chamber.watlow.WatlowF4':
-                    address = int(re.sub('\\D', '', self.l_config["chamber"]["chamber_entry_address"]))
-                else:
-                    address = self.l_config["chamber"]["chamber_entry_address"]
                 if RUN_EQUIPMENT:
                     try:
-                        self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
+                        self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], self.l_config["chamber"]["chamber_entry_address"])
                     except SerialException:
                         self.chamber.close()
-                        self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], address)
-                    self.log.info("Chamber configured")
+                        self.chamber = Chamber(self.l_config["chamber"]["chamber_menu_driver"]["item"], self.l_config["chamber"]["chamber_entry_address"])
                 else:
                     self.chamber = Mock_Chamber()
                 self.log.info("Chamber configured")
@@ -616,7 +612,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, SmartSignal):
         # save config
         dir_path = Path(__file__).resolve().parent
         with open(dir_path.joinpath("config", "local_config.json"), "w") as jsonfile:
-            json.dump(self.l_config, jsonfile)
+            json.dump(self.l_config, jsonfile, indent=4)
 
         self.log.info("Config saved")
 

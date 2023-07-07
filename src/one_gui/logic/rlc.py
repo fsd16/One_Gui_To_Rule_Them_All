@@ -1,3 +1,7 @@
+# Finn Drabsch
+# Enphase Energy
+# 2023
+
 from enphase_equipment.rlc_load.common import calculate_rlc_from_real_and_reactive_power
 from one_gui.logic.utils import import_class_from_string
 from time import sleep
@@ -5,9 +9,9 @@ from time import sleep
 class RLC:
     """Class wrapper for the RLC load
     """
-    def __init__(self, driver_path, address, *args, **kwargs):
+    def __init__(self, driver_path, address_r, address_p, *args, **kwargs):
         parent_class = import_class_from_string(driver_path)
-        self.parent_instance = parent_class(address)
+        self.parent_instance = parent_class(address_r, address_p)
         # self.__class__ = type(self.__class__.__name__,
         #                     (parent_class, object),
         #                     dict(self.__class__.__dict__))
