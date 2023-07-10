@@ -9,14 +9,10 @@ Run from the command line:
 
     one_gui
 <br />
-Alternatively, if you want to make your own changes you can clone the repository:
+Alternatively, if you want to make your own changes, clone the repository:
 
     git clone https://github.com/fsd16/One_Gui_To_Rule_Them_All.git
 
-Install dependecies:
+Install as an editable package:
 
-    pip install -r requirements.txt
-
-And run app.py
-
-    python src/one_gui/app.py
+    pip install --editable .
